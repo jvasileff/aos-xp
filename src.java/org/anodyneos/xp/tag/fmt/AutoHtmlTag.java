@@ -45,6 +45,7 @@ public class AutoHtmlTag extends XpTagSupport {
     protected static Attributes emptyAttributes = new AttributesImpl();
     protected class AutoHtmlParserSAX extends AutoHtmlParser {
 
+        // TODO: buffering was from DOM, we should output immediately.
         private StringBuffer sb;
         private ContentHandler ch;
         private AutoHtmlParserUrlGen urlGen;
