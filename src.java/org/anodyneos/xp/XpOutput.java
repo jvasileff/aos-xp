@@ -5,7 +5,7 @@ import org.xml.sax.SAXException;
 
 public final class XpOutput {
 
-    private XpContentHandler ch;
+    private final XpContentHandler ch;
 
     public XpOutput(XpContentHandler ch) {
         this.ch = ch;
