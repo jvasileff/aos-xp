@@ -75,6 +75,9 @@ public class XpClassLoader extends ClassLoader {
     }
 
     public static String getFileNameFromClassName(String root, String className){
+        if (!(root.endsWith("/") || root.endsWith("\\"))){
+            root += File.separator;
+        }
         String fileName = root + className.replace('.',File.separatorChar) + ".class";
         return fileName;
     }

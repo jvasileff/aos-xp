@@ -165,7 +165,11 @@ public class XpCachingLoader extends ClassLoader{
     }
 
     private String getClassFileName(String xpName){
-        return (getClassRoot() + TranslaterContext.DEFAULT_PACKAGE + "/" + xpName.replaceFirst("\\.xp",".class"));
+        String root = getClassRoot();
+        if (!(root.endsWith("/") || root.endsWith("\\"))){
+            root += File.separator;
+        }
+        return (root + TranslaterContext.DEFAULT_PACKAGE + "/" + xpName.replaceFirst("\\.xp",".class"));
     }
 
     private String getJavaFileName(String xpName){
@@ -173,7 +177,11 @@ public class XpCachingLoader extends ClassLoader{
         if (temp.startsWith("/")){
             temp = temp.substring(1,temp.length());
         }
-        return (getJavaRoot() + TranslaterContext.DEFAULT_PACKAGE + "/" + temp);
+        String root = getJavaRoot();
+        if (!(root.endsWith("/") || root.endsWith("\\"))){
+            root += File.separator;
+        }
+        return (root + TranslaterContext.DEFAULT_PACKAGE + "/" + temp);
     }
     private String getXpFileName(String xpName){
         return (getXpRoot() + xpName);
