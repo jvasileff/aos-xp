@@ -28,7 +28,6 @@ public class DebugTag extends XpTagSupport {
      */
     public DebugTag() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
     /* (non-Javadoc)
