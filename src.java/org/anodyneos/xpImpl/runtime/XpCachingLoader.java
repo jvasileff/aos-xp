@@ -8,12 +8,12 @@ import java.util.Map;
 
 import org.anodyneos.commons.net.URI;
 import org.anodyneos.commons.xml.UnifiedResolver;
+import org.anodyneos.xp.XpCompilationException;
+import org.anodyneos.xp.XpFileNotFoundException;
 import org.anodyneos.xp.XpPage;
+import org.anodyneos.xp.XpTranslationException;
 import org.anodyneos.xpImpl.compiler.JavaCompiler;
 import org.anodyneos.xpImpl.compiler.SunJavaCompiler;
-import org.anodyneos.xpImpl.runtime.exception.XpCompilationException;
-import org.anodyneos.xpImpl.runtime.exception.XpFileNotFoundException;
-import org.anodyneos.xpImpl.runtime.exception.XpTranslationException;
 import org.anodyneos.xpImpl.translater.Translater;
 import org.anodyneos.xpImpl.translater.TranslaterResult;
 
@@ -59,7 +59,7 @@ public class XpCachingLoader{
                 }
                 // is the xp file even there any longer ?
                 if (!Translater.xpExists(xpURI,getResolver())){
-                    throw new XpFileNotFoundException();
+                    throw new XpFileNotFoundException(xpURI.toString());
                 }
 
                 // does it still need reloading (we could have spent alot of time waiting for the lock) ?

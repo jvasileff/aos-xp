@@ -1,8 +1,8 @@
-package org.anodyneos.xpImpl.runtime.exception;
+package org.anodyneos.xp;
 
 import org.xml.sax.SAXParseException;
 
-public class XpTranslationException extends XpRuntimeException{
+public class XpTranslationException extends Exception{
     /**
      * Comment for <code>serialVersionUID</code>
      */
@@ -34,8 +34,6 @@ public class XpTranslationException extends XpRuntimeException{
             retVal.append(getColNumber());
             retVal.append("] ");
             setInternalMessage(retVal.toString());
-        } else {
-            setInternalMessage(rootCause.getMessage());
         }
     }
 

@@ -11,11 +11,11 @@ import org.anodyneos.commons.net.ClassLoaderURIHandler;
 import org.anodyneos.commons.net.URI;
 import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.commons.xml.sax.BaseParser;
+import org.anodyneos.xp.XpException;
+import org.anodyneos.xp.XpFileNotFoundException;
+import org.anodyneos.xp.XpTranslationException;
 import org.anodyneos.xp.tagext.TagLibraryRegistry;
 import org.anodyneos.xpImpl.registry.RegistryParser;
-import org.anodyneos.xpImpl.runtime.exception.XpFileNotFoundException;
-import org.anodyneos.xpImpl.runtime.exception.XpRuntimeException;
-import org.anodyneos.xpImpl.runtime.exception.XpTranslationException;
 import org.anodyneos.xpImpl.util.CodeWriter;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -131,7 +131,7 @@ public class Translater extends BaseParser {
         try{
             InputSource xpSource = resolver.resolveEntity(null,xpURI.toString());
             if (xpSource == null){
-                throw new XpFileNotFoundException();
+                throw new XpTranslationException("File Not Found: " + xpURI.toString());
             }
             String javaFile = getJavaFile(tempRoot, xpURI);
 
@@ -192,7 +192,7 @@ public class Translater extends BaseParser {
      * @return
      */
     public static boolean xpNeedsTranslating(URI xpURI, String tempRoot, UnifiedResolver resolver)
-    throws XpRuntimeException{
+    throws XpException{
 
         File javaFile = new File(getJavaFile(tempRoot,xpURI));
         if (javaFile.exists()){
@@ -212,7 +212,7 @@ public class Translater extends BaseParser {
      * @return
      */
     public static boolean xpNeedsCompiling(URI xpURI, String tempRoot, UnifiedResolver resolver)
-        throws XpRuntimeException{
+        throws XpException{
 
         File javaFile = new File(getClassFile(tempRoot,xpURI));
         if (javaFile.exists()){
@@ -242,7 +242,7 @@ public class Translater extends BaseParser {
             }
 
         }catch (IOException ioe){
-            throw new XpFileNotFoundException(ioe);
+            throw new XpFileNotFoundException(xpURI.toString());
         }
     }
 
