@@ -122,8 +122,8 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  runSample
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <target name="runSample" depends="compileSample" description="Run src.sample/Page.xp">
-        <java taskname="runSample" fork="yes" classname="Page">
+    <target name="runSample" depends="compileSample" description="Run src.sample/xp/Page.xp">
+        <java taskname="runSample" fork="yes" classname="xp.Page">
             <classpath refid="path.compile"/>
             <classpath location="${dir.build.classes}"/>
             <classpath location="${dir.build.classes.sample}"/>
