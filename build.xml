@@ -49,6 +49,8 @@
     <property name="xalan.jar" location="${dir.jars}/xalan-2.6.2/xalan.jar"/>
     <property name="xercesImpl.jar" location="${dir.jars}/xerces-2.6.0/xercesImpl.jar"/>
 
+    <property name="commons-logging.jar" location="${dir.jars}/commons-logging-1.0.3/commons-logging.jar"/>
+
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  prepare.post
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -71,6 +73,8 @@
         <copy toDir="${dir.build.ide.lib}" file="${xml-apis.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${xalan.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${xercesImpl.jar}"/>
+
+        <copy toDir="${dir.build.ide.lib}" file="${commons-logging.jar}"/>
 
         <!-- paths -->
         <path id="path.compile">

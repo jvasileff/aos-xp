@@ -16,8 +16,13 @@ import org.anodyneos.xpImpl.compiler.JavaCompiler;
 import org.anodyneos.xpImpl.compiler.SunJavaCompiler;
 import org.anodyneos.xpImpl.translater.Translater;
 import org.anodyneos.xpImpl.translater.TranslaterResult;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class XpCachingLoader{
+
+    private static final Log logger = LogFactory.getLog(XpCachingLoader.class);
+
     public static final long NEVER_LOADED = -1;
     private ClassLoader parentLoader;
     private String classPath;
@@ -66,7 +71,10 @@ public class XpCachingLoader{
                 // does it still need reloading (we could have spent alot of time waiting for the lock) ?
                 if ((xpPage == null )
                         || (xpPage != null && xpNeedsReloading(xpURI, loadTime, xpPage.getClass().getClassLoader()))){
-                    System.out.println(xpURI.toString() + " needs reloading");
+
+                    if (logger.isInfoEnabled()) {
+                        logger.info(xpURI.toString() + " needs reloading");
+                    }
                     translateXp(xpURI);
                     compileXp(xpURI);
                     xpCache.remove(xpURI.toString());
@@ -115,9 +123,10 @@ public class XpCachingLoader{
 
                 }catch (Exception e){
                     // something happened
-                    System.out.println("Unable to inspect children of "
-                            + xpURI.toString() + " to see if they would cause a reload.");
-                    e.printStackTrace();
+                    if(logger.isErrorEnabled()) {
+                        logger.error("Unable to inspect children of "
+                                + xpURI.toString() + " to see if they would cause a reload.", e);
+                    }
                     return true;
                 }
             }
@@ -131,7 +140,9 @@ public class XpCachingLoader{
 
 
     private void compileXp(URI xpURI) {
-        System.out.println("Compiling " + xpURI.toString());
+        if(logger.isInfoEnabled()) {
+            logger.info("Compiling " + xpURI.toString());
+        }
 
         JavaCompiler compiler = new SunJavaCompiler(getClassPath(),getClassRoot());
 
@@ -140,7 +151,9 @@ public class XpCachingLoader{
     }
 
     private void translateXp(URI xpURI) throws IllegalStateException, XpTranslationException,XpFileNotFoundException{
-        System.out.println("Translating " + xpURI.toString());
+        if(logger.isInfoEnabled()) {
+            logger.info("Translating " + xpURI.toString());
+        }
 
         if (getResolver() == null){
             throw new IllegalStateException("XpCachingLoader requires resolver to be set.");
