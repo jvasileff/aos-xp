@@ -33,7 +33,7 @@ public class Xpc {
         XpFile[] xpFiles = getXpFiles(new File(args[0]));
 
         // DOIT
-        xpCompiler.compile(xpcCtx, xpFiles);
+        xpCompiler.compile(xpcCtx, xpFiles, resolver);
     }
 
     public static XpFile[] getXpFiles(File xpRootDir) throws Exception {

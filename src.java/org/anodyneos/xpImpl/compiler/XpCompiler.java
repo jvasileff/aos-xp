@@ -9,11 +9,12 @@ import java.util.ArrayList;
 
 import org.anodyneos.xpImpl.translater.Translater;
 import org.anodyneos.xpImpl.translater.TranslaterResult;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
 public class XpCompiler {
 
-    public void compile(XpCompilerContext xpcCtx, XpFile[] xpFiles) throws Exception {
+    public void compile(XpCompilerContext xpcCtx, XpFile[] xpFiles, EntityResolver er) throws Exception {
         Translater translater = new Translater();
         ArrayList javaFiles = new ArrayList();
 
@@ -29,7 +30,8 @@ public class XpCompiler {
             // does not return null.)
             File tmpFile = File.createTempFile("xpc.", ".tmp", xpcCtx.getJavaDirectory());
             OutputStream os = new FileOutputStream(tmpFile);
-            TranslaterResult tr = translater.process(inputSource, os, xpcCtx.getTagLibraryRegistry(), xpFiles[i].getFullClassName());
+            TranslaterResult tr = translater.process(inputSource, os, xpcCtx.getTagLibraryRegistry(),
+                    xpFiles[i].getFullClassName(),er);
             is.close();
             os.close();
 
