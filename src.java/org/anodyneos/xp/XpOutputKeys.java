@@ -43,4 +43,6 @@ public class XpOutputKeys {
      */
     public static final String XSLT_URI = "xsltURI";
 
+    public static final String EXCLUDE_RESULT_PREFIXES = "excludeResultPrefixes";
+
 }

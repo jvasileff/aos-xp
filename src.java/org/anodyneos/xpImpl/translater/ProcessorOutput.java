@@ -41,7 +41,7 @@ public class ProcessorOutput extends TranslaterProcessor {
         }
     }
 
-    public Properties getProperties() {
-        return props;
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+        getTranslaterContext().setOutputProperties(props);
     }
 }

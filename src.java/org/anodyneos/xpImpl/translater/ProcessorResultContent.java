@@ -85,9 +85,7 @@ public class ProcessorResultContent extends TranslaterProcessor {
             out.printIndent().println(
                   "xpCH.addAttribute("
                 +        Util.escapeStringQuoted(attributes.getURI(i))
-                + ", " + Util.escapeStringQuoted(attributes.getLocalName(i))
                 + ", " + Util.escapeStringQuoted(attributes.getQName(i))
-                + ", " + Util.escapeStringQuoted(attributes.getType(i))
                 + ", " + codeValue
                 + ");"
             );

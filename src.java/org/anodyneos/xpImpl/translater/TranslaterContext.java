@@ -4,6 +4,7 @@ import java.io.StringWriter;
 import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.Stack;
 
 import org.anodyneos.commons.xml.sax.BaseContext;
@@ -22,6 +23,7 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
     private ArrayList fragments = new ArrayList();
     private int tagVariableCounter = 0;
     private int savedXPCHVariableCounter = 0;
+    private Properties outputProperties;
 
     // A list of files on which this current file depends
     private List dependents = new ArrayList();
@@ -134,4 +136,11 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
         return Collections.unmodifiableList(dependents);
     }
 
+    public Properties getOutputProperties() {
+        return outputProperties;
+    }
+
+    public void setOutputProperties(Properties outputProperties) {
+        this.outputProperties = outputProperties;
+    }
 }

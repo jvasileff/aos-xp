@@ -102,9 +102,9 @@ class ProcessorAttribute extends TranslaterProcessor {
                 codeValue = Util.escapeStringQuotedEL(value);
             }
             out.printIndent().println(
-                  "xpCH.addManagedAttribute("
-                +       Util.escapeStringQuoted(attName)
-                + "," + Util.escapeStringQuoted(attURI)
+                  "xpCH.addAttribute("
+                +       codeURI
+                + "," + codeName
                 + "," + codeValue
                 + ");"
             );
@@ -149,19 +149,18 @@ class ProcessorAttribute extends TranslaterProcessor {
                 codeValue = Util.escapeStringQuoted("");
             }
             out.printIndent().println(
-                  "xpCH.addManagedAttribute("
-                +       codeName
-                + "," + codeURI
+                  "xpCH.addAttribute("
+                +       codeURI
+                + "," + codeName
                 + "," + codeValue
                 + ");"
             );
         } else {
-            //addManagedAttribute(String name, String namespaceURI, String value)
             processorResultContent.flushCharacters();
             out.printIndent().println(
-                  savedXPCHVariable + ".addManagedAttribute("
-                +       codeName
-                + "," + codeURI
+                  savedXPCHVariable + ".addAttribute("
+                +       codeURI
+                + "," + codeName
                 + ", ((org.anodyneos.xp.util.TextContentHandler) xpCH.getWrappedContentHandler()).getText()"
                 + ");"
             );

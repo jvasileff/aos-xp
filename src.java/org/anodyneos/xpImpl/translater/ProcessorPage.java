@@ -123,11 +123,11 @@ class ProcessorPage extends TranslaterProcessor {
         // output properties
         out.printIndent().println("private void initOutputProperties() {");
         out.indentPlus();
-        if (null != outputProcessor) {
-            Enumeration keys = outputProcessor.getProperties().keys();
+        if (null != getTranslaterContext().getOutputProperties()) {
+            Enumeration keys = getTranslaterContext().getOutputProperties().keys();
             while (keys.hasMoreElements()) {
                 String key = (String) keys.nextElement();
-                String value = (String) outputProcessor.getProperties().get(key);
+                String value = (String) outputProcessor.getTranslaterContext().getOutputProperties().get(key);
                 out.printIndent().println(
                           "outputProperties.setProperty("
                         + Util.escapeStringQuoted(key)
