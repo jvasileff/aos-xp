@@ -3,7 +3,6 @@ package org.anodyneos.xpImpl.translater;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLConnection;
 import java.util.List;
@@ -14,9 +13,13 @@ import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.commons.xml.sax.BaseParser;
 import org.anodyneos.xp.tagext.TagLibraryRegistry;
 import org.anodyneos.xpImpl.registry.RegistryParser;
+import org.anodyneos.xpImpl.runtime.exception.XpFileNotFoundException;
+import org.anodyneos.xpImpl.runtime.exception.XpRuntimeException;
+import org.anodyneos.xpImpl.runtime.exception.XpTranslationException;
 import org.anodyneos.xpImpl.util.CodeWriter;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 public class Translater extends BaseParser {
@@ -104,51 +107,67 @@ public class Translater extends BaseParser {
      * @return TranslaterResult
      * @throws Exception
      */
-    public static TranslaterResult translate(String tempRoot,
-            URI xpURI, String registryFile, UnifiedResolver resolver) throws Exception{
+    public static TranslaterResult translate(String tempRoot, URI xpURI, String registryFile, UnifiedResolver resolver)
+    throws XpFileNotFoundException,XpTranslationException{
         Translater obj = new Translater();
+        try{
+            InputSource is = resolver.resolveEntity(null,registryFile);
+            TagLibraryRegistry registry = new RegistryParser().process(is, resolver);
 
-        InputSource is = resolver.resolveEntity(null,registryFile);
-        TagLibraryRegistry registry = new RegistryParser().process(is, resolver);
+            return obj.translate(tempRoot,xpURI,registry,resolver);
 
-        return obj.translate(tempRoot,xpURI,registry,resolver);
+        }catch(XpFileNotFoundException fnf){
+            throw fnf;
+        }catch(XpTranslationException te){
+            throw te;
+        }catch (Exception e){
+            throw new XpTranslationException(e);
+        }
     }
 
-    public TranslaterResult translate(String tempRoot,
-            URI xpURI, TagLibraryRegistry registry, UnifiedResolver resolver) throws Exception{
+    public TranslaterResult translate(String tempRoot, URI xpURI, TagLibraryRegistry registry, UnifiedResolver resolver)
+    throws XpFileNotFoundException, XpTranslationException{
 
+        try{
+            InputSource xpSource = resolver.resolveEntity(null,xpURI.toString());
+            if (xpSource == null){
+                throw new XpFileNotFoundException();
+            }
+            String javaFile = getJavaFile(tempRoot, xpURI);
 
-        String className = getClassName(xpURI); // i.e. xp.WEB_INF.common.header
+            String className = getClassName(xpURI); // i.e. xp.WEB_INF.common.header
 
-        InputSource xpSource = resolver.resolveEntity(null,xpURI.toString());
-        String javaFile = getJavaFile(tempRoot, xpURI);
+            OutputStream os;
+            if (createDir(javaFile)){
+                os = new FileOutputStream(javaFile);
+            }else{
+                throw new XpTranslationException("Unable to create file: " + javaFile +
+                        " because the directory structure could not be created.");
+            }
 
-        OutputStream os;
-        if (createDir(javaFile)){
-            os = new FileOutputStream(javaFile);
-        }else{
-            throw new Exception("Unable to create file: " + javaFile +
-                    " because the directory structure could not be created.");
+            TranslaterResult result = process(xpSource, os, registry, className, resolver);
+            os.close();
+
+            // now translate the dependents (There is no check to see if they are out of date)
+            // this is necessary in order to obtain the dependent list
+            List dependents = result.getDependents();
+            for (int i=0; i<dependents.size();i++){
+                String dependent = (String)dependents.get(i);
+                URI uriDep = new URI(dependent);
+                translate(tempRoot,uriDep,registry,resolver);
+            }
+
+            return result;
+        }catch (IOException ioe){
+            throw new XpTranslationException(ioe);
+        }catch (SAXException se){
+            throw new XpTranslationException(se);
         }
-
-        TranslaterResult result = process(xpSource, os, registry, className, resolver);
-        os.close();
-
-        // now translate the dependents (There is no check to see if they are out of date)
-        // this is necessary in order to obtain the dependent list
-        List dependents = result.getDependents();
-        for (int i=0; i<dependents.size();i++){
-            String dependent = (String)dependents.get(i);
-            URI uriDep = new URI(dependent);
-            translate(tempRoot,uriDep,registry,resolver);
-        }
-
-        return result;
     }
 
 
     public TranslaterResult process(InputSource is, OutputStream os, TagLibraryRegistry taglibRegistry,
-            String fullClassName, EntityResolver er) throws Exception {
+            String fullClassName, EntityResolver er) throws SAXException, IOException {
         CodeWriter out = new CodeWriter(os);
         TranslaterContext ctx = new TranslaterContext(is, out, taglibRegistry);
         ctx.setFullClassName(fullClassName);
@@ -166,7 +185,8 @@ public class Translater extends BaseParser {
      * @param resolver
      * @return
      */
-    public static boolean xpNeedsTranslating(URI xpURI, String tempRoot, UnifiedResolver resolver){
+    public static boolean xpNeedsTranslating(URI xpURI, String tempRoot, UnifiedResolver resolver)
+    throws XpRuntimeException{
 
         File javaFile = new File(getJavaFile(tempRoot,xpURI));
         if (javaFile.exists()){
@@ -185,25 +205,25 @@ public class Translater extends BaseParser {
      * @param resolver
      * @return
      */
-    public static boolean xpNeedsCompiling(URI xpURI, String tempRoot, UnifiedResolver resolver){
+    public static boolean xpNeedsCompiling(URI xpURI, String tempRoot, UnifiedResolver resolver)
+        throws XpRuntimeException{
 
         File javaFile = new File(getClassFile(tempRoot,xpURI));
         if (javaFile.exists()){
-            return xpIsOutOfDate(xpURI,tempRoot,resolver,javaFile.lastModified());
+                return xpIsOutOfDate(xpURI,tempRoot,resolver,javaFile.lastModified());
         }else{
             // the java file does not exist, so the xp needs translating
             return true;
         }
     }
 
-    public static boolean xpIsOutOfDate(URI xpURI, String tempRoot, UnifiedResolver resolver, long loadTime){
+    public static boolean xpIsOutOfDate(URI xpURI, String tempRoot, UnifiedResolver resolver, long loadTime)
+        throws XpFileNotFoundException{
 
-        InputStream is = null;
         try{
             URLConnection conn = resolver.openConnection(xpURI);
-            try{
-                is = conn.getInputStream();
-            }catch (NullPointerException npe){
+            if (conn == null){
+                System.out.println(xpURI.toString() + " does not exist");
                 throw new IOException(xpURI.toString() + " does not exist.");
             }
             long xpLastModified = conn.getLastModified();
@@ -216,13 +236,23 @@ public class Translater extends BaseParser {
             }
 
         }catch (IOException ioe){
-            System.out.println("[ERROR]Unable to load xp file " + xpURI.toString() +
-                    " to see if it is out of date. " + ioe.getMessage());
-            return true;
-        } finally {
-            try { if(is != null) is.close(); } catch (Exception e) { }
+            throw new XpFileNotFoundException(ioe);
         }
+    }
 
+    public static boolean xpExists(URI xpURI, UnifiedResolver resolver){
+        try{
+            URLConnection conn = resolver.openConnection(xpURI);
+            if (conn == null){
+                System.out.println(xpURI.toString() + " does not exist");
+                return false;
+            }else{
+                return true;
+            }
+
+        }catch (IOException ioe){
+            return false;
+        }
     }
 
 

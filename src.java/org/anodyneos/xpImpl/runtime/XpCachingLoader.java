@@ -11,6 +11,9 @@ import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.xp.XpPage;
 import org.anodyneos.xpImpl.compiler.JavaCompiler;
 import org.anodyneos.xpImpl.compiler.SunJavaCompiler;
+import org.anodyneos.xpImpl.runtime.exception.XpCompilationException;
+import org.anodyneos.xpImpl.runtime.exception.XpFileNotFoundException;
+import org.anodyneos.xpImpl.runtime.exception.XpTranslationException;
 import org.anodyneos.xpImpl.translater.Translater;
 import org.anodyneos.xpImpl.translater.TranslaterResult;
 
@@ -33,40 +36,62 @@ public class XpCachingLoader{
         return me;
     }
 
-    public XpPage getXpPage(URI xpURI){
+    public XpPage getXpPage(URI xpURI) throws XpFileNotFoundException, XpTranslationException, XpCompilationException{
+
+        XpPage xpPage = (XpPage)xpCache.get(xpURI.toString());
+        long loadTime = NEVER_LOADED;
+        if (xpPage != null ){
+            loadTime = xpPage.getLoadTime();
+        }
+
+        // if the page hasn't been loaded before or it's out of date,
+        // make sure we have exclusive access to the cache
+        // then check again to be more certain that nobody has reloaded it since we last checked
+        if ((xpPage == null )
+                || (xpPage != null && xpNeedsReloading(xpURI, loadTime, xpPage.getClass().getClassLoader()))){
+
+            synchronized(this){
+
+                xpPage = (XpPage)xpCache.get(xpURI.toString());
+                loadTime = NEVER_LOADED;
+                if (xpPage != null ){
+                    loadTime = xpPage.getLoadTime();
+                }
+                // is the xp file even there any longer ?
+                if (!Translater.xpExists(xpURI,getResolver())){
+                    throw new XpFileNotFoundException();
+                }
+
+                // does it still need reloading (we could have spent alot of time waiting for the lock) ?
+                if ((xpPage == null )
+                        || (xpPage != null && xpNeedsReloading(xpURI, loadTime, xpPage.getClass().getClassLoader()))){
+                    System.out.println(xpURI.toString() + " needs reloading");
+                    translateXp(xpURI);
+                    compileXp(xpURI);
+                    xpCache.remove(xpURI.toString());
+                    xpPage = loadPage(xpURI);
+                    xpCache.put(xpURI.toString(),xpPage);
+                }
+            }
+        }
+
+        return xpPage;
+
+
+    }
+
+    private XpPage loadPage(URI xpURI) throws XpCompilationException{
         try{
-
-            XpPage xpPage = (XpPage)xpCache.get(xpURI.toString());
-            long loadTime = NEVER_LOADED;
-            if (xpPage != null ){
-                loadTime = xpPage.getLoadTime();
-            }
-
-            if ((xpPage == null )
-                    || (xpPage != null && xpNeedsReloading(xpURI, loadTime, xpPage.getClass().getClassLoader()))){
-                translateXp(xpURI);
-                compileXp(xpURI);
-                xpCache.remove(xpURI.toString());
-                xpPage = loadPage(xpURI);
-                xpCache.put(xpURI.toString(),xpPage);
-            }
-
-            return xpPage;
-
+            XpClassLoader loader = new XpClassLoader(parentLoader);
+            loader.setRoot(getClassRoot());
+            Class cls = loader.loadClass(Translater.getClassName(xpURI));
+            return (XpPage)cls.newInstance();
         }catch(Exception e){
-            e.printStackTrace();
-            return null;
+            throw new XpCompilationException(e);
         }
     }
 
-    private XpPage loadPage(URI xpURI) throws Exception {
-        XpClassLoader loader = new XpClassLoader(parentLoader);
-        loader.setRoot(getClassRoot());
-        Class cls = loader.loadClass(Translater.getClassName(xpURI));
-        return (XpPage)cls.newInstance();
-    }
-
-    private boolean xpNeedsReloading(URI xpURI, long loadTime, ClassLoader loader){
+    private boolean xpNeedsReloading(URI xpURI, long loadTime, ClassLoader loader) throws XpFileNotFoundException{
         if (Translater.xpIsOutOfDate(xpURI,getClassRoot(),getResolver(),loadTime)) {
             return true;
         } else {
@@ -100,7 +125,7 @@ public class XpCachingLoader{
     }
 
 
-    private void compileXp(URI xpURI) throws Exception {
+    private void compileXp(URI xpURI) {
         System.out.println("Compiling " + xpURI.toString());
 
         JavaCompiler compiler = new SunJavaCompiler(getClassPath(),getClassRoot());
@@ -109,15 +134,14 @@ public class XpCachingLoader{
         compiler.compile(Translater.getJavaFile(getJavaRoot(),xpURI),System.err);
     }
 
-    private void translateXp(URI xpURI) throws Exception{
+    private void translateXp(URI xpURI) throws IllegalStateException, XpTranslationException,XpFileNotFoundException{
         System.out.println("Translating " + xpURI.toString());
+
         if (getResolver() == null){
             throw new IllegalStateException("XpCachingLoader requires resolver to be set.");
         }
-
         TranslaterResult result = Translater.translate(getJavaRoot(), xpURI, getXpRegistry(),resolver);
     }
-
     public String getClassRoot() {
         return classRoot;
     }
