@@ -1,10 +1,10 @@
 package org.anodyneos.xp;
 
+import java.util.Properties;
+
 import javax.servlet.jsp.el.ELException;
 
 import org.xml.sax.SAXException;
-import java.util.List;
-import java.util.Properties;
 
 public interface XpPage {
 
