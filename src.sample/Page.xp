@@ -26,7 +26,7 @@
     <xp:content>
         <c:newBean var="date" class="java.util.Date"/>
         <c:set var="start" value="${date.time}"/>
-        <c:set var="end" scope="global" value="${date.time}"/>
+        <c:set var="end" scope="application" value="${date.time}"/>
         <html testatt1="tatatt1val">
             <xp:attribute name="testatt2" value="testattval"/>
             <head/>

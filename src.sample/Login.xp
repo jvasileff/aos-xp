@@ -7,65 +7,39 @@
     xmlns:c="http://www.anodyneos.org/xmlns/xp/standard"
 >
     <xp:content>
-        <c:newBean var="date" class="java.util.Date"/>
-        <c:set var="start" value="${date.time}"/>
-        <c:set var="end" scope="global" value="${date.time}"/>
+
         <html>
-            <head><title>Login Page</title></head>
-            <c:set var="myvar" value="${1+2}"/>
-            <c:set var="i" value="${18}"/>
-            <body class="${1+1}">
-                <p>
-                    \${myvar}: ${myvar}
-                    \${1+1}: ${1+1}
-                </p>
-                <c:forEach begin="0" end="10" step="2" var="i">
-                    <h1>${i}</h1>
-                </c:forEach>
-                <h1>${i}</h1>
-                <c:if test="${false}" var="result">
-                    WOOPS
-                </c:if>
-                ${result}
-                <c:if test="${true}" var="result">
-                    Good
-                    <c:if test="${true}" var="result">
-                        Good
-                    </c:if>
-                    <c:if test="${false}" var="result">
-                        WOOPS
-                    </c:if>
-                </c:if>
-                <nobr>${result}</nobr>
-                <pre>
-                    <c:choose>
-                        <c:when test="false">first</c:when>
-                        <c:when test="false">second</c:when>
-                        <c:when test="false">third</c:when>
-                        <c:when test="false">fourth</c:when>
-                        <c:when test="false">fifth</c:when>
-                        <c:otherwise>_otherwise_</c:otherwise>
-                    </c:choose>
-                </pre>
-                <c:debug>
-                    <c:newBean var="date" class="java.util.Date"/>
-                    <c:set var="end" value="${date.time}"/>
-                    <pre>${date}</pre>
-                    <pre>${date.time}</pre>
-                    <pre>\${(end - start)/1000} seconds</pre>
-                </c:debug>
-                <pre>${(end - start)/1000} seconds</pre>
-                <pre>${(pageScope.end - start)/1000} seconds</pre>
-                <pre>${end}</pre>
-                <pre>${globalScope.end}</pre>
-                <c:newBean var="cal" class="java.util.GregorianCalendar"/>
-                <c:set value="0" target="${cal}" property="timeInMillis"/>
-                <pre>${cal.time}</pre>
-                <c:set value="${end}" target="${cal}" property="timeInMillis"/>
-                <pre>${cal.time}</pre>
-                <c:set value="${1000.00}" var="testvar"/>
-                <pre>${testvar}</pre>
+            <head>
+                <title> Login </title>                
+            </head>        
+            <body>
+                <table class="body">
+                    <tr>
+                        <td class="bodyMain">                                
+                            <form method="post" action="login.html">
+                                <table class="formatted">
+                                    <tr>
+                                        <th class="title" colspan="2">
+                                            <div style="float:left">
+                                            </div>
+                                        </th>
+                                    </tr>                            
+                                    <tr><td class="bodyMain">Account:</td><td><input id="acctCode" name="acctCode" value="ADMIN"/></td></tr>
+                                    <tr><td class="bodyMain">User Name:</td><td><input name="usrName" value="ADMIN"/></td></tr> 
+                                    <tr><td class="bodyMain">Password:</td><td><input type="password" name="password" value="password"/></td></tr>                            
+                                </table>                        
+                                <br/>
+                                <input type="submit" value="Log In"/>
+                            </form>                    
+                            <script language="javascript"><!--
+                            document.forms[0].elements[0].focus();
+                            //--></script>                    
+                        </td>
+                    </tr>
+                </table>
             </body>
         </html>
+
+        
     </xp:content>
 </xp:page>
