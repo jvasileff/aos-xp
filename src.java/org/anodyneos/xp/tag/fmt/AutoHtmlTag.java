@@ -3,7 +3,6 @@ package org.anodyneos.xp.tag.fmt;
 import java.io.InputStream;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 
 import javax.servlet.jsp.el.ELException;
 
@@ -13,11 +12,16 @@ import org.anodyneos.servlet.xsl.xalan.AutoHtmlParserUrlGenDefault;
 import org.anodyneos.servlet.xsl.xalan.ParseException;
 import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpException;
+import org.anodyneos.xp.XpOutput;
 import org.anodyneos.xp.tagext.XpTagSupport;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 public class AutoHtmlTag extends XpTagSupport {
+
+    private static final Log logger = LogFactory.getLog(AutoHtmlTag.class);
 
     private String text;
 
@@ -26,7 +30,7 @@ public class AutoHtmlTag extends XpTagSupport {
         if (null == text) {
             text = getXpBody().invokeToString();
         }
-        AutoHtmlParserSAX ahps = new AutoHtmlParserSAX(new java.io.StringReader(text), out);
+        AutoHtmlParserXp ahps = new AutoHtmlParserXp(new java.io.StringReader(text), new XpOutput(out));
         try {
             ahps.process();
         } catch (Exception e) {
@@ -43,21 +47,21 @@ public class AutoHtmlTag extends XpTagSupport {
 
     protected static AutoHtmlParserUrlGen urlGenDefault = new AutoHtmlParserUrlGenDefault();
     protected static Attributes emptyAttributes = new AttributesImpl();
-    protected class AutoHtmlParserSAX extends AutoHtmlParser {
+    protected class AutoHtmlParserXp extends AutoHtmlParser {
 
         // TODO: buffering was from DOM, we should output immediately.
         private StringBuffer sb;
-        private ContentHandler ch;
+        private XpOutput out;
         private AutoHtmlParserUrlGen urlGen;
 
-        protected AutoHtmlParserSAX(InputStream stream, ContentHandler ch) {
+        protected AutoHtmlParserXp(InputStream stream, XpOutput out) {
             super(stream);
-            this.ch = ch;
+            this.out = out;
         }
 
-        protected AutoHtmlParserSAX(java.io.Reader stream, ContentHandler ch) {
+        protected AutoHtmlParserXp(java.io.Reader stream, XpOutput out) {
             super(stream);
-            this.ch = ch;
+            this.out = out;
         }
 
         protected void process() throws ParseException {
@@ -98,10 +102,11 @@ public class AutoHtmlTag extends XpTagSupport {
             // Write contents of sb to node.
             try {
                 if (null != sb) {
-                    ch.characters(sb.toString().toCharArray(), 0, sb.length());
+                    out.characters(sb.toString().toCharArray(), 0, sb.length());
                     sb.setLength(0);
                 }
             } catch (SAXException e) {
+                logger.error("FIXME: Thrown away SAXException.", e);
                 // FIXME: should not throw away exception
             }
         }
@@ -110,18 +115,14 @@ public class AutoHtmlTag extends XpTagSupport {
             // first, write out cached text to node
             flushText();
 
-            // href attribute
-            AttributesImpl atts = new AttributesImpl();
-            atts.addAttribute("", "href", "href", "CDATA", href);
-
             try {
                 // "a" element
-                ch.startPrefixMapping("", "http://www.w3.org/1999/xhtml");
-                ch.startElement("http://www.w3.org/1999/xhtml", "a", "a", atts);
-                ch.characters(display.toCharArray(), 0, display.length());
-                ch.endElement("http://www.w3.org/1999/xhtml", "a", "a");
-                ch.endPrefixMapping("");
+                out.startElement("http://www.w3.org/1999/xhtml", "xhtml:a");
+                out.addAttribute("", "href", href);
+                out.characters(display.toCharArray(), 0, display.length());
+                out.endElement("http://www.w3.org/1999/xhtml", "xhtml:a");
             } catch (SAXException e) {
+                logger.error("FIXME: Thrown away SAXException.", e);
                 // FIXME: should not throw away exception
             }
         }
@@ -130,11 +131,10 @@ public class AutoHtmlTag extends XpTagSupport {
             flushText();
             try {
                 // "br" element
-                ch.startPrefixMapping("", "http://www.w3.org/1999/xhtml");
-                ch.startElement("http://www.w3.org/1999/xhtml", "br", "br", emptyAttributes);
-                ch.endElement("http://www.w3.org/1999/xhtml", "br", "br");
-                ch.endPrefixMapping("");
+                out.startElement("http://www.w3.org/1999/xhtml", "xhtml:br");
+                out.endElement("http://www.w3.org/1999/xhtml", "xhtml:br");
             } catch (SAXException e) {
+                logger.error("FIXME: Thrown away SAXException.", e);
                 // FIXME: should not throw away exception
             }
         }
@@ -146,5 +146,5 @@ public class AutoHtmlTag extends XpTagSupport {
         public void setUrlGen(AutoHtmlParserUrlGen urlGen) {
             this.urlGen = urlGen;
         }
-}
+    }
 }
