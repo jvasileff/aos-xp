@@ -305,5 +305,13 @@
             <type>java.lang.String</type>
         </attribute>
     </tag>
+    
+    <tag>
+        <description>
+            Logs content handler actions to System.err.
+        </description>
+        <name>debug</name>
+        <tag-class>org.anodyneos.xp.standard.DebugTag</tag-class>
+    </tag>
 
 </taglib>

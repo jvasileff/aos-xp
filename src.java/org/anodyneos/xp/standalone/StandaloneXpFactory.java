@@ -37,7 +37,7 @@ public abstract class StandaloneXpFactory {
         }
     }
 
-    public abstract StandaloneXpContext getStandaloneXpContext(org.xml.sax.ContentHandler ch);
+    public abstract StandaloneXpContext getStandaloneXpContext();
     public abstract void releaseStandaloneXpContext(StandaloneXpContext xpContext);
 
 }

@@ -1,6 +1,5 @@
 package org.anodyneos.xpImpl.standalone;
 
-import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.standalone.StandaloneXpContext;
 import org.anodyneos.xp.standalone.StandaloneXpFactory;
 
@@ -12,9 +11,9 @@ public class StandaloneXpFactoryImpl extends StandaloneXpFactory {
         // super();
     }
 
-    public StandaloneXpContext getStandaloneXpContext(org.xml.sax.ContentHandler ch) {
+    public StandaloneXpContext getStandaloneXpContext() {
         StandaloneXpContext xpCtx = new StandaloneXpContextImpl();
-        xpCtx.initialize(new XpContentHandler(ch));
+        xpCtx.initialize();
         return xpCtx;
     }
 

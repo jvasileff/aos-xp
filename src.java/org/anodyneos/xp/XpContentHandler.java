@@ -14,7 +14,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *
  *  @author John Vasileff
  */
-public final class XpContentHandler {
+public final class XpContentHandler implements ContentHandler {
     private boolean haveNextElement = false;
     private String nextElNamespaceURI;
     private String nextElLocalName;
@@ -140,4 +140,20 @@ public final class XpContentHandler {
             characters(x.toString());
         }
     }
+
+    /**
+     * @see org.xml.sax.ContentHandler#endDocument()
+     */
+    public void endDocument() throws SAXException {
+        // TODO should calls to this method be ignored?
+
+    }
+
+    /**
+     * @see org.xml.sax.ContentHandler#startDocument()
+     */
+    public void startDocument() throws SAXException {
+        // TODO should calls to this method be ignored?
+    }
+
 }

@@ -7,10 +7,8 @@ import javax.servlet.jsp.el.VariableResolver;
 
 public interface XpContext {
 
-    void initialize(XpContentHandler xpCH);
+    void initialize();
     void release();
-
-    XpContentHandler getXpContentHandler();
 
     Object getAttribute(String name);
     Object getAttribute(String name, int scope);

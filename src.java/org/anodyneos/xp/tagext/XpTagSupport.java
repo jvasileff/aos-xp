@@ -2,6 +2,7 @@ package org.anodyneos.xp.tagext;
 
 import javax.servlet.jsp.el.ELException;
 
+import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
 import org.xml.sax.SAXException;
@@ -11,7 +12,7 @@ import org.xml.sax.SAXException;
  * @author jvas
  *
  */
-public class XpTagSupport implements XpTag {
+public abstract class XpTagSupport implements XpTag {
     private XpTag parent;
 
     private XpFragment xpBody;
@@ -21,9 +22,12 @@ public class XpTagSupport implements XpTag {
         super();
     }
 
-    public void doTag() throws XpException, ELException, SAXException {
+    /*
+    public void doTag(XpContentHandler out) throws XpException, ELException, SAXException {
         // by default, do nothing;
     }
+    */
+    public abstract void doTag(XpContentHandler out) throws XpException, ELException, SAXException;
 
     public static final XpTag findAncestorWithClass(XpTag fromTag, Class theClass) {
         if (null == fromTag || null == theClass) {

@@ -92,12 +92,12 @@ public class ProcessorTag extends TranslaterProcessor {
 
         // instantiate tag
         out.printIndent().println(tagImplClass + " " + localVarName + " = new " + tagImplClass + "();");
-        out.printIndent().println(localVarName + ".setXpContext(xpContext);");
         if(ctx.inFragment()) {
             out.printIndent().println(localVarName + ".setParent(xpTagParent);");
         } else {
             out.printIndent().println("// " + localVarName + ".setParent(null);");
         }
+        out.printIndent().println(localVarName + ".setXpContext(xpContext);");
 
         // add attributes
         for (int i = 0; i < attributes.getLength(); i++) {
@@ -150,7 +150,7 @@ public class ProcessorTag extends TranslaterProcessor {
         }
 
         CodeWriter out = getTranslaterContext().getCodeWriter();
-        out.printIndent().println(localVarName + ".doTag();");
+        out.printIndent().println(localVarName + ".doTag(xpCH);");
         out.printIndent().println(localVarName + " = null;");
 
     }

@@ -110,14 +110,14 @@ class ProcessorPage extends TranslaterProcessor {
             out.printIndent().println("return xpContext;");
             out.endBlock();
             out.println();
-            out.printIndent().println("public void invoke() throws org.anodyneos.xp.XpException, javax.servlet.jsp.el.ELException, org.xml.sax.SAXException {");
+            out.printIndent().println("public void invoke(org.anodyneos.xp.XpContentHandler out) throws org.anodyneos.xp.XpException, javax.servlet.jsp.el.ELException, org.xml.sax.SAXException {");
             out.indentPlus();
             out.printIndent().println("switch(this.fragNum) {");
             out.indentPlus();
             for (int i = 0; i < getTranslaterContext().getFragmentCount(); i++) {
                 out.printIndent().println("case " + i + ":");
                 out.indentPlus();
-                out.printIndent().println("invoke" + i + "();");
+                out.printIndent().println("invoke" + i + "(out);");
                 out.printIndent().println("break;");
                 out.indentMinus();
             }
@@ -126,9 +126,9 @@ class ProcessorPage extends TranslaterProcessor {
             out.println();
 
             for (int i = 0; i < getTranslaterContext().getFragmentCount(); i++) {
-                out.printIndent().println("public void invoke" + i + "() throws org.anodyneos.xp.XpException, javax.servlet.jsp.el.ELException, org.xml.sax.SAXException  {");
+                out.printIndent().println("public void invoke" + i + "(org.anodyneos.xp.XpContentHandler xpCH) throws org.anodyneos.xp.XpException, javax.servlet.jsp.el.ELException, org.xml.sax.SAXException  {");
                 out.indentPlus();
-                out.printIndent().println("org.anodyneos.xp.XpContentHandler xpCH = xpContext.getXpContentHandler();");
+                //out.printIndent().println("org.anodyneos.xp.XpContentHandler xpCH = xpContext.getXpContentHandler();");
                 out.printIndent().println("javax.servlet.jsp.el.ExpressionEvaluator elEvaluator = xpContext.getExpressionEvaluator();");
                 out.printIndent().println("javax.servlet.jsp.el.VariableResolver varResolver = xpContext.getVariableResolver();");
                 out.println();

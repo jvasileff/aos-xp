@@ -8,6 +8,7 @@ package org.anodyneos.xp.standard;
 
 import javax.servlet.jsp.el.ELException;
 
+import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.tagext.XpTagSupport;
 import org.xml.sax.SAXException;
@@ -32,14 +33,14 @@ public class IfTag extends XpTagSupport {
         super();
     }
 
-    public void doTag() throws XpException, ELException, SAXException {
+    public void doTag(XpContentHandler out) throws XpException, ELException, SAXException {
         if(var != null && scope != null) {
             getXpContext().setAttribute(var, Boolean.valueOf(test), 0);
         } else if (var!=null) {
             getXpContext().setAttribute(var, Boolean.valueOf(test));
         }
         if(test) {
-            getXpBody().invoke();
+            getXpBody().invoke(out);
         }
     }
 

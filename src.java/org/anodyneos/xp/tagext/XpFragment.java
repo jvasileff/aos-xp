@@ -2,6 +2,7 @@ package org.anodyneos.xp.tagext;
 
 import javax.servlet.jsp.el.ELException;
 
+import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
 import org.xml.sax.SAXException;
@@ -14,6 +15,6 @@ import org.xml.sax.SAXException;
 public interface XpFragment {
 
     XpContext getXpContext();
-    void invoke() throws XpException, ELException, SAXException;
+    void invoke(XpContentHandler xpCH) throws XpException, ELException, SAXException;
 
 }

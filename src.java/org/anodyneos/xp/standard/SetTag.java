@@ -17,6 +17,7 @@ import javax.servlet.jsp.el.ELException;
 import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.el.VariableResolver;
 
+import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.tagext.XpTagSupport;
 
@@ -69,7 +70,7 @@ public class SetTag extends XpTagSupport {
         this.var = var;
     }
 
-    public void doTag() throws XpException, ELException {
+    public void doTag(XpContentHandler out) throws XpException, ELException {
         if (null != var) {
             // simple case, setting a scripting variable
             if (null == scope) {

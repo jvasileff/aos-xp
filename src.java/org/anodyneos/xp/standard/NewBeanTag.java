@@ -2,6 +2,7 @@ package org.anodyneos.xp.standard;
 
 import javax.servlet.jsp.el.ELException;
 
+import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.tagext.XpTagSupport;
 
@@ -16,7 +17,7 @@ public class NewBeanTag extends XpTagSupport {
 
     private String scope;
 
-    public void doTag() throws XpException, ELException {
+    public void doTag(XpContentHandler out) throws XpException, ELException {
         try {
             Object obj = Class.forName(className).newInstance();
             getXpContext().setAttribute(var, obj);

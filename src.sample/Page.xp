@@ -55,20 +55,22 @@
                 </c:if>
                 <nobr>${result}</nobr>
                 <pre>
-                <c:choose>
-                    <c:when test="false">first</c:when>
-                    <c:when test="false">second</c:when>
-                    <c:when test="false">third</c:when>
-                    <c:when test="false">fourth</c:when>
-                    <c:when test="false">fifth</c:when>
-                    <c:otherwise>_otherwise_</c:otherwise>
-                </c:choose>
+                    <c:choose>
+                        <c:when test="false">first</c:when>
+                        <c:when test="false">second</c:when>
+                        <c:when test="false">third</c:when>
+                        <c:when test="false">fourth</c:when>
+                        <c:when test="false">fifth</c:when>
+                        <c:otherwise>_otherwise_</c:otherwise>
+                    </c:choose>
                 </pre>
-                <c:newBean var="date" class="java.util.Date"/>
-                <c:set var="end" value="${date.time}"/>
-                <pre>${date}</pre>
-                <pre>${date.time}</pre>
-                <pre>\${(end - start)/1000} seconds</pre>
+                <c:debug>
+                    <c:newBean var="date" class="java.util.Date"/>
+                    <c:set var="end" value="${date.time}"/>
+                    <pre>${date}</pre>
+                    <pre>${date.time}</pre>
+                    <pre>\${(end - start)/1000} seconds</pre>
+                </c:debug>
                 <pre>${(end - start)/1000} seconds</pre>
                 <pre>${(pageScope.end - start)/1000} seconds</pre>
                 <pre>${end}</pre>

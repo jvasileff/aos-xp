@@ -8,6 +8,7 @@ package org.anodyneos.xp.standard;
 
 import javax.servlet.jsp.el.ELException;
 
+import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.tagext.XpTagSupport;
 import org.xml.sax.SAXException;
@@ -34,7 +35,7 @@ public final class ForEachTag extends XpTagSupport {
         super();
     }
 
-    public void doTag() throws XpException, ELException, SAXException {
+    public void doTag(XpContentHandler out) throws XpException, ELException, SAXException {
         if (begin > end || step < 1) {
             return;
         }
@@ -43,7 +44,7 @@ public final class ForEachTag extends XpTagSupport {
             if (null != var) {
                 getXpContext().setAttribute(var, Integer.toString(i));
             }
-            getXpBody().invoke();
+            getXpBody().invoke(out);
         }
         restoreVars();
     }

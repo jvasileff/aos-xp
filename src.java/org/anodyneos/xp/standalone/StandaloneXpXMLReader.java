@@ -5,6 +5,7 @@ package org.anodyneos.xp.standalone;
 
 import javax.servlet.jsp.el.ELException;
 
+import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
@@ -27,13 +28,13 @@ public class StandaloneXpXMLReader implements XMLReader {
         // create XpContext
         //XpContextImpl xpContext = new XpContextImpl();
         //xpContext.initialize(new XPContentHandlerImpl(getContentHandler()));
-        StandaloneXpContext xpContext = StandaloneXpFactory.getDefaultFactory().getStandaloneXpContext(getContentHandler());
-
+        StandaloneXpContext xpContext = StandaloneXpFactory.getDefaultFactory().getStandaloneXpContext();
+        XpContentHandler out = new XpContentHandler(getContentHandler());
 
         // process
         getContentHandler().startDocument();
         try {
-            xp._xpService(xpContext);
+            xp._xpService(xpContext, out);
         } catch (XpException e) {
             throw new SAXException(e);
         } catch (ELException e) {

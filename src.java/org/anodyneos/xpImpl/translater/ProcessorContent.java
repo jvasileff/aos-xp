@@ -39,9 +39,8 @@ public class ProcessorContent extends TranslaterProcessor {
     public void startElement(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
         CodeWriter out = getTranslaterContext().getCodeWriter();
-        out.printIndent().println("public final void _xpService (org.anodyneos.xp.standalone.StandaloneXpContext xpContext) throws org.anodyneos.xp.XpException, javax.servlet.jsp.el.ELException, org.xml.sax.SAXException {");
+        out.printIndent().println("public final void _xpService (org.anodyneos.xp.standalone.StandaloneXpContext xpContext, org.anodyneos.xp.XpContentHandler xpCH) throws org.anodyneos.xp.XpException, javax.servlet.jsp.el.ELException, org.xml.sax.SAXException {");
         out.indentPlus();
-        out.printIndent().println("org.anodyneos.xp.XpContentHandler xpCH = xpContext.getXpContentHandler();");
         out.printIndent().println("javax.servlet.jsp.el.ExpressionEvaluator elEvaluator = xpContext.getExpressionEvaluator();");
         out.printIndent().println("javax.servlet.jsp.el.VariableResolver varResolver = xpContext.getVariableResolver();");
         out.println();

@@ -9,7 +9,6 @@ import java.util.Set;
 import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.el.VariableResolver;
 
-import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.standalone.StandaloneXpContext;
 import org.apache.commons.el.ExpressionEvaluatorImpl;
 
@@ -20,26 +19,19 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
      */
     private Map[] scopeMaps = new Map[] { new HashMap(), new HashMap() };
     private VariableResolver variableResolver;
-    private XpContentHandler xpCH;
 
     public StandaloneXpContextImpl() {
     }
 
-    public void initialize(XpContentHandler xpCH) {
-        this.xpCH = xpCH;
+    public void initialize() {
         this.variableResolver = new StandaloneVariableResolverImpl(this);
     }
 
     public void release() {
-        this.xpCH = null;
         this.variableResolver = null;
     }
 
     // XpContext methods
-
-    public XpContentHandler getXpContentHandler() {
-        return xpCH;
-    }
 
     public Object getAttribute(String name) {
         return scopeMaps[PAGE_SCOPE].get(name);

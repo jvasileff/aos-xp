@@ -8,6 +8,7 @@ package org.anodyneos.xp.standard;
 
 import javax.servlet.jsp.el.ELException;
 
+import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.tagext.XpTagSupport;
 import org.xml.sax.SAXException;
@@ -27,10 +28,10 @@ public class WhenTag extends XpTagSupport {
         this.test = test;
     }
 
-    public void doTag() throws XpException, ELException, SAXException {
+    public void doTag(XpContentHandler out) throws XpException, ELException, SAXException {
         ChooseTag parent = (ChooseTag) getParent();
         if (! parent.isComplete() && test) {
-            getXpBody().invoke();
+            getXpBody().invoke(out);
             parent.markComplete();
         }
     }
