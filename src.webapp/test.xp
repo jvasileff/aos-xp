@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE xp:page [
+    <!ENTITY copy "&#169;">
+    <!ENTITY nbsp "&#160;">
+    <!ENTITY baseURL "..">
+]>
+
+<xp:page 
+    xmlns:xp="http://www.anodyneos.org/xmlns/xp"
+    xmlns:xpext="http://www.anodyneos.org/xmlns/xpext"
+    xmlns:fmt="http://www.anodyneos.org/xmlns/xp/fmt"
+    xmlns:c="http://www.anodyneos.org/xmlns/xp/standard"
+    xmlns="http://www.w3.org/1999/xhtml"
+>
+    <xp:output  indent="yes"
+                indentAmount="2"
+                mediaType="application/xhtml+xml"
+                encoding="us-ascii"
+                method="xml"
+                excludeResultPrefixes="xp xpext fmt c"
+                />
+    <xp:content>
+        <html>
+            <head/>
+            <body>
+                <h1>Test XP Page</h1>
+            </body>
+        </html>
+    </xp:content>
+</xp:page>

@@ -40,10 +40,9 @@ import org.anodyneos.xp.XpFileNotFoundException;
 import org.anodyneos.xp.XpOutputKeys;
 import org.anodyneos.xp.XpPage;
 import org.anodyneos.xp.XpTranslationException;
+import org.anodyneos.xp.XpXMLReader;
 import org.anodyneos.xp.http.HttpXpContext;
-import org.anodyneos.xp.http.HttpXpXMLReader;
 import org.anodyneos.xpImpl.http.HttpXpContextImpl;
-import org.anodyneos.xpImpl.runtime.XpCachingLoader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.fop.apps.Driver;
@@ -134,7 +133,7 @@ public class XpServlet extends HttpServlet{
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
-            XMLReader xmlReader = new HttpXpXMLReader(xpPage, xpContext);
+            XMLReader xmlReader = new XpXMLReader(xpPage, xpContext);
 
             // If XSLT URI is specified, use it to transform output.  Otherwise, use identity transformer.
             // Propogate all <xp:output> settings when identity transformer is used.  Otherwise, only propogate

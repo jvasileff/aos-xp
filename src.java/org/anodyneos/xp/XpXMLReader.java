@@ -1,4 +1,4 @@
-package org.anodyneos.xp.http;
+package org.anodyneos.xp;
 
 import javax.servlet.jsp.el.ELException;
 
@@ -17,9 +17,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.XMLReader;
 
-public class HttpXpXMLReader implements XMLReader {
+public class XpXMLReader implements XMLReader {
 
-    private static final Log logger = LogFactory.getLog(HttpXpXMLReader.class);
+    private static final Log logger = LogFactory.getLog(XpXMLReader.class);
 
     private XpPage xp;
     private XpContext xpContext;
@@ -34,7 +34,7 @@ public class HttpXpXMLReader implements XMLReader {
      */
     private boolean namespacePrefixes = false;
 
-    public HttpXpXMLReader(XpPage xp, XpContext xpContext) {
+    public XpXMLReader(XpPage xp, XpContext xpContext) {
         this.xp = xp;
         this.xpContext = xpContext;
     }
