@@ -34,11 +34,11 @@ public class HttpXpContextImpl extends HttpXpContext {
         this.servletResponse = servletResponse;
     }
 
-    public ServletRequest getServletRequest() {
+    public ServletRequest getRequest() {
         return servletRequest;
     }
 
-    public ServletResponse getServletResponse() {
+    public ServletResponse getResponse() {
         return servletResponse;
     }
 
@@ -50,7 +50,7 @@ public class HttpXpContextImpl extends HttpXpContext {
         return servlet.getServletConfig().getServletContext();
     }
 
-    public HttpSession getHttpSession() {
+    public HttpSession getSession() {
         return ((HttpServletRequest)servletRequest).getSession();
     }
 
@@ -84,7 +84,7 @@ public class HttpXpContextImpl extends HttpXpContext {
             case REQUEST_SCOPE:
                 return servletRequest.getAttribute(name);
             case SESSION_SCOPE:
-                return getHttpSession().getAttribute(name);
+                return getSession().getAttribute(name);
             case APPLICATION_SCOPE:
                 return getServletContext().getAttribute(name);
             default:
@@ -109,7 +109,7 @@ public class HttpXpContextImpl extends HttpXpContext {
                 servletRequest.removeAttribute(name);
                 break;
             case SESSION_SCOPE:
-                getHttpSession().removeAttribute(name);
+                getSession().removeAttribute(name);
                 break;
             case APPLICATION_SCOPE:
                 getServletContext().removeAttribute(name);
@@ -138,7 +138,7 @@ public class HttpXpContextImpl extends HttpXpContext {
                 servletRequest.setAttribute(name, obj);
                 break;
             case SESSION_SCOPE:
-                getHttpSession().setAttribute(name, obj);
+                getSession().setAttribute(name, obj);
                 break;
             case APPLICATION_SCOPE:
                 getServletContext().setAttribute(name, obj);
@@ -156,7 +156,7 @@ public class HttpXpContextImpl extends HttpXpContext {
         case REQUEST_SCOPE:
             return servletRequest.getAttributeNames();
         case SESSION_SCOPE:
-            return getHttpSession().getAttributeNames();
+            return getSession().getAttributeNames();
         case APPLICATION_SCOPE:
             return getServletContext().getAttributeNames();
         default:

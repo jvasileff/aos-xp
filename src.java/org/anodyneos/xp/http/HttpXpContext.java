@@ -19,11 +19,11 @@ public abstract class HttpXpContext implements XpContext {
     public static final String SESSION_SCOPE_STRING = "session";
     public static final String APPLICATION_SCOPE_STRING = "application";
 
-    public abstract ServletRequest getServletRequest();
-    public abstract ServletResponse getServletResponse();
+    public abstract ServletRequest getRequest();
+    public abstract ServletResponse getResponse();
     public abstract ServletConfig getServletConfig();
     public abstract ServletContext getServletContext();
-    public abstract HttpSession getHttpSession();
+    public abstract HttpSession getSession();
 
     public abstract void initialize(Servlet servlet, ServletRequest servletRequest,
             ServletResponse servletResponse);

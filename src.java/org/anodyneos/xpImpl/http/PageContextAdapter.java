@@ -39,7 +39,7 @@ public class PageContextAdapter extends PageContext {
     }
 
     public HttpSession getSession() {
-        return httpXpContext.getHttpSession();
+        return httpXpContext.getSession();
     }
 
     public Object getPage() {
@@ -47,11 +47,11 @@ public class PageContextAdapter extends PageContext {
     }
 
     public ServletRequest getRequest() {
-        return httpXpContext.getServletRequest();
+        return httpXpContext.getRequest();
     }
 
     public ServletResponse getResponse() {
-        return httpXpContext.getServletResponse();
+        return httpXpContext.getResponse();
     }
 
     public Exception getException() {
