@@ -11,6 +11,7 @@ import org.xml.sax.InputSource;
 
 public class TranslaterContext extends BaseContext implements TranslaterResult {
 
+    public static final String DEFAULT_PACKAGE = "xp";
     private CodeWriter mainCodeWriter;
     private TagLibraryRegistry taglibRegistry;
     private String className;

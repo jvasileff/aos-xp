@@ -80,10 +80,9 @@ public class Translater extends BaseParser {
 
     public TranslaterResult process(InputSource is, OutputStream os,
             TagLibraryRegistry taglibRegistry, String fullClassName) throws Exception {
-        System.out.println("process: fullClasName = " + fullClassName);
         CodeWriter out = new CodeWriter(os);
         TranslaterContext ctx = new TranslaterContext(is, out, taglibRegistry);
-        ctx.setFullClassName(fullClassName);
+        ctx.setFullClassName(TranslaterContext.DEFAULT_PACKAGE + "."+fullClassName);
         TranslaterProcessor p = new ProcessorPage(ctx);
         process(is, p);
         out.flush();
