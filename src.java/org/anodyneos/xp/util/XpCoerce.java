@@ -85,4 +85,47 @@ public class XpCoerce {
     public static final Long coerceToLong(String x) {           return new Long(coerceToLongType(x)); }
     public static final Short coerceToShort(String x) {         return new Short(coerceToShortType(x)); }
 
+    public static final char CR = '\r';
+    public static final char LF = '\n';
+    public static String normalizeCRLF(String inStr) {
+        // From XML 1.0, 2.11: To simplify the tasks of applications, the characters passed to
+        // an application by the XML processor must be as if the XML processor normalized all line
+        // breaks in external parsed entities (including the document entity) on input, before
+        // parsing, by translating both the two-character sequence #xD #xA and any #xD that is not
+        // followed by #xA to a single #xA character.
+
+        if(inStr == null) {
+            return null;
+        }
+
+        String retStr;
+        int firstCR = inStr.indexOf(CR);
+
+        // first, find a CR - if none exist, return inStr, else, generate new string
+        if (firstCR == -1) {
+            retStr = inStr;
+        } else {
+            StringBuffer sb = new StringBuffer(inStr.length());
+            boolean lastWasCR = false;
+            char current;
+            for (int i = 0; i < inStr.length(); i++) {
+                current = inStr.charAt(i);
+                if (lastWasCR && (current != LF)) {
+                    sb.append(LF);
+                }
+                if (current == CR) {
+                    lastWasCR = true;
+                } else {
+                    lastWasCR = false;
+                    sb.append(current);
+                }
+            }
+            if (lastWasCR) {
+                sb.append(LF);
+            }
+            retStr = sb.toString();
+        }
+        return retStr;
+    }
+
 }
