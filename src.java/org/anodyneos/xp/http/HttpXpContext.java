@@ -9,7 +9,7 @@ import javax.servlet.http.HttpSession;
 
 import org.anodyneos.xp.XpContext;
 
-public abstract class HttpXpContext implements XpContext {
+public interface HttpXpContext extends XpContext {
 
     public static final int REQUEST_SCOPE = 2;
     public static final int SESSION_SCOPE = 3;

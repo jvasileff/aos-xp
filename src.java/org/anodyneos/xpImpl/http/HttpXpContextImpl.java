@@ -16,7 +16,7 @@ import javax.servlet.jsp.el.VariableResolver;
 import org.anodyneos.xp.http.HttpXpContext;
 import org.apache.commons.el.ExpressionEvaluatorImpl;
 
-public class HttpXpContextImpl extends HttpXpContext {
+public class HttpXpContextImpl implements HttpXpContext {
 
     private Servlet servlet;
     private ServletRequest servletRequest;
@@ -184,6 +184,25 @@ public class HttpXpContextImpl extends HttpXpContext {
         } else {
             throw new IllegalArgumentException("Illegal Scope: " + scope);
         }
+    }
+
+    public String resolveScope(int scope) {
+        switch (scope) {
+        case PAGE_SCOPE:
+            return PAGE_SCOPE_STRING;
+        case REQUEST_SCOPE:
+            return REQUEST_SCOPE_STRING;
+        case SESSION_SCOPE:
+            return SESSION_SCOPE_STRING;
+        case APPLICATION_SCOPE:
+            return APPLICATION_SCOPE_STRING;
+        default:
+            throw new IllegalArgumentException("Illegal Scope: " + scope);
+        }
+    }
+
+    public int[] getScopes() {
+        return new int[] { PAGE_SCOPE, REQUEST_SCOPE, SESSION_SCOPE, APPLICATION_SCOPE };
     }
 
     public Object findAttribute(String name) {

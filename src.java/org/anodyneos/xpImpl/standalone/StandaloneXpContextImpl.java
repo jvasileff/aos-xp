@@ -153,4 +153,19 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
             throw new IllegalArgumentException("invalid scope string: " + scope);
         }
     }
+
+    public String resolveScope(int scope) {
+        switch (scope) {
+        case PAGE_SCOPE:
+            return PAGE_SCOPE_STRING;
+        case APPLICATION_SCOPE:
+            return APPLICATION_SCOPE_STRING;
+        default:
+            throw new IllegalArgumentException("Illegal Scope: " + scope);
+        }
+    }
+
+    public int[] getScopes() {
+        return new int[] { PAGE_SCOPE, APPLICATION_SCOPE };
+    }
 }

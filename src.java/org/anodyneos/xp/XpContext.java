@@ -34,4 +34,7 @@ public interface XpContext {
     VariableResolver getVariableResolver();
 
     int resolveScope(String scope);
+    String resolveScope(int scope);
+
+    int[] getScopes();
 }
