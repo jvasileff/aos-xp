@@ -13,6 +13,8 @@ compile.debuglevel:lines,source,vars
 # MISC
 webapp.context: /aos-xp
 webapp.reloadable: false
+transformerFactory: xalan
+#transformerFactory: xsltc
 
 
 ################################################################################
