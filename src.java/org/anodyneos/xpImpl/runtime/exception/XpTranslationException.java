@@ -1,7 +1,5 @@
 package org.anodyneos.xpImpl.runtime.exception;
 
-import java.io.FileNotFoundException;
-
 import org.xml.sax.SAXParseException;
 
 public class XpTranslationException extends XpRuntimeException{
@@ -28,12 +26,13 @@ public class XpTranslationException extends XpRuntimeException{
             // generate an informative/useful error message
             StringBuffer retVal = new StringBuffer("XpTranslationException: ");
             retVal.append(rootCause.getMessage());
-            retVal.append("  File: ");
+            retVal.append("  [File: ");
             retVal.append(getFileName());
-            retVal.append(" Line: ");
+            retVal.append("] [Line: ");
             retVal.append(getLineNumber());
-            retVal.append(" Column: ");
+            retVal.append("] [Column: ");
             retVal.append(getColNumber());
+            retVal.append("] ");
             setInternalMessage(retVal.toString());
         } else {
             setInternalMessage(rootCause.getMessage());
