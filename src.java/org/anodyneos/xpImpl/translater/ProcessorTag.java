@@ -85,7 +85,7 @@ public class ProcessorTag extends TranslaterProcessor {
         if(ctx.inFragment()) {
             out.printIndent().println(localVarName + ".setParent(xpTagParent);");
         } else {
-            out.printIndent().println("// " + localVarName + ".setParent(null);");
+            out.printIndent().println("// " + localVarName + ".setParent(null); // no parent tag");
         }
         out.printIndent().println(localVarName + ".setXpContext(xpContext);");
 

@@ -289,7 +289,7 @@ public class Util {
 
     public static void outputCharactersCode(String raw, CodeWriter out) throws SAXException {
         // this will output on multiple lines to make generated code easier to read.
-        // @TODO split up the regular text lines at line breaks
+        // TODO split up the regular text lines at line breaks
 
         // NOTE: we should really only expect "\n" from the input because of:
         // http://www.w3.org/TR/1998/REC-xml-19980210#sec-line-ends which
@@ -297,7 +297,7 @@ public class Util {
         // replace \r crap with just \n although this doesn't necesarily apply
         // to text mode if that will be supported.
 
-        // @TODO: What about normalizing the result of EL expressions at
+        // TODO: What about normalizing the result of EL expressions at
         // runtime???
 
         // note: cannot use part.part.split("\n|\r\n|\r"); because split()

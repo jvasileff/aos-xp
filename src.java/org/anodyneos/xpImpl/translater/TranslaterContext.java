@@ -18,6 +18,7 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
     private Stack fragmentCodeWriters = new Stack();
     private ArrayList fragments = new ArrayList();
     private int tagVariableCounter = 0;
+    private int savedXPCHVariableCounter = 0;
 
     public TranslaterContext(InputSource is, CodeWriter codeWriter, TagLibraryRegistry taglibRegistry) {
         super(is);
@@ -110,6 +111,10 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
 
     public String getVariableForTag(String className) {
         return "tag" + tagVariableCounter++;
+    }
+
+    public String getVariableForSavedXPCH() {
+        return "savedXPCH" + savedXPCHVariableCounter++;
     }
 
     public boolean inFragment() {

@@ -101,9 +101,30 @@
             <b>xp:attribute NAMESPACE TEST: prefix provided and namespace specified</b>
             <myns:nstest xmlns:myns="http://myns.com">
                 <c:if test="${true}">
-                    <xp:attribute name="myns2:att1" namespace="http://myns2.com" value="att1val"/>
+                    <xp:attribute name="myns2:att1" namespace="http://myns2.com">AT<b>T${2 + 2}</b>VAL1</xp:attribute>
                 </c:if>
             </myns:nstest>
+            <b/>
+            <b/>
+            <myns:nstest xmlns:myns="http://myns.com">
+                <xp:attribute name="myns2:att1" namespace="http://myns2.com">
+                    <c:if test="${true}" var="result">${result}</c:if>
+                    <c:if test="${false}" var="result">${result}</c:if> ${false}=false \${false}=false </xp:attribute>
+            </myns:nstest>
+            <myns:nstest xmlns:myns="http://myns.com">
+                <xp:attribute name="myns2:att1" namespace="http://myns2.com">
+line1
+line2
+line3
+                </xp:attribute>
+            </myns:nstest>
+            <b/>
+            <b/>
+            <mytag>
+line1
+line2 ${1+1}
+line3
+            </mytag>
         </html>
     </xp:content>
 </xp:page>

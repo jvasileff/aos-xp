@@ -246,6 +246,15 @@ public final class XpContentHandler implements ContentHandler {
         // TODO should calls to this method be ignored?
     }
 
+    /**
+     * This method should be used carefully; output should not be made directly to the wrapped <code>ContentHandler</code>.
+     *
+     * @return the wrapped <code>ContentHandler</code>
+     */
+    public ContentHandler getWrappedContentHandler() {
+        return contentHandler;
+    }
+
     private class El {
         private String namespaceURI;
         private String localName;
