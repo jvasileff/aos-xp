@@ -161,7 +161,7 @@ class ProcessorPage extends TranslaterProcessor {
         if(getTranslaterContext().getFragmentCount() > 0) {
             // Output Fragments
             out.flush();
-            out.printIndent().println("private final class FragmentHelper implements org.anodyneos.xp.tagext.XpFragment {");
+            out.printIndent().println("private final class FragmentHelper extends org.anodyneos.xp.tagext.XpFragment {");
             out.indentPlus();
             out.println();
             out.printIndent().println("private int fragNum;");
