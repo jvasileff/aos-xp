@@ -25,6 +25,7 @@ public class XpCachingLoader{
     private String javaRoot;
     private String xpRegistry;
     private UnifiedResolver resolver;
+    private boolean autoLoad = true;
 
     private final Map xpCache =
         Collections.synchronizedMap(new HashMap());
@@ -92,36 +93,40 @@ public class XpCachingLoader{
     }
 
     private boolean xpNeedsReloading(URI xpURI, long loadTime, ClassLoader loader) throws XpFileNotFoundException{
-        if (Translater.xpIsOutOfDate(xpURI,getClassRoot(),getResolver(),loadTime)) {
-            return true;
-        } else {
-
-            try{
-                Class xpClass = Class.forName(Translater.getClassName(xpURI),true,loader);
-
-                Method getDependents = xpClass.getDeclaredMethod("getDependents",(Class[])null);
-
-                List dependents = (List)getDependents.invoke((Object)null,(Object[])null);
-
-                for (int i=0; i<dependents.size();i++){
-                    String dependent = (String)dependents.get(i);
-                    URI uriDep = new URI(dependent);
-                    if (xpNeedsReloading(uriDep,loadTime,loader)){
-                        return true;
-                    }
-                }
-
-            }catch (Exception e){
-                // something happened
-                System.out.println("Unable to inspect children of "
-                        + xpURI.toString() + " to see if they would cause a reload.");
-                e.printStackTrace();
+        if (this.isAutoLoad()){
+            if (Translater.xpIsOutOfDate(xpURI,getClassRoot(),getResolver(),loadTime)) {
                 return true;
-            }
-        }
-        // neither the file itself nor any dependents are out of date
-        return false;
+            } else {
 
+                try{
+                    Class xpClass = Class.forName(Translater.getClassName(xpURI),true,loader);
+
+                    Method getDependents = xpClass.getDeclaredMethod("getDependents",(Class[])null);
+
+                    List dependents = (List)getDependents.invoke((Object)null,(Object[])null);
+
+                    for (int i=0; i<dependents.size();i++){
+                        String dependent = (String)dependents.get(i);
+                        URI uriDep = new URI(dependent);
+                        if (xpNeedsReloading(uriDep,loadTime,loader)){
+                            return true;
+                        }
+                    }
+
+                }catch (Exception e){
+                    // something happened
+                    System.out.println("Unable to inspect children of "
+                            + xpURI.toString() + " to see if they would cause a reload.");
+                    e.printStackTrace();
+                    return true;
+                }
+            }
+            // neither the file itself nor any dependents are out of date
+            return false;
+        }else{
+            // autoload is not enabled, so never reload what's already there.
+            return false;
+        }
     }
 
 
@@ -173,16 +178,22 @@ public class XpCachingLoader{
         this.parentLoader = parentLoader;
     }
 
-    /**
-     * @return Returns the resolver.
-     */
     public UnifiedResolver getResolver() {
         return resolver;
     }
-    /**
-     * @param resolver The resolver to set.
-     */
     public void setResolver(UnifiedResolver resolver) {
         this.resolver = resolver;
     }
+    public boolean isAutoLoad() {
+        return autoLoad;
+    }
+    public void setAutoLoad(boolean autoLoad) {
+        this.autoLoad = autoLoad;
+    }
+    public void setAutoLoad(String autoLoadString) {
+        if (autoLoadString!=null){
+            this.autoLoad = "TRUE".equals(autoLoadString.toUpperCase());
+        }
+    }
+
 }
