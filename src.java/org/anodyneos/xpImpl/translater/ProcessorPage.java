@@ -1,12 +1,14 @@
 package org.anodyneos.xpImpl.translater;
 
+import java.util.Enumeration;
+import java.util.List;
+
 import org.anodyneos.commons.xml.sax.ElementProcessor;
 import org.anodyneos.xpImpl.util.CodeWriter;
 import org.anodyneos.xpImpl.util.JavaClass;
+import org.anodyneos.xpImpl.util.Util;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import java.util.List;
-import java.util.ArrayList;
 /**
  * ProcessorPage handles the xp:page element.
  *
@@ -24,16 +26,17 @@ class ProcessorPage extends TranslaterProcessor {
 
     private JavaClass jc = new JavaClass();
 
-    //private OutputProcessor outputProcessor;
     //private ArrayList xmlPiplineProcessors = new ArrayList();
+    private ProcessorOutput outputProcessor;
     private ProcessorContent contentProcessor;
 
-    //static final String E_OUTPUT = "output";
     //static final String E_XML_PIPELINE = "xml-pipeline";
+    public static final String E_OUTPUT = "output";
     public static final String E_CONTENT = "content";
 
     public ProcessorPage(TranslaterContext ctx) {
         super(ctx);
+        outputProcessor = new ProcessorOutput(ctx);
         contentProcessor = new ProcessorContent(ctx);
     }
 
@@ -41,6 +44,8 @@ class ProcessorPage extends TranslaterProcessor {
         if (URI_XP.equals(uri)) {
             if (E_CONTENT.equals(localName)) {
                 return contentProcessor;
+            } else if (E_OUTPUT.equals(localName)) {
+                return outputProcessor;
             } else {
                 return super.getProcessorFor(uri, localName, qName);
             }
@@ -67,10 +72,31 @@ class ProcessorPage extends TranslaterProcessor {
         CodeWriter out = getTranslaterContext().getCodeWriter();
         c.printHeader(out);
 
+        // output properties
+        out.printIndent().println("private static final java.util.Properties defaultProperties = new java.util.Properties();");
+        out.println();
+        out.printIndent().println("static {");
+        out.indentPlus();
+        out.printIndent().println("defaultProperties.put(\"cdataSectionElements\", \"\");");
+        out.printIndent().println("defaultProperties.put(\"doctypePublic\", \"\");");
+        out.printIndent().println("defaultProperties.put(\"doctypeSystem\", \"\");");
+        out.printIndent().println("defaultProperties.put(\"encoding\", \"\");");
+        out.printIndent().println("defaultProperties.put(\"indent\", \"no\");");
+        out.printIndent().println("defaultProperties.put(\"mediaType\", \"text/xml\");");
+        out.printIndent().println("defaultProperties.put(\"method\", \"xml\");");
+        out.printIndent().println("defaultProperties.put(\"omitXmlDeclaration\", \"no\");");
+        out.printIndent().println("defaultProperties.put(\"xhtmlCompat\", \"\");");
+        out.printIndent().println("defaultProperties.put(\"xsltURI\", \"\");");
+        out.endBlock();
+
+        out.println();
+        out.printIndent().println("private java.util.Properties outputProperties = new java.util.Properties(defaultProperties);");
+        out.println();
+
         // constructor()
         out.printIndent().println("public " + c.getClassName() + "() {");
         out.indentPlus();
-        out.printIndent().println("// super();");
+        out.printIndent().println("initOutputProperties();");
         out.endBlock();
         out.println();
 
@@ -89,8 +115,32 @@ class ProcessorPage extends TranslaterProcessor {
     private void printJavaFooter() {
         CodeWriter out = getTranslaterContext().getCodeWriter();
 
-        // implementing methods of XpPage interface
+        // output properties
+        out.printIndent().println("private void initOutputProperties() {");
+        out.indentPlus();
+        if (null != outputProcessor) {
+            Enumeration keys = outputProcessor.getProperties().keys();
+            while (keys.hasMoreElements()) {
+                String key = (String) keys.nextElement();
+                String value = (String) outputProcessor.getProperties().get(key);
+                out.printIndent().println(
+                          "outputProperties.put("
+                        + Util.escapeStringQuoted(key)
+                        + ", "
+                        + Util.escapeStringQuoted(value)
+                        + ");");
+            }
+        }
+        out.endBlock();
         out.println();
+
+        // implementing methods of XpPage interface
+        out.printIndent().println("public java.util.Properties getOutputProperties() {");
+        out.indentPlus();
+        out.printIndent().println("return new java.util.Properties(outputProperties);");
+        out.endBlock();
+        out.println();
+
         out.printIndent().println("public java.util.List getDependents(){");
         out.indentPlus();
         out.printIndent().println("java.util.List dependents = new java.util.ArrayList();");
@@ -132,6 +182,7 @@ class ProcessorPage extends TranslaterProcessor {
 
         // end the main class
         out.endBlock();
+        out.println();
 
 
         if(getTranslaterContext().getFragmentCount() > 0) {

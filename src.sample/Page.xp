@@ -5,23 +5,17 @@
     xmlns:xpext="http://www.anodyneos.org/xmlns/xpext"
     xmlns:fmt="http://www.anodyneos.org/xmlns/xp/fmt"
     xmlns:c="http://www.anodyneos.org/xmlns/xp/standard"
+    xmlns:testxpns="http://testxpns.test.er"
 >
-    <!--
     <xp:output
-        cdataSectionElements="xxx"
-        doctypePublic="xxx"
-        doctypeSystem="xxx"
-        encoding="xxx"
-        indent="yes|no"
-        mediaType="text/html"
-        method="xml|html|text"
-        omitXmlDeclaration="yes|no"
-        standalone="yes|no"
-        version="1.0"
-        xpext:xhtmlCompat="yes|no"
-        xsltURI="xx"
-        />
-    -->
+        encoding="utf-8"
+        indent="yes"
+        mediaType="text/xml"
+        method="xml"
+        omitXmlDeclaration="no"
+        xhtmlCompat="yes"
+        testxpns:testwns="asdf"
+    />
 
     <xp:content>
         <c:newBean var="date" class="java.util.Date"/>
