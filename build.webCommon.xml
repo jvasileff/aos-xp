@@ -1,0 +1,364 @@
+<?xml version="1.0"?>
+
+<!--****************************************************************************
+**
+**  COMMON WEB TARGETS
+**
+*****************************************************************************-->
+
+<project name="aos-web-common" default="compile" basedir=".">
+
+    <!-- setup -->
+    <property name="build.sysclasspath"         value="ignore"/>
+    <property name="file.depCache"              location="build/ant_depcache"/>
+
+    <!-- properties -->
+    <property name="dir.src.java"               location="src.java"/>
+    <property name="dir.build"                  location="build"/>
+    <property name="dir.build.apidocs"          location="${dir.build}/apidocs"/>
+    <property name="dir.build.classes"          location="${dir.build}/classes"/>
+    <property name="dir.build.jar"              location="${dir.build}/jar"/>
+    <property name="dir.build.java"             location="${dir.build}/java"/>
+    <property name="dir.build.ide.classes"      location="${dir.build}/ide.classes"/>
+    <property name="dir.build.ide.lib"          location="${dir.build}/ide.lib"/>
+    <property name="dir.build.ide.src"          location="${dir.build}/ide.src"/>
+    <property name="file.jar"                   location="${dir.build.jar}/${ant.project.name}.jar"/>
+    <property name="file.src.zip"               location="${dir.build.jar}/${ant.project.name}-src.zip"/>
+
+    <!-- webapp properties -->
+    <property name="dir.src.misc"               location="src.misc"/>
+    <property name="dir.src.webapp"             location="src.webapp"/>
+    <property name="dir.src.lib.xml"            location="src.lib.xml"/>
+    <property name="dir.build.webapp"           location="build/webapp"/>
+    <property name="webapp.name"                value="${ant.project.name}"/>
+    <property name="file.build.context"         location="${dir.build}/context.xml"/>
+    <property name="file.war"                   location="${dir.build.jar}/${ant.project.name}.war"/>
+
+    <!-- patterns -->
+    <patternset id="pattern.docRoot">
+        <include name="**/*.css"/>
+        <include name="**/*.csv"/>
+        <include name="**/*.dtd"/>
+        <include name="**/*.xeml"/>
+        <include name="**/*.gif"/>
+        <include name="**/*.htm"/>
+        <include name="**/*.html"/>
+        <include name="**/*.jpg"/>
+        <include name="**/*.js"/>
+        <include name="**/*.jsp"/>
+        <include name="**/*.jspf"/>
+        <include name="**/*.pdf"/>
+        <include name="**/*.png"/>
+        <include name="**/*.svg"/>
+        <include name="**/*.txt"/>
+        <include name="**/*.xml"/>
+        <include name="**/*.ent"/>
+        <include name="**/*.xsd"/>
+        <include name="**/*.xsl"/>
+        <include name="**/*.xp"/>
+        <include name="**/*.xpreg"/>
+        <include name="**/*.xptld"/>
+        <include name="**/*.properties"/>
+    </patternset>
+
+    <patternset id="pattern.resources">
+        <include name="**/*.html"/>
+        <include name="**/*.gif"/>
+        <include name="**/*.png"/>
+        <include name="**/*.jpg"/>
+        <include name="**/*.xml"/>
+        <include name="**/*.xsl"/>
+        <include name="**/*.xsd"/>
+        <include name="**/*.css"/>
+        <include name="**/*.dtd"/>
+        <include name="**/*.js"/>
+        <include name="**/*.jsp"/>
+        <include name="**/*.properties"/>
+    </patternset>
+
+    <!-- paths -->
+    <path id="path.source">
+        <pathelement location="${dir.src.java}"/>
+        <pathelement location="${dir.build.java}"/>
+    </path>
+
+    <!-- Tomcat stuff -->
+    <path id="path.tomcat5.ant">
+        <fileset dir="${catalina.home}/server/lib">
+            <include name="catalina-ant.jar"/>
+        </fileset>
+    </path>
+
+    <!-- for tomcat -->
+    <script language="javascript">
+        <![CDATA[
+            // tomcat needs the webapp dir in the form of a URL
+            project.setProperty("url.build.webapp",
+                    "file:" + project.getProperty("dir.build.webapp").replace('\\','/'));
+            project.setProperty("url.build.context",
+                    "file:" + project.getProperty("file.build.context").replace('\\','/'));
+        ]]>
+    </script>
+
+    <!--++++++++++++++++++++++++++++++++++++
+    ++
+    ++  PREPARE/CLEAN/MISC
+    ++
+    +++++++++++++++++++++++++++++++++++++-->
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  prepare
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+    <target name="prepare.common">
+        <mkdir dir="${dir.build.apidocs}"/>
+        <mkdir dir="${dir.build.classes}"/>
+        <mkdir dir="${dir.build.jar}"/>
+        <mkdir dir="${dir.build.java}"/>
+        <mkdir dir="${dir.build.ide.classes}"/>
+        <mkdir dir="${dir.build.ide.lib}"/>
+
+        <!-- webapp -->
+        <mkdir dir="${dir.build.webapp}"/>
+    </target>
+
+    <target name="prepare.pre"/>
+    <target name="prepare.post"/>
+
+    <target name="prepare" depends="prepare.pre, prepare.common, prepare.post" description="Create dirs, copy libs, etc."/>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  clean
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+    <target name="clean" description="Clean from previous builds">
+        <delete dir="${dir.build}"/>
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  all
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+    <target name="all" depends="clean,jar,apidocs" description="Clean, jar, apidocs"/>
+
+    <!--++++++++++++++++++++++++++++++++++++
+    ++
+    ++  COMPILE/JAR/APIDOCS
+    ++
+    +++++++++++++++++++++++++++++++++++++-->
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  compileJava
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="compileJava" depends="prepare, genCatalogProps">
+        <!-- depend -->
+        <property refid="path.source" name="srcpath"/>
+        <depend srcdir="${srcpath}"
+                destdir="${dir.build.classes}"
+                cache="${file.depCache}"
+                closure="yes">
+        </depend>
+
+        <!-- compile -->
+        <javac  destdir="${dir.build.classes}"
+                deprecation="${compile.deprecation}"
+                debug="${compile.debug}"
+                debuglevel="${compile.debuglevel}">
+            <src refid="path.source"/>
+            <classpath refid="path.compile"/>
+        </javac>
+
+        <!-- resources -->
+        <copy toDir="${dir.build.classes}">
+            <fileset dir="${dir.src.java}">
+                <patternset refid="pattern.resources"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile.common" depends="compileJava, refreshWebapp"/>
+    <target name="compile.pre"/>
+    <target name="compile.post"/>
+
+    <target name="compile" depends="compile.pre, compile.common, compile.post"/>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  checkCatalogProps
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="checkCatalogProps" depends="prepare">
+        <uptodate
+                property="u2d.CatalogManager.properties"
+                srcfile="build.properties"
+                targetfile="${dir.build.classes}/CatalogManager.properties"/>
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  genCatalogProps
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="genCatalogProps" depends="checkCatalogProps, prepare"
+            unless="u2d.CatalogManager.properties">
+        <propertyfile file="${dir.build.classes}/CatalogManager.properties">
+            <entry key="catalogs" value="${dir.src.lib.xml}/xhtml.cat"/>
+        </propertyfile>
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  Refresh Webapp
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="refreshWebapp.common" depends="prepare">
+        <!-- build context.xml -->
+        <style  in="${dir.src.misc}/dummy.xml"
+                out="${file.build.context}"
+                style="${dir.src.misc}/context.xsl">
+            <param name="dir.build.webapp" expression="${dir.build.webapp}"/>
+            <param name="webapp.context" expression="${webapp.context}"/>
+            <param name="webapp.reloadable" expression="${webapp.reloadable}"/>
+        </style>
+
+        <!-- webapp -->
+        <copy toDir="${dir.build.webapp}">
+            <fileset dir="${dir.src.webapp}">
+                <patternset refid="pattern.docRoot"/>
+            </fileset>
+        </copy>
+
+        <!-- lib -->
+        <copy toDir="${dir.build.webapp}/WEB-INF/lib">
+            <fileset refid="fs.jars"/>
+            <mapper type="flatten"/>
+        </copy>
+
+        <!-- classes -->
+        <copy toDir="${dir.build.webapp}/WEB-INF/classes">
+            <fileset dir="${dir.build.classes}"/>
+        </copy>
+    </target>
+
+    <target name="refreshWebapp.pre"/>
+    <target name="refreshWebapp.post"/>
+    <target name="refreshWebapp" depends="refreshWebapp.pre, refreshWebapp.common, refreshWebapp.post"
+            description="Refresh Webapp (no compile)"/>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  jar
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+    <target name="jar" depends="compile" description="Create the jar/war">
+        <jar jarfile="${file.jar}" compress="no">
+            <fileset dir="${dir.build.classes}">
+                <patternset refid="pattern.resources"/>
+                <include name="**/*.class"/>
+                <exclude name="CatalogManager.properties"/>
+            </fileset>
+        </jar>
+        <war
+            warfile="${file.war}"
+            webxml="${dir.src.webapp}/WEB-INF/web.xml"
+            compress="no">
+            <fileset dir="${dir.src.webapp}">
+                <patternset refid="pattern.docRoot"/>
+                <!-- get rid of web.xml warning on war task -->
+                <exclude name="WEB-INF/web.xml"/>
+            </fileset>
+            <lib dir="${dir.build.webapp}/WEB-INF/lib">
+                <include name="*.jar"/>
+                <include name="*.zip"/>
+            </lib>
+            <lib file="${file.jar}"/>
+        </war>
+        <zip zipfile="${file.src.zip}" compress="no">
+            <fileset dir="${dir.src.java}">
+                <patternset refid="pattern.resources"/>
+                <include name="**/*.java"/>
+                <exclude name="CatalogManager.properties"/>
+            </fileset>
+            <fileset dir="${dir.build.java}">
+                <patternset refid="pattern.resources"/>
+                <include name="**/*.java"/>
+                <exclude name="CatalogManager.properties"/>
+            </fileset>
+        </zip>
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  apidocs
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="apidocs" depends="prepare" description="Create api documentation">
+        <javadoc    packagenames="*"
+                    destdir="${dir.build.apidocs}"
+                    author="true"
+                    version="true"
+                    group="true" >
+            <classpath refid="path.compile"/>
+            <sourcepath refid="path.source"/>
+        </javadoc>
+    </target>
+
+    <!--++++++++++++++++++++++++++++++++++++
+    ++
+    ++  TOMCAT
+    ++
+    +++++++++++++++++++++++++++++++++++++-->
+
+   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  Prep Tomcat
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="prepTc">
+        <!-- Define Tomcat tasks -->
+        <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask"
+                classpathref="path.tomcat5.ant"/>
+        <taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask"
+                classpathref="path.tomcat5.ant"/>
+        <taskdef name="reload" classname="org.apache.catalina.ant.ReloadTask"
+                classpathref="path.tomcat5.ant"/>
+        <taskdef name="list" classname="org.apache.catalina.ant.ListTask"
+                classpathref="path.tomcat5.ant"/>
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  deploy
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="tcDeploy" depends="prepare, prepTc" description="Deploy to Tomcat">
+        <deploy
+                url="${catalina.url.manager}"
+                username="${catalina.username}"
+                password="${catalina.password}"
+                path="${webapp.context}"
+                localWar="${url.build.webapp}"
+                config="${url.build.context}" />
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  undeploy
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="tcUndeploy" depends="prepare, prepTc" description="Undeploy to Tomcat">
+        <undeploy
+                url="${catalina.url.manager}"
+                username="${catalina.username}"
+                password="${catalina.password}"
+                path="${webapp.context}"/>
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  reload
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="tcReload" depends="prepare, prepTc" description="Reload on Tomcat">
+        <reload
+                url="${catalina.url.manager}"
+                username="${catalina.username}"
+                password="${catalina.password}"
+                path="${webapp.context}"/>
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  list
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="tcList" depends="prepare, prepTc" description="List Tomcat Webapps">
+        <list
+                url="${catalina.url.manager}"
+                username="${catalina.username}"
+                password="${catalina.password}"/>
+    </target>
+
+</project>
+

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<taglib>
+    <description>
+        This is the format tag library.
+    </description>
+    <tag>
+        <name>timeZone</name>
+        <description>
+            Specifies the timezone
+        </description>
+        <tag-class>org.anodyneos.xpTags.fmt.TimeZone</tag-class>
+        <attribute>
+            <description>The java formatted timezone to use</description>
+            <name>timeZone</name>
+            <required>true</required>
+            <request-time-ok>true</request-time-ok>
+            <type>java.lang.String</type>
+            <fragment>false</fragment>
+        </attribute>
+        <attribute>
+            <description>Testing</description>
+            <name>e</name>
+            <required>true</required>
+            <request-time-ok>true</request-time-ok>
+            <type>java.lang.String</type>
+            <fragment>false</fragment>
+        </attribute>
+    </tag>
+    <tag>
+        <name>parseNumber</name>
+        <description>
+            Parses the string
+        </description>
+        <tag-class>org.anodyneos.xpTags.fmt.ParseNumber</tag-class>
+        <attribute>
+            <description>String to be parsed.</description>
+            <name>value</name>
+            <required>true</required>
+            <request-time-ok>true</request-time-ok>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+</taglib>

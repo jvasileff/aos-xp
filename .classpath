@@ -15,5 +15,8 @@
 	<classpathentry kind="lib" path="build/ide.lib/xalan.jar"/>
 	<classpathentry kind="lib" path="build/ide.lib/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="build/ide.lib/xml-apis.jar"/>
+	<classpathentry kind="lib" path="build/ide.lib/avalon-framework-cvs-20020806.jar"/>
+	<classpathentry kind="lib" path="build/ide.lib/batik.jar"/>
+	<classpathentry kind="lib" path="build/ide.lib/fop.jar"/>
 	<classpathentry kind="output" path="build/ide.classes"/>
 </classpath>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN"
+    "http://java.sun.com/j2ee/dtds/web-app_2.2.dtd">
+
+<web-app>
+
+    <!-- XP Servlet -->
+    <servlet>
+        <servlet-name>xp</servlet-name>
+        <servlet-class>org.anodyneos.xpImpl.runtime.XpServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>xp</servlet-name>
+        <url-pattern>*.xp</url-pattern>
+    </servlet-mapping>
+
+</web-app>
