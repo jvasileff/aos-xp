@@ -3,7 +3,6 @@ package org.anodyneos.xpImpl.translater;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.List;
 
 import org.anodyneos.commons.net.ClassLoaderURIHandler;
 import org.anodyneos.commons.xml.UnifiedResolver;

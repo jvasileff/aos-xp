@@ -1,15 +1,13 @@
 package org.anodyneos.xpImpl.translater;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+
 import org.anodyneos.commons.xml.sax.ElementProcessor;
 import org.anodyneos.xpImpl.util.CodeWriter;
-import org.anodyneos.xpImpl.util.Util;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-import java.util.HashMap;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 /**
  * @author yao
  */
