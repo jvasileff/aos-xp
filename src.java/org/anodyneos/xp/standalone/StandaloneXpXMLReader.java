@@ -7,6 +7,7 @@ import javax.servlet.jsp.el.ELException;
 
 import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpException;
+import org.anodyneos.xp.XpPage;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
 import org.xml.sax.EntityResolver;
@@ -18,9 +19,9 @@ import org.xml.sax.XMLReader;
 public class StandaloneXpXMLReader implements XMLReader {
 
     // Xp specific
-    private StandaloneXpPage xp;
+    private XpPage xp;
 
-    public StandaloneXpXMLReader(StandaloneXpPage xp) {
+    public StandaloneXpXMLReader(XpPage xp) {
         this.xp = xp;
     }
 
@@ -34,7 +35,7 @@ public class StandaloneXpXMLReader implements XMLReader {
         // process
         getContentHandler().startDocument();
         try {
-            xp._xpService(xpContext, out);
+            xp.service(xpContext, out);
         } catch (XpException e) {
             throw new SAXException(e);
         } catch (ELException e) {

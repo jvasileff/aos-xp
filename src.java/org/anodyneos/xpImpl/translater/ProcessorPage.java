@@ -61,7 +61,7 @@ class ProcessorPage extends TranslaterProcessor {
         // package, imports, class header
         JavaClass c = new JavaClass();
         c.setFullClassName(getTranslaterContext().getFullClassName());
-        c.setExtends("org.anodyneos.xp.standalone.StandaloneXpPage");
+        c.addInterface("org.anodyneos.xp.XpPage");
 
         CodeWriter out = getTranslaterContext().getCodeWriter();
         c.printHeader(out);
