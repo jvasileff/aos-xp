@@ -1,6 +1,8 @@
 package org.anodyneos.xpImpl.translater;
 
 import java.io.StringWriter;
+import java.util.Collections;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -20,6 +22,9 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
     private ArrayList fragments = new ArrayList();
     private int tagVariableCounter = 0;
     private int savedXPCHVariableCounter = 0;
+
+    // A list of files on which this current file depends
+    private List dependents = new ArrayList();
 
     public TranslaterContext(InputSource is, CodeWriter codeWriter, TagLibraryRegistry taglibRegistry) {
         super(is);
@@ -121,4 +126,12 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
     public boolean inFragment() {
         return fragmentCodeWriters.size() > 0;
     }
+
+    public void addDependent(String dependent){
+        dependents.add(dependent);
+    }
+    public List getDependents(){
+        return Collections.unmodifiableList(dependents);
+    }
+
 }
