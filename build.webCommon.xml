@@ -360,5 +360,10 @@
                 password="${catalina.password}"/>
     </target>
 
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  Utility
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="compileReload" description="Compile, Reload Webapp" depends="compile, tcReload"/>
+
 </project>
 
