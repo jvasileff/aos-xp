@@ -259,29 +259,53 @@ public class Translater extends BaseParser {
         }
     }
 
+    private static String stripXpExtensionFromPath(String xpPath){
+        if (xpPath.trim().toUpperCase().endsWith(".XP")){
+            String trimmedPath = xpPath.trim();
+            return trimmedPath.substring(0,trimmedPath.length()-3);
+        }else{
+            return xpPath;
+        }
+    }
 
     public static String getJavaFile(String tempRoot, URI xpURI){
         String fullPath = concatPaths(TranslaterContext.DEFAULT_PACKAGE + "/",xpURI.getPath());
+        fullPath = stripXpExtensionFromPath(fullPath);
         fullPath = fullPath.replace('-','_');   // TODO replace with more robust replacement
+        fullPath = fullPath.replace('.','_');   // TODO replace with more robust replacement
+        fullPath += ".java";
         fullPath = concatPaths(tempRoot,fullPath);
-        fullPath = fullPath.replaceAll("\\.xp",".java");
+
         return fullPath;
 
     }
     public static String getClassFile(String tempRoot, URI xpURI){
         String fullPath = concatPaths(TranslaterContext.DEFAULT_PACKAGE + "/",xpURI.getPath());
+        fullPath = stripXpExtensionFromPath(fullPath);
         fullPath = fullPath.replace('-','_');   // TODO replace with more robust replacement
+        fullPath = fullPath.replace('.','_');   // TODO replace with more robust replacement
+        fullPath += ".class";
         fullPath = concatPaths(tempRoot,fullPath);
-        fullPath = fullPath.replaceAll("\\.xp",".class");
+
         return fullPath;
 
     }
 
+
+
+    /**
+     *
+     * Convert webapp:///WEB-INF/xp/account/account_list.query.xp into xp.WEB_INF.xp.account.account_list_query
+     *
+     * @param xpURI
+     * @return String
+     */
     public static String getClassName(URI xpURI){
         String fullPath = xpURI.getPath();
+        fullPath = stripXpExtensionFromPath(fullPath);
         fullPath = fullPath.replace('-','_');   // TODO replace with more robust replacement
+        fullPath = fullPath.replace('.','_');   // TODO replace with more robust replacement
         fullPath = concatPaths(TranslaterContext.DEFAULT_PACKAGE + "/",fullPath);
-        fullPath = fullPath.replaceAll("\\.xp","");
         fullPath = fullPath.replace('/','.');
         return fullPath;
 
