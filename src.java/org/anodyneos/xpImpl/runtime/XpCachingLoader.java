@@ -53,6 +53,9 @@ public class XpCachingLoader{
         // if the page hasn't been loaded before or it's out of date,
         // make sure we have exclusive access to the cache
         // then check again to be more certain that nobody has reloaded it since we last checked
+
+        // TODO: jv note: technically, this may not work, see http://www.javaworld.com/jw-02-2001/jw-0209-double.html
+        // not sure how much the weakness may just be theoretical, but we may want to take a closer look.
         if ((xpPage == null )
                 || (xpPage != null && xpNeedsReloading(xpURI, loadTime, xpPage.getClass().getClassLoader()))){
 
