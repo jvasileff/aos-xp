@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.anodyneos.commons.xml.sax.CDATAProcessor;
 import org.anodyneos.commons.xml.sax.ElementProcessor;
+import org.anodyneos.xp.tagext.FunctionInfo;
 import org.anodyneos.xp.tagext.TagInfo;
 import org.anodyneos.xp.tagext.TagLibraryInfo;
 import org.xml.sax.SAXException;
@@ -15,10 +16,12 @@ class ProcessorTaglib extends TLDProcessor {
     private CDATAProcessor descriptionProcessor;
 
     private ArrayList tags = new ArrayList();
+    private ArrayList functions = new ArrayList();
 
     public static final String E_DESCRIPTION = "description";
 
     public static final String E_TAG = "tag";
+    public static final String E_FUNCTION = "function";
 
     public ProcessorTaglib(TLDContext ctx) {
         super(ctx);
@@ -33,6 +36,10 @@ class ProcessorTaglib extends TLDProcessor {
             ElementProcessor p = new ProcessorTag(getTLDContext());
             tags.add(p);
             return p;
+        } else if (E_FUNCTION.equals(localName)) {
+            ElementProcessor p = new ProcessorFunction(getTLDContext());
+            functions.add(p);
+            return p;
         } else {
             return super.getProcessorFor(uri, localName, qName);
         }
@@ -44,7 +51,12 @@ class ProcessorTaglib extends TLDProcessor {
             tarray[i] = (TagInfo) ((ProcessorTag) tags.get(i)).getTagInfo();
         }
 
-        tagLibraryInfo = new TagLibraryInfo(descriptionProcessor.getCDATA(), tarray);
+        FunctionInfo[] farray = new FunctionInfo[functions.size()];
+        for (int i = 0; i < functions.size(); i++) {
+            farray[i] = (FunctionInfo) ((ProcessorFunction) functions.get(i)).getFunctionInfo();
+        }
+
+        tagLibraryInfo = new TagLibraryInfo(descriptionProcessor.getCDATA(), tarray, farray);
 
         descriptionProcessor = null;
         tags = null;
