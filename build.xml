@@ -57,6 +57,7 @@
 
     <property name="commons-logging.jar" location="${dir.jars}/commons-logging-1.0.3/commons-logging.jar"/>
     <property name="log4j-1.2.8.jar" location="${dir.jars}/jakarta-log4j-1.2.8/log4j-1.2.8.jar"/>
+    <property name="commons-collections-2.1.1.jar" location="${dir.jars}/commons-collections-2.1.1/commons-collections-2.1.1.jar"/>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  prepare.post
@@ -89,6 +90,7 @@
 
         <copy toDir="${dir.build.ide.lib}" file="${commons-logging.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${log4j-1.2.8.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${commons-collections-2.1.1.jar}"/>
 
         <!-- paths -->
         <path id="path.compile">

@@ -314,4 +314,62 @@
         <tag-class>org.anodyneos.xp.tag.core.DebugTag</tag-class>
     </tag>
 
+  	<tag>
+    	<name>url</name>
+    	<tag-class>org.anodyneos.xp.tag.core.UrlTag</tag-class>
+    <description>
+        Creates a URL with optional query parameters.
+    </description>
+    <attribute>
+        <name>var</name>
+        <required>false</required>
+        <request-time-ok>false</request-time-ok>
+    </attribute>
+    <attribute>
+        <name>scope</name>
+        <required>false</required>
+        <request-time-ok>false</request-time-ok>
+    </attribute>
+    <attribute>
+        <name>value</name>
+        <required>false</required>
+        <request-time-ok>true</request-time-ok>
+    </attribute>
+    <attribute>
+        <name>context</name>
+        <required>false</required>
+        <request-time-ok>true</request-time-ok>
+    </attribute>
+    <attribute>
+        <name>attributeName</name>
+        <required>false</required>
+        <request-time-ok>true</request-time-ok>
+    </attribute>
+    <attribute>
+        <name>attributeNamespace</name>
+        <required>false</required>
+        <request-time-ok>true</request-time-ok>
+    </attribute>
+  </tag>
+
+
+	<tag>
+    	<name>param</name>
+    	<tag-class>org.anodyneos.xp.tag.core.ParamTag</tag-class>
+    	<description>
+        	Adds a parameter to a containing 'import' tag's URL.
+    	</description>
+    	<attribute>
+        	<name>name</name>
+        	<required>true</required>
+        	<request-time-ok>true</request-time-ok>
+    	</attribute>
+    	<attribute>
+        	<name>value</name>
+        	<required>false</required>
+        	<request-time-ok>true</request-time-ok>
+    	</attribute>
+  	</tag>
+  
+
 </taglib>

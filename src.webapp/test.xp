@@ -41,6 +41,62 @@
                     alkj shfalsdkfh asldjfh alsdjfh alskdfh alsfh alskfh as
                     lkjfhasldfkj hasldfh l
                 </fmt:autoHtml>
+
+
+                <h3>Request Parameters</h3>
+                <table border="2">
+                    <c:set var="last" value=""/>
+                    <c:forEach var="current" items="${param}" varStatus="outerStatus">
+                        <c:forEach var="aVal" items="${paramValues[current.key]}">
+                            <tr>
+                                <td>
+                                    <c:if test="${last != current.key}">
+                                        <b>${current.key}</b>
+                                    </c:if>
+                                </td>
+                                <td>${aVal}</td>
+                            </tr>
+                            <c:set var="last" value="${current.key}"/>
+                        </c:forEach>
+                    </c:forEach>
+                </table>
+
+                <h3>Headers</h3>
+                <table border="2">
+                    <c:forEach var="current" items="${header}">
+                        <tr>
+                            <td>${current}</td>
+                        </tr>
+                    </c:forEach>
+                </table>
+
+                <h3>Cookies</h3>
+                <table border="2">
+                    <c:forEach var="current" items="${cookie}">
+                        <tr>
+                            <td><b>${current.value.name}</b></td>
+                            <td>${current.value.value}</td>
+                        </tr>
+                    </c:forEach>
+                </table>
+
+                <div>URL Testing</div>
+                <a>
+                    <xp:attribute name="href">
+                        <c:url value="/somePage">
+                            <c:param name="param&amp;1" value="val1"/>
+                        </c:url>
+                    </xp:attribute>
+                    Link #1
+                </a>
+
+                <div>Another URL Testing</div>
+                <a>
+                    <c:url value="somePage2" attributeName="href">
+                        <c:param name="param&amp;1" value="val1"/>
+                    </c:url>
+                    Link #2
+                </a>
             </body>
         </html>
     </xp:content>
