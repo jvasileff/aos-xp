@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<registry>
+    <taglib>
+        <taglib-uri>http://www.anodyneos.org/xmlns/xp/fmt</taglib-uri>
+        <taglib-location>fmt.xptld</taglib-location>
+    </taglib>
+    <taglib>
+        <taglib-uri>http://www.anodyneos.org/xmlns/xp/standard</taglib-uri>
+        <taglib-location>standard.xptld</taglib-location>
+    </taglib>
+</registry>

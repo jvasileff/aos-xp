@@ -1,0 +1,24 @@
+compile.deprecation:off
+compile.debug:true
+compile.debuglevel:lines,source
+
+################################################################################
+##
+## EXTERNAL JAR FILES; ONE OF THE FOLLOWING SECTIONS IS NECESSARY:
+##
+################################################################################
+
+## ALL JARS FROM REPOSITORY:
+dir.jars=/path/to/jars
+
+## JARS SPECIFIED INDIVIDUALLY:
+#anodyneos-commons.jar=/path/to/jarfile
+#anodyneos-servlet.jar=/path/to/jarfile
+#ant.jar=/path/to/jarfile
+#bsf.jar=/path/to/jarfile
+#commons-el.jar=/path/to/jarfile
+#jsp-api.jar=/path/to/jarfile
+#junit.jar=/path/to/jarfile
+#servlet.jar=/path/to/jarfile
+#tools.jar=/path/to/jarfile
+

@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+
+<!--****************************************************************************
+**
+**  ANODYNE OS - XP
+**
+*****************************************************************************-->
+
+<project name="anodyneos-xp" default="compile" basedir=".">
+
+    <!--++++++++++++++++++++++++++++++++++++
+    ++
+    ++  SETUP
+    ++
+    +++++++++++++++++++++++++++++++++++++-->
+
+    <property file="build.properties"/>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  common
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <import file="build.common.xml"/>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  properties
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <property environment="env"/>
+    <property name="dir.src.sample"             location="src.sample"/>
+    <property name="dir.build.java.sample"      location="build/java.sample"/>
+    <property name="dir.build.classes.sample"   location="build/classes.sample"/>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  required jars
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <!--
+        ALSO NEED:
+            anodyneos-servlet.jar
+            anodyneos-commons.jar
+    -->
+    <property name="ant.jar" location="${dir.jars}/apache-ant-1.6.1/ant.jar"/>
+    <property name="bsf.jar" location="${dir.jars}/ibm-bsf-2.2/bsf.jar"/>
+    <property name="commons-el.jar" location="${dir.jars}/commons-el-1.0/commons-el.jar"/>
+    <property name="jsp-api.jar" location="${dir.jars}/jsp-api-2.0/jsp-api.jar"/>
+    <property name="junit.jar" location="${dir.jars}/junit-3.8.1/junit.jar"/>
+    <property name="servlet.jar" location="${dir.jars}/servlet-api-2.3/servlet.jar"/>
+    <property name="tools.jar" location="${env.JAVA_HOME}/lib/tools.jar"/>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  prepare.post
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="prepare.post">
+        <!-- make directories -->
+        <mkdir dir="${dir.build.java.sample}"/>
+        <mkdir dir="${dir.build.classes.sample}"/>
+
+        <!-- ide.lib -->
+        <copy toDir="${dir.build.ide.lib}" file="${anodyneos-commons.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${anodyneos-servlet.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${ant.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${bsf.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${commons-el.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${jsp-api.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${junit.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${servlet.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${tools.jar}"/>
+
+        <!-- paths -->
+        <path id="path.compile">
+            <fileset id="fs.lib" dir="${dir.build.ide.lib}">
+                <include name="*.jar"/>
+            </fileset>
+        </path>
+    </target>
+
+    <!--++++++++++++++++++++++++++++++++++++
+    ++
+    ++  SAMPLE
+    ++
+    +++++++++++++++++++++++++++++++++++++-->
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  translateSample
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="translateSample" depends="compile">
+        <java taskname="runSample" fork="yes" classname="org.anodyneos.xpImpl.translater.Translater">
+            <classpath refid="path.compile"/>
+            <classpath location="${dir.build.classes}"/>
+            <arg value="${dir.src.sample}/Page.xp" />
+            <arg value="${dir.build.java.sample}/Page.java" />
+            <arg value="${dir.src.sample}/registry.xpreg" />
+        </java>
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  compileSample
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="compileSample" depends="translateSample">
+        <!-- compile -->
+        <javac  destdir="${dir.build.classes.sample}"
+                deprecation="no"
+                includes="**/*.java"
+                debuglevel="${compile.debuglevel}"
+                debug="${compile.debug}">
+            <classpath refid="path.compile"/>
+            <classpath location="${dir.build.classes}"/>
+            <src path="${dir.build.java.sample}"/>
+        </javac>
+        <!-- resources -->
+        <copy toDir="${dir.build.classes.sample}">
+            <fileset dir="${dir.build.java.sample}">
+                <patternset refid="pattern.resources"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  runSample
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="runSample" depends="compileSample">
+        <java taskname="runSample" fork="yes" classname="Page">
+            <classpath refid="path.compile"/>
+            <classpath location="${dir.build.classes}"/>
+            <classpath location="${dir.build.classes.sample}"/>
+        </java>
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  cs
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="cs">
+        <!-- compile -->
+        <javac  destdir="${dir.build.classes.sample}"
+                deprecation="no"
+                includes="**/*.java"
+                debuglevel="${compile.debuglevel}"
+                debug="${compile.debug}">
+            <classpath refid="path.compile"/>
+            <classpath location="${dir.build.classes}"/>
+            <src path="${dir.build.java.sample}"/>
+        </javac>
+        <!-- resources -->
+        <copy toDir="${dir.build.classes.sample}">
+            <fileset dir="${dir.build.java.sample}">
+                <patternset refid="pattern.resources"/>
+            </fileset>
+        </copy>
+    </target>
+</project>
+

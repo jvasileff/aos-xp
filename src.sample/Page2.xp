@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+
+<xp:page 
+    xmlns:xp="http://www.anodyneos.org/xmlns/xp"
+    xmlns:fmt="http://www.anodyneos.org/xmlns/xp/fmt"
+    xmlns:c="http://www.anodyneos.org/xmlns/xp/standard"
+>
+
+    <!--
+    <xp:output
+        type="xml|html"
+        doctype-system="xxx"
+        doctype-public="xxx"
+        xhtml-compat="true|false">
+
+    <xp:xsl url="xx">
+    <xp:xsl url="xx">
+    -->
+
+    <xp:content>
+        <html>
+            <fmt:timeZone timeZone="America/New_York" e="\${er} ${expr}"/>
+            <fmt:timeZone timeZone="America/New_York" e="\${er}\${\${"/>
+            <fmt:timeZone timeZone="America/New_York"/>
+            <fmt:timeZone timeZone="America/New_York"/>
+            <fmt:timeZone timeZone="America/New_York"/>
+            <fmt:timeZone timeZone="America/New_York"/>
+            <head/>
+            <body class="${expr}">
+                <h1>
+                    Heading...
+                    ${myexpression}
+                    \$
+                    $
+                </h1>
+                \${ $ \$ asdfasdf
+                ${expr1}${expr2}${expr3}
+            </body>
+        </html>
+        <c:set>
+            <h1/>
+        </c:set>
+        <c:set>
+            <h1/>
+        </c:set>
+    </xp:content>
+</xp:page>
