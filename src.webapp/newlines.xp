@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!DOCTYPE xp:page [
+    <!ENTITY copy "&#169;">
+    <!ENTITY nbsp "&#160;">
+    <!ENTITY baseURL "..">
+]>
+
+<xp:page 
+    xmlns:xp="http://www.anodyneos.org/xmlns/xp"
+    xmlns:fmt="http://www.anodyneos.org/xmlns/xp/fmt"
+    xmlns:c="http://www.anodyneos.org/xmlns/xp/core"
+    xmlns="http://www.w3.org/1999/xhtml"
+>
+    <xp:output  indent="yes"
+                indentAmount="2"
+                mediaType="application/xhtml+xml"
+                encoding="us-ascii"
+                method="xml"
+                excludeResultPrefixes="xp xpext fmt c" />
+    <xp:content>
+        <html>
+            <head/>
+            <body>
+                <h1>Newline Testing</h1>
+                <form method="post">
+                    <c:set var="myvar" value="pre ${'mid'} post"/>
+                    <!--<xp:attribute name="action" value="http://localhost:8080/aos-servlet/echoRaw"/>-->
+                    <textarea rows="20" cols="80" name="text">${param.text}</textarea>
+                    <br/>
+                    <input type="submit"/>
+                </form>
+                <br/>
+                <form method="post">
+                    <textarea rows="20" cols="80" name="text">1
+23
+4
+6
+7
+8
+9
+10</textarea>
+                    <br/>
+                    <input type="submit"/>
+                </form>
+            </body>
+        </html>
+    </xp:content>
+</xp:page>
