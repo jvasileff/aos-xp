@@ -7,7 +7,11 @@ import javax.servlet.jsp.el.VariableResolver;
 
 public interface XpContext {
 
-    void initialize();
+    public static final int PAGE_SCOPE = 1;
+
+    public static final String PAGE_SCOPE_STRING = "page";
+
+    //void initialize();
     void release();
 
     Object getAttribute(String name);
@@ -20,6 +24,9 @@ public interface XpContext {
     void setAttribute(String name, Object obj, int scope);
 
     Enumeration getAttributeNamesInScope(int scope);
+
+    Object findAttribute(String name);
+    int getAttributesScope(String name);
 
     ExpressionEvaluator getExpressionEvaluator();
     VariableResolver getVariableResolver();

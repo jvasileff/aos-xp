@@ -18,7 +18,11 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
      * Page Context
      */
     private Map[] scopeMaps = new Map[] { new HashMap(), new HashMap() };
+
+    private Map pageScopeMap = new HashMap();
+    private Map globalScopeMap = new HashMap();
     private VariableResolver variableResolver;
+    private ExpressionEvaluator expEval = new ExpressionEvaluatorImpl(false);
 
     public StandaloneXpContextImpl() {
     }
@@ -34,66 +38,102 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
     // XpContext methods
 
     public Object getAttribute(String name) {
-        return scopeMaps[PAGE_SCOPE].get(name);
+        return pageScopeMap.get(name);
     }
 
     public Object getAttribute(String name, int scope) {
-        try {
-            return scopeMaps[scope].get(name);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new IllegalArgumentException("invalid scope: " + scope);
+        switch (scope) {
+            case PAGE_SCOPE:
+                return pageScopeMap.get(name);
+            case GLOBAL_SCOPE:
+                return globalScopeMap.get(name);
+            default:
+                throw new IllegalArgumentException("invalid scope: " + scope);
         }
     }
 
     public void removeAttribute(String name) {
-        scopeMaps[PAGE_SCOPE].remove(name);
+        pageScopeMap.remove(name);
     }
 
     public void removeAttribute(String name, int scope) {
-        try {
-            scopeMaps[scope].remove(name);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new IllegalArgumentException("invalid scope: " + scope);
+        switch (scope) {
+            case PAGE_SCOPE:
+                pageScopeMap.remove(name);
+                break;
+            case GLOBAL_SCOPE:
+                globalScopeMap.remove(name);
+                break;
+            default:
+                throw new IllegalArgumentException("invalid scope: " + scope);
         }
     }
 
     public void setAttribute(String name, Object obj) {
-        scopeMaps[PAGE_SCOPE].put(name, obj);
+        pageScopeMap.put(name, obj);
     }
 
     public void setAttribute(String name, Object obj, int scope) {
-        try {
-            scopeMaps[scope].put(name, obj);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new IllegalArgumentException("invalid scope: " + scope);
+        if (null == obj) {
+            removeAttribute(name, scope);
+        } else {
+            switch (scope) {
+                case PAGE_SCOPE:
+                    pageScopeMap.put(name,obj);
+                    break;
+                case GLOBAL_SCOPE:
+                    globalScopeMap.put(name,obj);
+                    break;
+                default:
+                    throw new IllegalArgumentException("invalid scope: " + scope);
+            }
         }
     }
 
     public Enumeration getAttributeNamesInScope(int scope){
-        try {
-            Set keys = scopeMaps[scope].keySet();
-            final String[] array = (String[]) keys.toArray(new String[keys.size()]);
-            return new Enumeration() {
-                private int next = 0;
-
-                public boolean hasMoreElements() {
-                    if(next >= array.length) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                }
-
-                public Object nextElement() throws NoSuchElementException {
-                    if(! hasMoreElements()) {
-                        throw new NoSuchElementException("no more elements.");
-                    }
-                    return array[next++];
-                }
-            };
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new IllegalArgumentException("invalid scope: " + scope);
+        Set keys;
+        switch (scope) {
+            case PAGE_SCOPE:
+                keys = pageScopeMap.keySet();
+                break;
+            case GLOBAL_SCOPE:
+                keys = globalScopeMap.keySet();
+                break;
+            default:
+                throw new IllegalArgumentException("invalid scope: " + scope);
         }
+        final String[] array = (String[]) keys.toArray(new String[keys.size()]);
+        return new Enumeration() {
+            private int next = 0;
+
+            public boolean hasMoreElements() {
+                if(next >= array.length) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            public Object nextElement() throws NoSuchElementException {
+                if(! hasMoreElements()) {
+                    throw new NoSuchElementException("no more elements.");
+                }
+                return array[next++];
+            }
+        };
+    }
+
+    public Object findAttribute(String name) {
+        Object o;
+        o = getAttribute(name, PAGE_SCOPE);
+        if(null == o) { o = getAttribute(name, GLOBAL_SCOPE); }
+        return o;
+    }
+
+    public int getAttributesScope(String name) {
+        if(null != getAttribute(name, PAGE_SCOPE)) { return PAGE_SCOPE; }
+        if(null != getAttribute(name, GLOBAL_SCOPE)) { return GLOBAL_SCOPE; }
+        return 0;
     }
 
     public VariableResolver getVariableResolver() {
@@ -101,7 +141,7 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
     }
 
     public ExpressionEvaluator getExpressionEvaluator() {
-        return new ExpressionEvaluatorImpl();
+        return expEval;
     }
 
     public int resolveScope(String scope) {

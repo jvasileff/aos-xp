@@ -1,6 +1,5 @@
 package org.anodyneos.xp.util;
 
-import java.io.OutputStream;
 import java.io.PrintStream;
 
 import javax.xml.transform.OutputKeys;

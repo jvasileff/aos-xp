@@ -24,9 +24,9 @@ public class StandaloneVariableResolverImpl implements VariableResolver {
      * Implicit variables take precidence over defined variables.
      */
     public Object resolveVariable(String pName) throws ELException {
-        if ("pageScope".equals(pName)) {
+        if (StandaloneXpContext.PAGE_SCOPE_STRING.equals(pName)) {
             return new PageScopeMap(ctx);
-        } else if ("globalScope".equals(pName)) {
+        } else if (StandaloneXpContext.GLOBAL_SCOPE_STRING.equals(pName)) {
             return new GlobalScopeMap(ctx);
         } else {
             return ctx.getAttribute(pName);
@@ -67,7 +67,6 @@ public class StandaloneVariableResolverImpl implements VariableResolver {
             return ctx.getAttributeNamesInScope(StandaloneXpContext.GLOBAL_SCOPE);
         }
 
-
         public boolean isMutable() {
             return true;
         }
@@ -79,8 +78,6 @@ public class StandaloneVariableResolverImpl implements VariableResolver {
                 return null;
             }
         }
-
     }
-
 
 }
