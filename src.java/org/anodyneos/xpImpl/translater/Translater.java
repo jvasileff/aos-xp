@@ -59,7 +59,7 @@ public class Translater extends BaseParser {
 
         // add a / if it doesn't exist
         char lastChar = xpRoot.charAt(xpRoot.length()-1);
-        if ( lastChar != '/' && lastChar != '/'){
+        if ( lastChar != '/' && lastChar != '\\'){
             xpRoot += File.separatorChar;
         }
         // translate codegen
