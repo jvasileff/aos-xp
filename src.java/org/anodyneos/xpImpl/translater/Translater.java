@@ -3,6 +3,7 @@ package org.anodyneos.xpImpl.translater;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import org.anodyneos.commons.net.ClassLoaderURIHandler;
 import org.anodyneos.commons.xml.UnifiedResolver;
@@ -46,7 +47,7 @@ public class Translater extends BaseParser {
         }
     }
 
-    public static void translate(String xpRoot, String xpPage, String javaFile, String registryFile) throws Exception{
+    public static TranslaterResult translate(String xpRoot, String xpPage, String javaFile, String registryFile) throws Exception{
         OutputStream os;
         Translater obj = new Translater();
 
@@ -65,6 +66,9 @@ public class Translater extends BaseParser {
         // translate codegen
         String className = xpPage;
         className = className.substring(xpRoot.length(),className.length());
+        if (className.startsWith("/")){
+            className = className.substring(1,className.length());
+        }
         className = className.replace('/','.');
         className = className.replace('\\','.');
         className = className.substring(0, className.lastIndexOf('.'));
@@ -72,9 +76,10 @@ public class Translater extends BaseParser {
         // TODO: create (sub)directory(s) if not already exist
         os = new FileOutputStream(javaFile);
 
-        obj.process(new InputSource(xpPage), os, registry, className);
+        TranslaterResult result = obj.process(new InputSource(xpPage), os, registry, className);
         os.close();
 
+        return result;
     }
 
     public TranslaterResult process(InputSource is, OutputStream os,
@@ -85,6 +90,7 @@ public class Translater extends BaseParser {
         TranslaterProcessor p = new ProcessorPage(ctx);
         process(is, p);
         out.flush();
+
         return (TranslaterResult) ctx;
     }
 
