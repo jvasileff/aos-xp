@@ -20,6 +20,7 @@ import javax.servlet.jsp.el.VariableResolver;
 import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.tagext.XpTagSupport;
+import org.xml.sax.SAXException;
 
 /**
  * SetTag supports setting a value of a scripting variable or a property of a
@@ -27,11 +28,11 @@ import org.anodyneos.xp.tagext.XpTagSupport;
  *
  * <xp:set @value @var [@scope]/>
  *
- * <xp:set @var [@scope]>bodyContent </xp:set> (Not yet supported)
+ * <xp:set @var [@scope]>bodyContent </xp:set>
  *
  * <xp:set @value @target @property/>
  *
- * <xp:set @target @property>bodyContent </xp:set> (Not yet supported)
+ * <xp:set @target @property>bodyContent </xp:set>
  *
  * @author jvas
  */
@@ -70,7 +71,15 @@ public class SetTag extends XpTagSupport {
         this.var = var;
     }
 
-    public void doTag(XpContentHandler out) throws XpException, ELException {
+    public void doTag(XpContentHandler out) throws XpException, ELException, SAXException {
+        if (null == value) {
+            if (getXpBody() != null) {
+                // get value from body
+                value = getXpBody().invokeToString();
+            } else {
+                value = null;
+            }
+        }
         if (null != var) {
             // simple case, setting a scripting variable
             if (null == scope) {
