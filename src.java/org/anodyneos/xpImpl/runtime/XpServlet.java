@@ -256,6 +256,12 @@ public class XpServlet extends HttpServlet{
 
         cpath.append(scratchDir);
 
+        // The following is tomcat specific
+        String tccp = (String) getServletContext().getAttribute("org.apache.catalina.jsp_classpath");
+        if (null != tccp) {
+            cpath.append(File.pathSeparator + tccp);
+        }
+
         if (logger.isInfoEnabled()) {
             logger.info("XpServlet.getClassPath - " + cpath.toString());
         }
