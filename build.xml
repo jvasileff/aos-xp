@@ -43,6 +43,10 @@
     <property name="batik.jar" location="${dir.jars}/apache-fop-0.20.5/batik.jar"/>
     <property name="avalon-framework-cvs-20020806.jar" location="${dir.jars}/apache-fop-0.20.5/avalon-framework-cvs-20020806.jar"/>
 
+    <!-- for jsp -->
+    <property name="jstl.jar" location="${dir.jars}/jstl/jstl.jar"/>
+    <property name="standard.jar" location="${dir.jars}/jstl/standard.jar"/>
+
     <property name="ant.jar" location="${dir.jars}/apache-ant-1.6.1/ant.jar"/>
     <property name="bsf.jar" location="${dir.jars}/ibm-bsf-2.2/bsf.jar"/>
     <property name="commons-el.jar" location="${dir.jars}/commons-el-1.0/commons-el.jar"/>
@@ -74,6 +78,9 @@
         <copy toDir="${dir.build.ide.lib}" file="${batik.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${avalon-framework-cvs-20020806.jar}"/>
 
+        <copy toDir="${dir.build.ide.lib}" file="${jstl.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${standard.jar}"/>
+
         <copy toDir="${dir.build.ide.lib}" file="${anodyneos-commons.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${anodyneos-servlet.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${ant.jar}"/>
@@ -102,6 +109,7 @@
         <fileset id="fs.jars" dir="${dir.build.ide.lib}">
             <include name="*.jar"/>
             <exclude name="servlet.jar"/>
+            <exclude name="jsp-api.jar"/>
         </fileset>
     </target>
 
@@ -115,6 +123,10 @@
                 <include name="log4j.properties"/>
             </fileset>
         </copy>
+
+        <!-- /WEB-INF/classes/META-INF/services/javax.xml.transform.TransformerFactory -->
+        <copy file="${dir.src.misc}/TransformerFactory.${transformerFactory}"
+                tofile="${dir.build.webapp}/WEB-INF/classes/META-INF/services/javax.xml.transform.TransformerFactory"/>
     </target>
 
     <!--++++++++++++++++++++++++++++++++++++
