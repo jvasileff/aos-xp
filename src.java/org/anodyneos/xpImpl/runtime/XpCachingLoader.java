@@ -1,6 +1,5 @@
 package org.anodyneos.xpImpl.runtime;
 
-import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
@@ -104,13 +103,7 @@ public class XpCachingLoader{
     private void compileXp(URI xpURI) throws Exception {
         System.out.println("Compiling " + xpURI.toString());
 
-        String cPath = System.getProperty("java.class.path");
-
-        cPath += File.pathSeparator + getClassPath();
-
-        System.out.println("classpath = " + cPath);
-
-        JavaCompiler compiler = new SunJavaCompiler(cPath,getClassRoot());
+        JavaCompiler compiler = new SunJavaCompiler(getClassPath(),getClassRoot());
 
         compiler.setSourcePath(getJavaRoot());
         compiler.compile(Translater.getJavaFile(getJavaRoot(),xpURI),System.err);
