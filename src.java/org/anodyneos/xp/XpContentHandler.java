@@ -101,6 +101,9 @@ public final class XpContentHandler implements ContentHandler {
 
     public void startElement( String namespaceURI, String localName, String qName, Attributes atts)
     throws SAXException {
+
+        // **** WARNING **** Any changes made here should also be made in the other startElement() method.
+
         if(logDebugEnabled) {
             logger.debug("startElement("
                     + namespaceURI
@@ -111,15 +114,6 @@ public final class XpContentHandler implements ContentHandler {
         }
         flush();
 
-        // buffer this element to allow attributes to be added
-        bufferedElNamespaceURI = namespaceURI;
-        bufferedElLocalName = localName;
-        bufferedElQName = qName;
-        bufferedElAttributes.clear();
-        if (atts != null) {
-            bufferedElAttributes.setAttributes(atts);
-        }
-
         // nextEl is now bufferedEl, save mappings and get ready for mappings for the next element.
         namespaceSupport.pushContext();
         Iterator it = nextElStartPrefixMappings.keySet().iterator();
@@ -128,6 +122,15 @@ public final class XpContentHandler implements ContentHandler {
             namespaceSupport.declarePrefix(prefix, (String) nextElStartPrefixMappings.get(prefix));
         }
         nextElStartPrefixMappings.clear();
+
+        // buffer this element to allow attributes to be added
+        bufferedElNamespaceURI = namespaceURI;
+        bufferedElLocalName = localName;
+        bufferedElQName = qName;
+        bufferedElAttributes.clear();
+        if (atts != null) {
+            bufferedElAttributes.setAttributes(atts);
+        }
     }
 
     public void endElement(String namespaceURI, String localName, String qName) throws SAXException {
@@ -267,6 +270,170 @@ public final class XpContentHandler implements ContentHandler {
         }
     }
 
+    /**
+     * This method tries to be forgiving, the following rules apply:
+     *
+     * 1. When uri == null && qName has a prefix: The prefix must be in scope.
+     * The namespace URI in the output will be that of the namespace associated
+     * with the prefix. If the prefix is not in scope, a SAXException is thrown.
+     *
+     * 2. When uri == null && qName has no prefix: The qName is used as is with
+     * the current default namespace URI.
+     *
+     * 3. When uri == "": The element will have no namespace and the default xmlns
+     * will be set to "no namespace".
+     *
+     * 4. When uri == someURI: A prefix will be given to the attribute in the
+     * following priority:
+     *
+     * 4.a) If the uri is the current default namespace, no prefix will be used.
+     *
+     * 4.b) the provided prefix if one was provided and it is currently mapped to
+     * the uri.
+     *
+     * 4.c) a prefix that is currently mapped to the URI.
+     *
+     * 4.d) the provided prefix if it is not currently mapped to another URI.  A new
+     * mapping will be created.
+     *
+     * 4.e) a generated prefix. In the case of D or E, a new namespace mapping
+     * will be created.
+     */
+    public void startElement(String uri, String qName) throws SAXException {
+        flush();
+
+        // first, make namespaceSupport current so we can use it.
+        // nextEl is now bufferedEl, save mappings and get ready for mappings for the next element.
+        namespaceSupport.pushContext();
+        Iterator it = nextElStartPrefixMappings.keySet().iterator();
+        while (it.hasNext()) {
+            String prefix = (String) it.next();
+            namespaceSupport.declarePrefix(prefix, (String) nextElStartPrefixMappings.get(prefix));
+        }
+        // Don't do this quite yet (we may need to undo our work...
+        // nextElStartPrefixMappings.clear();
+
+        String[] elData;
+
+        try {
+            elData = resolveElementPrefix(uri, qName);
+        } catch (SAXException e) {
+            // undo our namespace changes
+            namespaceSupport.popContext();
+            throw e;
+        }
+
+        // finish namespace cleanup work
+        nextElStartPrefixMappings.clear();
+
+        String myURI = elData[0];
+        String localName = elData[1];
+        String myQName = elData[2];
+        String prefix = parsePrefix(myQName);
+
+        // find out if we need to declare a new prefix or a new default namespace
+        String currentURI = namespaceSupport.getURI(prefix);
+        if (null == currentURI) {
+            currentURI = "";
+        }
+        if (! myURI.equals(currentURI)) {
+            // at this point, namespaceSupport holds mappings for this element
+            // (at the start of this method, it was nextElStartPrefixMappings,
+            // but this element _is_ the "next element" now.
+            namespaceSupport.declarePrefix(prefix, myURI);
+        }
+
+        // buffer this element to allow attributes to be added
+        bufferedElNamespaceURI = myURI;
+        bufferedElLocalName = localName;
+        bufferedElQName = myQName;
+        bufferedElAttributes.clear();
+    }
+
+    /**
+     * This method corresponds to startElement(uri, qName);
+     *
+     * @param uri
+     * @param qName
+     */
+    public void endElement(String uri, String qName) throws SAXException {
+        // NOTE: we are trusting that sane values where passed in for uri and qName here.
+
+        String[] elData;
+        elData = resolveElementPrefix(uri, qName);
+
+        String myURI = elData[0];
+        String localName = elData[1];
+        String myQName = elData[2];
+
+        endElement(myURI, localName, myQName);
+    }
+
+    private String[] resolveElementPrefix(final String uri, final String qName) throws SAXException {
+        final String myQName;
+        final String myURI;
+        final String localName = parseLocalName(qName);
+        final String prefix = parsePrefix(qName);
+
+        if (localName.length() == 0) {
+            throw new SAXException("Could not determine localName for element: '" + qName + "'.");
+        }
+
+        if (null == uri) {
+            if (prefix.length() == 0) {
+                myQName = localName;
+                String u = namespaceSupport.getURI("");
+                if (null == u) {
+                    u = "";
+                }
+                myURI = u;
+            } else {
+                // the prefix must be in scope
+                myURI = namespaceSupport.getURI(prefix);
+                if (null == myURI) {
+                    throw new SAXException("Cannot find URI for '" + qName + "' and none was provided.");
+                }
+                myQName = qName;
+            }
+        } else if (uri.length() == 0) {
+            // use "" URI and no prefix
+            myQName = localName;
+            myURI = "";
+            // *** startPrefixMapping("", myURI);
+        } else {
+            // we have a uri, lets find a good prefix
+            if (uri.equals(namespaceSupport.getURI(""))) {
+                // Case A: the uri is currently the default namespace; don't use a prefix
+                myQName = localName;
+                myURI = uri;
+            } else if (prefix.length() != 0 && uri.equals(namespaceSupport.getURI(prefix))) {
+                // Case B: prefix was provided and uri matches
+                myQName = qName;
+                myURI = uri;
+            } else {
+                String p = namespaceSupport.getPrefix(uri);
+                if (null != p) {
+                    // Case C: we already have a perfectly good prefix
+                    myQName = p + ":" + localName;
+                    myURI = uri;
+                } else if (prefix.length() != 0 && (null == namespaceSupport.getURI(prefix))) {
+                    // Case D: the provided prefix will do; create new namespace mapping
+                    // *** startPrefixMapping(prefix, uri);
+                    myQName = qName;
+                    myURI = uri;
+                } else {
+                    // Case E: punt... generate a new prefix for the attribute
+                    p = genPrefix();
+                    // *** startPrefixMapping(p, uri);
+                    myQName = p + ":" + localName;
+                    myURI = uri;
+                }
+            }
+        }
+
+        return new String[] {myURI, localName, myQName};
+    }
+
     ////////////////////////////////////////////////////////////////////////////////
     //
     // SAX Methods (simple pass through)
@@ -348,6 +515,9 @@ public final class XpContentHandler implements ContentHandler {
             while (e.hasMoreElements()) {
                 String prefix = (String) e.nextElement();
                 String uri = namespaceSupport.getURI(prefix);
+                if (null == uri) {
+                    uri = "";
+                }
                 if(logDebugEnabled) {
                     logger.debug("   calling wrapped contentHandler.startPrefixMapping("
                             + "'"   + prefix + "'"
