@@ -13,6 +13,8 @@ import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.tagext.XpTagSupport;
 import org.xml.sax.SAXException;
 
+import java.util.Collection;
+
 /**
  * @author jvas
  *
@@ -40,11 +42,30 @@ public final class ForEachTag extends XpTagSupport {
             return;
         }
         saveVars();
-        for (int i = begin; i <= end; i+=step) {
-            if (null != var) {
-                getXpContext().setAttribute(var, Integer.toString(i));
+        if (items != null){
+
+            Object[] arrItems;
+
+            if (!(items instanceof Object[])){
+                // TODO test with various collection types
+                arrItems = ((Collection)items).toArray();
+            }else{
+                arrItems = (Object[])items;
             }
-            getXpBody().invoke(out);
+            for (int i = 0; i < arrItems.length; i+=step) {
+                if (null != var) {
+                    getXpContext().setAttribute(var, arrItems[i]);
+                }
+                getXpBody().invoke(out);
+            }
+
+        }else{
+            for (int i = begin; i <= end; i+=step) {
+                if (null != var) {
+                    getXpContext().setAttribute(var, Integer.toString(i));
+                }
+                getXpBody().invoke(out);
+            }
         }
         restoreVars();
     }
