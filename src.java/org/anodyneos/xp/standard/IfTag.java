@@ -35,7 +35,7 @@ public class IfTag extends XpTagSupport {
 
     public void doTag(XpContentHandler out) throws XpException, ELException, SAXException {
         if(var != null && scope != null) {
-            getXpContext().setAttribute(var, Boolean.valueOf(test), 0);
+            getXpContext().setAttribute(var, Boolean.valueOf(test), getXpContext().resolveScope(scope));
         } else if (var!=null) {
             getXpContext().setAttribute(var, Boolean.valueOf(test));
         }

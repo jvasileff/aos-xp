@@ -211,7 +211,8 @@ public class Util {
 
                 // Same as string, but run-time pass through Coerce utility
                 if (CoerceUtil.isNativeType(type)) {
-                    expr.insert(0, "org.anodyneos.xp.util.XpCoerce.coerceTo" + type + "Type(");
+                    String type2 = type.substring(0,1).toUpperCase() + type.substring(1);
+                    expr.insert(0, "org.anodyneos.xp.util.XpCoerce.coerceTo" + type2 + "Type(");
                     expr.append(")");
                 } else if (CoerceUtil.isBoxClass(type)) {
                     expr.insert(0, "org.anodyneos.xp.util.XpCoerce.coerceTo" + type + "(");
