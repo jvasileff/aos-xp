@@ -11,8 +11,8 @@ import org.anodyneos.xp.XpContext;
 
 public abstract class HttpXpContext implements XpContext {
 
-    public static final int REQUEST_SCOPE = 10;
-    public static final int SESSION_SCOPE = 11;
+    public static final int REQUEST_SCOPE = 2;
+    public static final int SESSION_SCOPE = 3;
 
     public static final String REQUEST_SCOPE_STRING = "request";
     public static final String SESSION_SCOPE_STRING = "session";
