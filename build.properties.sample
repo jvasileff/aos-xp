@@ -9,11 +9,11 @@ compile.debuglevel:lines,source
 ################################################################################
 
 ## ALL JARS FROM REPOSITORY:
-dir.jars=/path/to/jars
+dir.jars=/opt/gx/repository/jars
 
 ## JARS SPECIFIED INDIVIDUALLY:
-#anodyneos-commons.jar=/path/to/jarfile
-#anodyneos-servlet.jar=/path/to/jarfile
+anodyneos-commons.jar=../anodyneos-commons/build/jar/anodyneos-commons.jar
+anodyneos-servlet.jar=../anodyneos-servlet/build/jar/anodyneos-servlet.jar
 #ant.jar=/path/to/jarfile
 #bsf.jar=/path/to/jarfile
 #commons-el.jar=/path/to/jarfile
