@@ -54,7 +54,7 @@ public class Translater extends BaseParser {
         }
     }
 
-    public static void translate(String xpPage, String javaFile, String registryFile) throws Exception{
+    public static void translate(String xpRoot, String xpPage, String javaFile, String registryFile) throws Exception{
         OutputStream os;
         Translater obj = new Translater();
 
@@ -66,17 +66,21 @@ public class Translater extends BaseParser {
         TagLibraryRegistry registry = new RegistryParser().process(is, resolver);
 
         // translate codegen
-        File inputFile = new File(xpPage);
-        String className = inputFile.getName();
-        className = className.substring(0, className.indexOf('.'));
+        String className = xpPage;
+        className = className.substring(xpRoot.length(),className.length());
+        className = className.replace('/','.');
+        className = className.substring(0, className.lastIndexOf('.'));
+
         os = new FileOutputStream(javaFile);
 
         obj.process(new InputSource(xpPage), os, registry, className);
         os.close();
 
     }
+
     public TranslaterResult process(InputSource is, OutputStream os,
             TagLibraryRegistry taglibRegistry, String fullClassName) throws Exception {
+        System.out.println("process: fullClasName = " + fullClassName);
         CodeWriter out = new CodeWriter(os);
         TranslaterContext ctx = new TranslaterContext(is, out, taglibRegistry);
         ctx.setFullClassName(fullClassName);
