@@ -73,13 +73,33 @@ public class Translater extends BaseParser {
         className = className.replace('\\','.');
         className = className.substring(0, className.lastIndexOf('.'));
 
-        // TODO: create (sub)directory(s) if not already exist
-        os = new FileOutputStream(javaFile);
+        if (createDir(javaFile)){
+            os = new FileOutputStream(javaFile);
+        }else{
+            throw new Exception("Unable to create file: " + javaFile +
+                    " because the directory structure could not be created.");
+        }
 
         TranslaterResult result = obj.process(new InputSource(xpPage), os, registry, className);
         os.close();
 
         return result;
+    }
+
+    private static boolean createDir(String javaFile){
+        boolean created = false;
+        System.out.println("javaFile = " + javaFile);
+        String filePath = javaFile.replaceFirst("[/\\\\]\\w*\\.java","");
+
+        File dir = new File(filePath);
+        System.out.println("Creating " + dir.getAbsolutePath());
+        if (!dir.exists()){
+            created = dir.mkdirs();
+        }else{
+            created = true;
+        }
+
+        return created;
     }
 
     public TranslaterResult process(InputSource is, OutputStream os,
