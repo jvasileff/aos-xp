@@ -1,4 +1,4 @@
-package org.anodyneos.xp.standard;
+package org.anodyneos.xp.tag.core;
 
 import javax.servlet.jsp.el.ELException;
 

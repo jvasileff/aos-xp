@@ -1,0 +1,317 @@
+<?xml version="1.0"?>
+
+<taglib>
+    <description>
+        Standard taglib.
+    </description>
+    <tag>
+        <description>Sets the result of an expression evaluation in a 'scope'</description>
+        <name>set</name>
+        <tag-class>org.anodyneos.xp.standard.SetTag</tag-class>
+        <attribute>
+            <description>
+                Name of the exported scoped variable to hold the value
+                specified in the action. The type of the scoped variable is
+                whatever type the value expression evaluates to.
+            </description>
+            <name>var</name>
+            <required>false</required>
+            <request-time-ok>false</request-time-ok>
+        </attribute>
+        <attribute>
+            <description>
+                Expression to be evaluated.
+            </description>
+            <name>value</name>
+            <required>false</required>
+            <request-time-ok>true</request-time-ok>
+            <type>java.lang.Object</type>
+        </attribute>
+        <attribute>
+            <description>
+                Target object whose property will be set. Must evaluate to a
+                JavaBeans object with setter property property, or to a
+                java.util.Map object.
+            </description>
+            <name>target</name>
+            <required>false</required>
+            <request-time-ok>true</request-time-ok>
+            <type>java.lang.Object</type>
+        </attribute>
+        <attribute>
+            <description>
+                Name of the property to be set in the target object.
+            </description>
+            <name>property</name>
+            <required>false</required>
+            <request-time-ok>true</request-time-ok>
+        </attribute>
+        <attribute>
+            <description>
+                Scope for var.
+            </description>
+            <name>scope</name>
+            <required>false</required>
+            <request-time-ok>false</request-time-ok>
+        </attribute>
+    </tag>
+
+    <tag>
+        <description>
+            The basic iteration tag, accepting many different collection types
+            and supporting subsetting and other functionality
+        </description>
+        <name>forEach</name>
+        <tag-class>org.anodyneos.xp.standard.ForEachTag</tag-class>
+        <attribute>
+            <description>
+                Collection of items to iterate over.
+            </description>
+            <name>items</name>
+            <required>false</required>
+            <request-time-ok>true</request-time-ok>
+            <type>java.lang.Object</type>
+        </attribute>
+        <attribute>
+            <description>
+                If items specified: Iteration begins at the item located at the
+                specified index. First item of the collection has index 0.  If
+                items not specified: Iteration begins with index set at the
+                value specified.
+            </description>
+            <name>begin</name>
+            <required>false</required>
+            <request-time-ok>true</request-time-ok>
+            <type>int</type>
+        </attribute>
+        <attribute>
+            <description>
+                If items specified: Iteration ends at the item located at the
+                specified index (inclusive).  If items not specified: Iteration
+                ends when index reaches the value specified.
+            </description>
+            <name>end</name>
+            <required>false</required>
+            <request-time-ok>true</request-time-ok>
+            <type>int</type>
+        </attribute>
+        <attribute>
+            <description>
+                Iteration will only process every step items of the collection,
+                starting with the first one.
+            </description>
+            <name>step</name>
+            <required>false</required>
+            <request-time-ok>true</request-time-ok>
+            <type>int</type>
+        </attribute>
+        <attribute>
+            <description>
+                Name of the exported scoped variable for the current item of
+                the iteration. This scoped variable has nested visibility. Its
+                type depends on the object of the underlying collection.
+            </description>
+            <name>var</name>
+            <required>false</required>
+            <request-time-ok>false</request-time-ok>
+        </attribute>
+        <attribute>
+            <description>
+                Name of the exported scoped variable for the status of the
+                iteration. Object exported is of type
+                javax.servlet.jsp.jstl.core.LoopTagStatus. This scoped variable
+                has nested visibility.
+            </description>
+            <name>varStatus</name>
+            <required>false</required>
+            <request-time-ok>false</request-time-ok>
+        </attribute>
+    </tag>
+
+    <tag>
+        <description>
+            Iterates over tokens, separated by the supplied delimeters
+        </description>
+        <name>forTokens</name>
+        <tag-class>org.apache.taglibs.standard.tag.rt.core.ForTokensTag</tag-class>
+        <attribute>
+            <description>
+                String of tokens to iterate over.
+            </description>
+            <name>items</name>
+            <required>true</required>
+            <request-time-ok>true</request-time-ok>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                The set of delimiters (the characters that separate the tokens
+                in the string).
+            </description>
+            <name>delims</name>
+            <required>true</required>
+            <request-time-ok>true</request-time-ok>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Iteration begins at the token located at the specified index.
+                First token has index 0.
+            </description>
+            <name>begin</name>
+            <required>false</required>
+            <request-time-ok>true</request-time-ok>
+            <type>int</type>
+        </attribute>
+        <attribute>
+            <description>
+                Iteration ends at the token located at the specified index
+                (inclusive).
+            </description>
+            <name>end</name>
+            <required>false</required>
+            <request-time-ok>true</request-time-ok>
+            <type>int</type>
+        </attribute>
+        <attribute>
+            <description>
+                Iteration will only process every step tokens of the string,
+                starting with the first one.
+            </description>
+            <name>step</name>
+            <required>false</required>
+            <request-time-ok>true</request-time-ok>
+            <type>int</type>
+        </attribute>
+        <attribute>
+            <description>
+                Name of the exported scoped variable for the current item of
+                the iteration. This scoped variable has nested visibility.
+            </description>
+            <name>var</name>
+            <required>false</required>
+            <request-time-ok>false</request-time-ok>
+        </attribute>
+        <attribute>
+            <description>
+                Name of the exported scoped variable for the status of the
+                iteration. Object exported is of type
+                javax.servlet.jsp.jstl.core.LoopTag Status. This scoped
+                variable has nested visibility.
+            </description>
+            <name>varStatus</name>
+            <required>false</required>
+            <request-time-ok>false</request-time-ok>
+        </attribute>
+    </tag>
+
+    <tag>
+        <description>
+            Simple conditional tag, which evalutes its body if the
+            supplied condition is true and optionally exposes a Boolean
+            scripting variable representing the evaluation of this condition
+        </description>
+        <name>if</name>
+        <tag-class>org.anodyneos.xp.standard.IfTag</tag-class>
+        <attribute>
+            <description>
+                The test condition that determines whether or not the body
+                content should be processed.
+            </description>
+            <name>test</name>
+            <required>true</required>
+            <request-time-ok>true</request-time-ok>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                Name of the exported scoped variable for the resulting value of
+                the test condition. The type of the scoped variable is Boolean.
+            </description>
+            <name>var</name>
+            <required>false</required>
+            <request-time-ok>false</request-time-ok>
+        </attribute>
+        <attribute>
+            <description>
+                Scope for var.
+            </description>
+            <name>scope</name>
+            <required>false</required>
+            <request-time-ok>false</request-time-ok>
+        </attribute>
+    </tag>
+
+    <tag>
+        <description>
+            Simple conditional tag that establishes a context for mutually
+            exclusive conditional operations, marked by &lt;when&gt; and
+            &lt;otherwise&gt;
+        </description>
+        <name>choose</name>
+        <tag-class>org.anodyneos.xp.standard.ChooseTag</tag-class>
+    </tag>
+
+    <tag>
+        <description>
+            Subtag of &lt;choose&gt; that includes its body if its condition
+            evalutes to 'true'
+        </description> 
+        <name>when</name>
+        <tag-class>org.anodyneos.xp.standard.WhenTag</tag-class>
+        <attribute>
+            <description>
+                The test condition that determines whether or not the body content
+                should be processed.
+            </description>
+            <name>test</name>
+            <required>true</required>
+            <request-time-ok>true</request-time-ok>
+            <type>boolean</type>
+        </attribute>
+    </tag>
+
+    <tag>
+        <description>
+            Subtag of &lt;choose&gt; that follows &lt;when&gt; tags and runs
+            only if all of the prior conditions evaluated to 'false'
+        </description>
+        <name>otherwise</name>
+        <tag-class>org.anodyneos.xp.standard.OtherwiseTag</tag-class>
+    </tag>
+
+    <tag>
+        <description>
+            Create a new java bean
+        </description> 
+        <name>newBean</name>
+        <tag-class>org.anodyneos.xp.standard.NewBeanTag</tag-class>
+        <attribute>
+            <name>var</name>
+            <required>true</required>
+            <request-time-ok>false</request-time-ok>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <name>scope</name>
+            <required>false</required>
+            <request-time-ok>false</request-time-ok>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <name>class</name>
+            <required>true</required>
+            <request-time-ok>false</request-time-ok>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+    
+    <tag>
+        <description>
+            Logs content handler actions to System.err.
+        </description>
+        <name>debug</name>
+        <tag-class>org.anodyneos.xp.standard.DebugTag</tag-class>
+    </tag>
+
+</taglib>
