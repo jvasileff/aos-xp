@@ -11,7 +11,7 @@ import org.xml.sax.XMLReader;
 
 public class XMLStreamer {
 
-    public static void process(XMLReader xmlReader, PrintStream out) throws Exception {
+    public static void process(XMLReader xmlReader, PrintStream os) throws Exception {
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
 
@@ -20,7 +20,6 @@ public class XMLStreamer {
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
-        OutputStream os = System.out;
         transformer.transform(
                 new javax.xml.transform.sax.SAXSource(xmlReader, new org.xml.sax.InputSource("")),
                 new javax.xml.transform.stream.StreamResult(os));
