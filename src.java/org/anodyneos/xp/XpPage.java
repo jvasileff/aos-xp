@@ -14,20 +14,8 @@ public interface XpPage {
     public long getLoadTime();
 
     /**
-     * XP output properties are defined by the optional <code>&lt;xp:output&gt;</code> tag.  They include:
-     *
-     *  <pre>
-     *  cdataSectionElements="xxx"
-     *  doctypePublic
-     *  doctypeSystem
-     *  encoding
-     *  indent="yes|no"
-     *  mediaType
-     *  method="xml|html"
-     *  omitXmlDeclaration="yes|no"
-     *  xhtmlCompat="yes|no"
-     *  xsltURI
-     *  </pre>
+     * XP output properties are defined by the optional <code>&lt;xp:output&gt;</code> tag.  See XpOutputKeys for
+     * standard properties.
      *
      * @return the output <code>Properties</code> object.
      */
