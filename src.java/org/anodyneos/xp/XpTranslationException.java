@@ -2,7 +2,7 @@ package org.anodyneos.xp;
 
 import org.xml.sax.SAXParseException;
 
-public class XpTranslationException extends Exception{
+public class XpTranslationException extends XpException{
     /**
      * Comment for <code>serialVersionUID</code>
      */
