@@ -7,9 +7,8 @@
 
 <xp:page 
     xmlns:xp="http://www.anodyneos.org/xmlns/xp"
-    xmlns:xpext="http://www.anodyneos.org/xmlns/xpext"
     xmlns:fmt="http://www.anodyneos.org/xmlns/xp/fmt"
-    xmlns:c="http://www.anodyneos.org/xmlns/xp/standard"
+    xmlns:c="http://www.anodyneos.org/xmlns/xp/core"
     xmlns="http://www.w3.org/1999/xhtml"
 >
     <xp:output  indent="yes"
@@ -17,7 +16,7 @@
                 mediaType="application/xhtml+xml"
                 encoding="us-ascii"
                 method="xml"
-                excludeResultPrefixes="xp xpext fmt c"
+                excludeResultPrefixes="xp fmt c"
                 />
     <xp:content>
         <xp:newBean var="browser" class="org.anodyneos.servlet.util.BrowserDetector"/>

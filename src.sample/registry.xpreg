@@ -3,10 +3,10 @@
 <registry>
     <taglib>
         <taglib-uri>http://www.anodyneos.org/xmlns/xp/fmt</taglib-uri>
-        <taglib-location>fmt2.xptld</taglib-location>
+        <taglib-location>classpath:org/anodyneos/xp/tag/fmt/fmt.xptld</taglib-location>
     </taglib>
     <taglib>
-        <taglib-uri>http://www.anodyneos.org/xmlns/xp/standard</taglib-uri>
-        <taglib-location>standard.xptld</taglib-location>
+        <taglib-uri>http://www.anodyneos.org/xmlns/xp/core</taglib-uri>
+        <taglib-location>classpath:org/anodyneos/xp/tag/core/core.xptld</taglib-location>
     </taglib>
 </registry>

@@ -2,9 +2,8 @@
 
 <xp:page 
     xmlns:xp="http://www.anodyneos.org/xmlns/xp"
-    xmlns:xpext="http://www.anodyneos.org/xmlns/xpext"
     xmlns:fmt="http://www.anodyneos.org/xmlns/xp/fmt"
-    xmlns:c="http://www.anodyneos.org/xmlns/xp/standard"
+    xmlns:c="http://www.anodyneos.org/xmlns/xp/core"
     xmlns:testxpns="http://testxpns.test.er"
     xmlns="http://xhtml.com"
 >
@@ -15,7 +14,6 @@
         method="xml"
         omitXmlDeclaration="no"
         xhtmlCompat="yes"
-        testxpns:testwns="asdf"
     />
 
     <xp:content>
