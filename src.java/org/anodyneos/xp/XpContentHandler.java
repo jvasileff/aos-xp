@@ -204,6 +204,10 @@ public final class XpContentHandler implements ContentHandler {
     throws SAXException {
         if (null == bufferedElLocalName) {
             throw new SAXException("Cannot addAttribute() unless directly after startElement().");
+        } else if (qName.equals("xmlns") || qName.startsWith("xmlns:")) {
+            // flush() automatically handles namespace prefixes.  We already know about the namespace
+            // from startPrefixMapping().
+            return;
         } else {
             // lets put this code here, not in flush().  This way the internal state is kept current and we get
             // immediate feedback on errors.
@@ -330,14 +334,15 @@ public final class XpContentHandler implements ContentHandler {
         // remove all "xmlns" and xmlns:xxx" attributes, then add required attributes from namespaceSupport if the
         // feature is set to "true"
 
-        for (int i = 0; i < bufferedElAttributes.getLength(); i++) {
-            String qName = bufferedElAttributes.getQName(i);
-            if (qName.equals("xmlns") || qName.startsWith("xmlns:")) {
-                bufferedElAttributes.removeAttribute(i);
-            }
-        }
-
         if (null != bufferedElLocalName) {
+
+            for (int i = 0; i < bufferedElAttributes.getLength(); i++) {
+                String qName = bufferedElAttributes.getQName(i);
+                if (qName.equals("xmlns") || qName.startsWith("xmlns:")) {
+                    bufferedElAttributes.removeAttribute(i);
+                }
+            }
+
             // start prefix mappings; namespaceSupport.push() was already called
             Enumeration e = namespaceSupport.getDeclaredPrefixes();
             while (e.hasMoreElements()) {
