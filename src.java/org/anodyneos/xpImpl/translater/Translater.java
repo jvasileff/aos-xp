@@ -71,6 +71,7 @@ public class Translater extends BaseParser {
         className = className.replace('/','.');
         className = className.substring(0, className.lastIndexOf('.'));
 
+        // TODO: create (sub)directory(s) if not already exist
         os = new FileOutputStream(javaFile);
 
         obj.process(new InputSource(xpPage), os, registry, className);
