@@ -22,6 +22,7 @@ public class ProcessorResultContent extends TranslaterProcessor {
     public static final String E_SET = "set";
     public static final String E_REMOVE = "remove";
     public static final String E_NEW_BEAN = "newBean";
+    public static final String E_INCLUDE = "include";
 
     public ProcessorResultContent(TranslaterContext ctx) {
         super(ctx);
@@ -45,6 +46,8 @@ public class ProcessorResultContent extends TranslaterProcessor {
                 return new ProcessorXPTagRemove(getTranslaterContext());
             } else if (E_NEW_BEAN.equals(localName)) {
                 return new ProcessorXPTagNewBean(getTranslaterContext());
+            } else if (E_INCLUDE.equals(localName)) {
+                return new ProcessorXPTagInclude(getTranslaterContext());
             } else {
                 return super.getProcessorFor(uri, localName, qName);
             }

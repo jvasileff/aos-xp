@@ -15,6 +15,11 @@ import org.xml.sax.SAXParseException;
 
 public class Translater extends BaseParser {
 
+    private static final int CL_XP_ROOT = 0;
+    private static final int CL_XP_PAGE = 1;
+    private static final int CL_JAVA_FILE = 2;
+    private static final int CL_REGISTRY_FILE = 3;
+
     public Translater() {
         // super();
     }
@@ -25,21 +30,8 @@ public class Translater extends BaseParser {
             Translater obj = new Translater();
             long start = System.currentTimeMillis();
 
-            // registry
-            UnifiedResolver resolver = new UnifiedResolver();
-            resolver.addProtocolHandler("classpath",
-                    new ClassLoaderURIHandler(RegistryParser.class.getClassLoader()));
-            InputSource is = new InputSource(new java.io.File(args[2]).toURL().toString());
-            TagLibraryRegistry registry = new RegistryParser().process(is, resolver);
+            translate(args[CL_XP_ROOT],args[CL_XP_PAGE],args[CL_JAVA_FILE],args[CL_REGISTRY_FILE]);
 
-            // translate codegen
-            File inputFile = new File(args[0]);
-            String className = inputFile.getName();
-            className = className.substring(0, className.indexOf('.'));
-            os = new FileOutputStream(args[1]);
-
-            obj.process(new InputSource(args[0]), os, registry, className);
-            os.close();
             System.out.println("Completed in " + (System.currentTimeMillis() - start) + " milliseconds.");
         } catch (SAXParseException e) {
             System.err.print(e.getSystemId());
@@ -65,10 +57,16 @@ public class Translater extends BaseParser {
         InputSource is = new InputSource(new java.io.File(registryFile).toURL().toString());
         TagLibraryRegistry registry = new RegistryParser().process(is, resolver);
 
+        // add a / if it doesn't exist
+        char lastChar = xpRoot.charAt(xpRoot.length()-1);
+        if ( lastChar != '/' && lastChar != '/'){
+            xpRoot += File.separatorChar;
+        }
         // translate codegen
         String className = xpPage;
         className = className.substring(xpRoot.length(),className.length());
         className = className.replace('/','.');
+        className = className.replace('\\','.');
         className = className.substring(0, className.lastIndexOf('.'));
 
         // TODO: create (sub)directory(s) if not already exist

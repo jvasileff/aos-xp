@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<xp:page 
+    xmlns:xp="http://www.anodyneos.org/xmlns/xp"
+    xmlns:xpext="http://www.anodyneos.org/xmlns/xpext"
+    xmlns:fmt="http://www.anodyneos.org/xmlns/xp/fmt"
+    xmlns:c="http://www.anodyneos.org/xmlns/xp/standard"
+>
+    <xp:content>
+        <br/>
+        <table class="footer">
+            <tr>
+                <td class="footerLeft">
+                    <a href="http://www.marketingcentral.com/">MarketingCentral</a>
+                </td>
+                <td class="footerMain">
+                    <div style="white-space:nowrap">
+                        Copyright 2004 MarketingCentral, L.L.C. Company Confidential.
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </xp:content>
+</xp:page>
