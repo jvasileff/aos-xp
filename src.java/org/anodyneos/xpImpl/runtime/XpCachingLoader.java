@@ -32,7 +32,7 @@ public class XpCachingLoader extends ClassLoader{
         return me;
     }
 
-    public Class< ? > loadClass(String name) throws ClassNotFoundException {
+    public Class loadClass(String name) throws ClassNotFoundException {
         if (name.startsWith(TranslaterContext.DEFAULT_PACKAGE + ".")){
             return getXpPage(name).getClass();
         }else{
@@ -41,7 +41,7 @@ public class XpCachingLoader extends ClassLoader{
     }
     public XpPage getXpPage(String xpName){
         try{
-            if (xpNeedsReloading(xpName)){
+            if (xpNeedsReloading(xpName,-1)){
                 translateXp(xpName);
                 compileXp(xpName);
                 xpCache.remove(xpName);
@@ -79,16 +79,24 @@ public class XpCachingLoader extends ClassLoader{
         }
         return retVal;
     }
-    private boolean xpNeedsReloading(String xpFileName){
+    private boolean xpNeedsReloading(String xpFileName, long loadTime){
         File xpFile = new File (getXpFileName(xpFileName));
         File classFile = new File(getClassFileName(xpFileName));
         if (classFile.exists()){
             if (xpFile.exists()){
 
-                if (classFile.lastModified() >= xpFile.lastModified()){
+                XpPage xpPage = (XpPage)xpCache.get(xpFileName);
+
+                if (xpPage != null){
+                    loadTime = xpPage.getLoadTime();
+                }
+
+                if (xpFile.lastModified() > loadTime && loadTime > 0){
+                    // the xp file is newer than what's been cached
+                    return true;
+                }else if (classFile.lastModified() >= xpFile.lastModified()){
                     // the class file is up to date,check dependents
                     try{
-                        XpPage xpPage = (XpPage)xpCache.get(xpFileName);
 
                         if (xpPage == null){
                             xpPage = loadPage(xpFileName);
@@ -97,7 +105,7 @@ public class XpCachingLoader extends ClassLoader{
                         List dependents = xpPage.getDependents();
                         for (int i=0;i<dependents.size();i++){
                             String dependent = (String)dependents.get(i);
-                            if (xpNeedsReloading(dependent)){
+                            if (xpNeedsReloading(dependent,loadTime)){
                                 return true;
                             }
                         }
@@ -109,7 +117,7 @@ public class XpCachingLoader extends ClassLoader{
                     return false;
 
                 }else{
-                    // the source file is newer than the class file
+                    // the source file is newer than the class file and we've already got that file loaded
                     return true;
                 }
 
@@ -149,7 +157,7 @@ public class XpCachingLoader extends ClassLoader{
         for (int i=0; i<dependents.size();i++){
             String dependent = (String)dependents.get(i);
             // TODO figure out a way to prevent/detect circular references
-            if (xpNeedsReloading(dependent)){
+            if (xpNeedsReloading(dependent,-1)){
                 translateXp(dependent);
                 compileXp(dependent);
             }

@@ -10,5 +10,5 @@ public interface XpPage {
     public List getDependents();
     public abstract void service(XpContext xpContext, XpContentHandler out)
     throws XpException, ELException, SAXException;
-
+    public long getLoadTime();
 }

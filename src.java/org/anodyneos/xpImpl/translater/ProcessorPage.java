@@ -101,6 +101,13 @@ class ProcessorPage extends TranslaterProcessor {
         out.printIndent().println("return dependents;");
         out.endBlock();
 
+        out.println();
+        out.printIndent().println("private final long loadTime = System.currentTimeMillis();");
+        out.printIndent().println("public long getLoadTime(){");
+        out.indentPlus();
+        out.printIndent().println("return loadTime;");
+        out.endBlock();
+
 
         out.println();
         out.printIndent().println("private org.anodyneos.xp.XpPage getIncludedPage(String xpName){");

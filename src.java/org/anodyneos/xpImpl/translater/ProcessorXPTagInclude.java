@@ -51,10 +51,10 @@ public class ProcessorXPTagInclude extends TranslaterProcessor {
         if (file.startsWith("/") || file.startsWith("\\")){
             file = file.substring(1,file.length());
         }
-        //out.printIndent().println("new " +
-        //        TranslaterContext.DEFAULT_PACKAGE + "." + file.replace('/','.') + "().service(xpContext,xpCH);");
-        out.printIndent().println("getIncludedPage(\"" + TranslaterContext.DEFAULT_PACKAGE + "." + file.replace('/','.')+
-                                                    "\").service(xpContext,xpCH);");
+        out.printIndent().println("new " +
+                TranslaterContext.DEFAULT_PACKAGE + "." + file.replace('/','.') + "().service(xpContext,xpCH);");
+        //out.printIndent().println("getIncludedPage(\"" + TranslaterContext.DEFAULT_PACKAGE + "." + file.replace('/','.')+
+        //                                            "\").service(xpContext,xpCH);");
     }
     private static String stripExtension(String fileName){
         int dotXp = fileName.indexOf(".xp");
