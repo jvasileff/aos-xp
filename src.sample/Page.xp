@@ -6,6 +6,7 @@
     xmlns:fmt="http://www.anodyneos.org/xmlns/xp/fmt"
     xmlns:c="http://www.anodyneos.org/xmlns/xp/standard"
     xmlns:testxpns="http://testxpns.test.er"
+    xmlns="http://xhtml.com"
 >
     <xp:output
         encoding="US-ASCII"
@@ -28,7 +29,7 @@
         <c:newBean var="date" class="java.util.Date"/>
         <c:set var="start" value="${date.time}"/>
         <c:set var="end" scope="application" value="${date.time}"/>
-        <html testatt1="tatatt1val">
+        <html testatt1="tatatt1val" xmlns="http://xhtml.com">
             <xp:attribute name="testatt2" value="testattval"/>
 
             <h1><fmt:message key="test.term"> THIS_SHOULDN'T_APPEAR </fmt:message></h1>
@@ -211,6 +212,8 @@ line1
 line2
 line3
                 </xp:attribute>
+                <xp:attribute name="testNoPrefixAttr1" namespace="http://myns${2*3}.com" value="asdf${1}"/>
+                <xp:attribute name="testNoPrefixAttr2" namespace="http://mynsx${2*3}.com" value="asdf${2}"/>
             </myns:nstest>
             <b/>
             <b/>
