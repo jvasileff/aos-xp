@@ -18,6 +18,7 @@ public class ProcessorResultContent extends TranslaterProcessor {
 
     public static final String E_ATTRIBUTE = "attribute";
     public static final String E_IF = "if";
+    public static final String E_CHOOSE = "choose";
     public static final String E_SET = "set";
     public static final String E_REMOVE = "remove";
     public static final String E_NEW_BEAN = "newBean";
@@ -36,6 +37,8 @@ public class ProcessorResultContent extends TranslaterProcessor {
                 return new ProcessorAttribute(getTranslaterContext());
             } else if (E_IF.equals(localName)) {
                 return new ProcessorXPTagIf(getTranslaterContext());
+            } else if (E_CHOOSE.equals(localName)) {
+                return new ProcessorXPTagChoose(getTranslaterContext());
             } else if (E_SET.equals(localName)) {
                 return new ProcessorXPTagSet(getTranslaterContext());
             } else if (E_REMOVE.equals(localName)) {
