@@ -298,8 +298,8 @@ public class Util {
         // replace \r crap with just \n although this doesn't necesarily apply
         // to text mode if that will be supported.
 
-        // TODO: What about normalizing the result of EL expressions at
-        // runtime???
+        // Well, not really the case: xml can have &#13; which is not converted as above.  However,
+        // should make it safe to split on \n (\r characters will not break lines.)
 
         // note: cannot use part.part.split("\n|\r\n|\r"); because split()
         // throws away
@@ -312,7 +312,8 @@ public class Util {
             if (part.isEL) {
                 String codeValue = elExpressionCode(new TextPart[] { part },
                         "String");
-                out.printIndent().println("xpOut.characters(" + codeValue + ");");
+                //out.printIndent().println("xpOut.characters(" + codeValue + ");");
+                out.printIndent().println("xpOut.characters(org.anodyneos.xp.util.XpCoerce.normalizeCRLF(" + codeValue + "));");
             } else {
                 // since we are getting the String after elSplit, it does not need further
                 // unescaping, so we will use the regular "escapeStringQuoted"
@@ -490,4 +491,5 @@ public class Util {
             return(this.part.equals(that.part));
         }
     }
+
 }
