@@ -77,16 +77,16 @@ class ProcessorPage extends TranslaterProcessor {
         out.println();
         out.printIndent().println("static {");
         out.indentPlus();
-        out.printIndent().println("defaultProperties.put(\"cdataSectionElements\", \"\");");
-        out.printIndent().println("defaultProperties.put(\"doctypePublic\", \"\");");
-        out.printIndent().println("defaultProperties.put(\"doctypeSystem\", \"\");");
-        out.printIndent().println("defaultProperties.put(\"encoding\", \"\");");
-        out.printIndent().println("defaultProperties.put(\"indent\", \"no\");");
-        out.printIndent().println("defaultProperties.put(\"mediaType\", \"text/xml\");");
-        out.printIndent().println("defaultProperties.put(\"method\", \"xml\");");
-        out.printIndent().println("defaultProperties.put(\"omitXmlDeclaration\", \"no\");");
-        out.printIndent().println("defaultProperties.put(\"xhtmlCompat\", \"\");");
-        out.printIndent().println("defaultProperties.put(\"xsltURI\", \"\");");
+        out.printIndent().println("defaultProperties.setProperty(\"cdataSectionElements\", \"\");");
+        out.printIndent().println("defaultProperties.setProperty(\"doctypePublic\", \"\");");
+        out.printIndent().println("defaultProperties.setProperty(\"doctypeSystem\", \"\");");
+        out.printIndent().println("defaultProperties.setProperty(\"encoding\", \"\");");
+        out.printIndent().println("defaultProperties.setProperty(\"indent\", \"no\");");
+        out.printIndent().println("defaultProperties.setProperty(\"mediaType\", \"text/xml\");");
+        out.printIndent().println("defaultProperties.setProperty(\"method\", \"xml\");");
+        out.printIndent().println("defaultProperties.setProperty(\"omitXmlDeclaration\", \"no\");");
+        out.printIndent().println("defaultProperties.setProperty(\"xhtmlCompat\", \"\");");
+        out.printIndent().println("defaultProperties.setProperty(\"xsltURI\", \"\");");
         out.endBlock();
 
         out.println();
@@ -124,7 +124,7 @@ class ProcessorPage extends TranslaterProcessor {
                 String key = (String) keys.nextElement();
                 String value = (String) outputProcessor.getProperties().get(key);
                 out.printIndent().println(
-                          "outputProperties.put("
+                          "outputProperties.setProperty("
                         + Util.escapeStringQuoted(key)
                         + ", "
                         + Util.escapeStringQuoted(value)

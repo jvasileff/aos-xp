@@ -33,10 +33,10 @@ public class XpOutputKeys {
 
     public static final String OMIT_XML_DECLARATION = "omitXmlDeclaration";
 
-    /**
-     * performs browser checking and converts XHTML to HTML for non-XHTML browsers (IE 6.0, etc)
-     */
-    public static final String XHMTL_COMPAT = "xhtmlCompat";
+    ///**
+    // * performs browser checking and converts XHTML to HTML for non-XHTML browsers (IE 6.0, etc)
+    // */
+    //public static final String XHMTL_COMPAT = "xhtmlCompat";
 
     /**
      * url of XSLT stylesheet to use prior to output.
