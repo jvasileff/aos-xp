@@ -54,6 +54,27 @@ public class Translater extends BaseParser {
         }
     }
 
+    public static void translate(String xpPage, String javaFile, String registryFile) throws Exception{
+        OutputStream os;
+        Translater obj = new Translater();
+
+        // registry
+        UnifiedResolver resolver = new UnifiedResolver();
+        resolver.addProtocolHandler("classpath",
+                new ClassLoaderURIHandler(RegistryParser.class.getClassLoader()));
+        InputSource is = new InputSource(new java.io.File(registryFile).toURL().toString());
+        TagLibraryRegistry registry = new RegistryParser().process(is, resolver);
+
+        // translate codegen
+        File inputFile = new File(xpPage);
+        String className = inputFile.getName();
+        className = className.substring(0, className.indexOf('.'));
+        os = new FileOutputStream(javaFile);
+
+        obj.process(new InputSource(xpPage), os, registry, className);
+        os.close();
+
+    }
     public TranslaterResult process(InputSource is, OutputStream os,
             TagLibraryRegistry taglibRegistry, String fullClassName) throws Exception {
         CodeWriter out = new CodeWriter(os);
