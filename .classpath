@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src.java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="build/ide.lib/anodyneos-commons.jar"/>
+	<classpathentry kind="lib" path="build/ide.lib/anodyneos-servlet.jar"/>
+	<classpathentry kind="lib" path="build/ide.lib/ant.jar"/>
+	<classpathentry kind="lib" path="build/ide.lib/bsf.jar"/>
+	<classpathentry kind="lib" path="build/ide.lib/commons-el.jar"/>
+	<classpathentry kind="lib" path="build/ide.lib/jsp-api.jar"/>
+	<classpathentry kind="lib" path="build/ide.lib/junit.jar"/>
+	<classpathentry kind="lib" path="build/ide.lib/servlet.jar"/>
+	<classpathentry kind="lib" path="build/ide.lib/tools.jar"/>
+	<classpathentry kind="output" path="build/ide.classes"/>
+</classpath>
