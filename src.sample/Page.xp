@@ -181,7 +181,6 @@ line3
                     <xp:otherwise>_otherwise_</xp:otherwise>
                 </xp:choose>
             </pre>
-            <xp:content/>
             <!--<xp:include file="common/footer.xp"/>-->
         </html>
     </xp:content>
