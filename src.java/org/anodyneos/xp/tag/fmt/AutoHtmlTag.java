@@ -10,7 +10,6 @@ import org.anodyneos.servlet.xsl.xalan.AutoHtmlParser;
 import org.anodyneos.servlet.xsl.xalan.AutoHtmlParserUrlGen;
 import org.anodyneos.servlet.xsl.xalan.AutoHtmlParserUrlGenDefault;
 import org.anodyneos.servlet.xsl.xalan.ParseException;
-import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.XpOutput;
 import org.anodyneos.xp.tagext.XpTagSupport;
@@ -25,12 +24,12 @@ public class AutoHtmlTag extends XpTagSupport {
 
     private String text;
 
-    public void doTag(XpContentHandler out) throws XpException, ELException,
+    public void doTag(XpOutput out) throws XpException, ELException,
             SAXException {
         if (null == text) {
             text = getXpBody().invokeToString();
         }
-        AutoHtmlParserXp ahps = new AutoHtmlParserXp(new java.io.StringReader(text), new XpOutput(out));
+        AutoHtmlParserXp ahps = new AutoHtmlParserXp(new java.io.StringReader(text), out);
         try {
             ahps.process();
         } catch (Exception e) {

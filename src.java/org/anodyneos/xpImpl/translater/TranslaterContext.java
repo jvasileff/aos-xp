@@ -22,7 +22,7 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
     private Stack fragmentCodeWriters = new Stack();
     private ArrayList fragments = new ArrayList();
     private int tagVariableCounter = 0;
-    private int savedXPCHVariableCounter = 0;
+    private int savedXPOutVariableCounter = 0;
     private Properties outputProperties;
 
     // A list of files on which this current file depends
@@ -121,8 +121,8 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
         return "tag" + tagVariableCounter++;
     }
 
-    public String getVariableForSavedXPCH() {
-        return "savedXPCH" + savedXPCHVariableCounter++;
+    public String getVariableForSavedXPOut() {
+        return "savedXPOut" + savedXPOutVariableCounter++;
     }
 
     public boolean inFragment() {

@@ -24,9 +24,9 @@ import java.util.Locale;
 
 import javax.servlet.jsp.el.ELException;
 
-import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
+import org.anodyneos.xp.XpOutput;
 import org.anodyneos.xp.tagext.XpTagSupport;
 import org.xml.sax.SAXException;
 
@@ -132,7 +132,7 @@ public class ParseNumberTag extends XpTagSupport {
     // *********************************************************************
     // Tag logic
 
-    public void doTag(XpContentHandler out) throws XpException, ELException, SAXException {
+    public void doTag(XpOutput out) throws XpException, ELException, SAXException {
         String input = null;
 
         // determine the input by...

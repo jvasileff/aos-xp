@@ -1,5 +1,6 @@
 package org.anodyneos.xp;
 
+import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 public final class XpOutput {
@@ -8,6 +9,10 @@ public final class XpOutput {
 
     public XpOutput(XpContentHandler ch) {
         this.ch = ch;
+    }
+
+    public XpOutput(ContentHandler ch) {
+        this.ch = new XpContentHandler(ch);
     }
 
     public XpContentHandler getXpContentHandler() {

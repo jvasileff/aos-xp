@@ -2,7 +2,6 @@ package org.anodyneos.xp;
 
 import javax.servlet.jsp.el.ELException;
 
-import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.XpPage;
@@ -41,8 +40,8 @@ public class XpXMLReader implements XMLReader {
 
     public void parse(InputSource input) throws SAXException {
 
-        XpContentHandler out = new XpContentHandler(getContentHandler());
-        out.setNamespacePrefixes(namespacePrefixes);
+        XpOutput out = new XpOutput(getContentHandler());
+        out.getXpContentHandler().setNamespacePrefixes(namespacePrefixes);
 
         // process
         getContentHandler().startDocument();

@@ -24,9 +24,9 @@ import java.util.Locale;
 
 import javax.servlet.jsp.el.ELException;
 
-import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
+import org.anodyneos.xp.XpOutput;
 import org.anodyneos.xp.tagext.XpTagSupport;
 import org.xml.sax.SAXException;
 
@@ -185,7 +185,7 @@ public class FormatNumberTag extends XpTagSupport {
     // *********************************************************************
     // Tag logic
 
-    public void doTag(XpContentHandler out) throws XpException, SAXException, ELException {
+    public void doTag(XpOutput out) throws XpException, SAXException, ELException {
         String formatted = null;
         Object input = null;
 

@@ -23,8 +23,8 @@ import java.util.List;
 
 import javax.servlet.jsp.el.ELException;
 
-import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpException;
+import org.anodyneos.xp.XpOutput;
 import org.anodyneos.xp.http.HttpXpContext;
 import org.anodyneos.xp.tagext.XpTag;
 import org.anodyneos.xp.tagext.XpTagSupport;
@@ -67,7 +67,7 @@ public class ParamTag extends XpTagSupport {
     // Tag logic
 
     // simply send our name and value to our appropriate ancestor
-    public void doTag(XpContentHandler ch) throws XpException, SAXException,
+    public void doTag(XpOutput out) throws XpException, SAXException,
             ELException {
         XpTag t = findAncestorWithClass(this, ParamParent.class);
         if (t == null) {

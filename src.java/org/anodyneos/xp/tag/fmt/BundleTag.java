@@ -23,9 +23,9 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.el.ELException;
 
-import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
+import org.anodyneos.xp.XpOutput;
 import org.anodyneos.xp.http.HttpXpContext;
 import org.anodyneos.xp.tag.Util;
 import org.anodyneos.xp.tagext.XpTagSupport;
@@ -84,7 +84,7 @@ public class BundleTag extends XpTagSupport {
 
     // *********************************************************************
     // Tag logic
-    public void doTag(XpContentHandler out) throws XpException, ELException, SAXException {
+    public void doTag(XpOutput out) throws XpException, ELException, SAXException {
 
         locCtxt = getLocalizationContext(((XpContext) getXpContext()), basename);
         getXpBody().invoke(out);

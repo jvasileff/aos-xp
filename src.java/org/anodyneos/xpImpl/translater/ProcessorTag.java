@@ -140,7 +140,7 @@ public class ProcessorTag extends TranslaterProcessor {
         }
 
         CodeWriter out = getTranslaterContext().getCodeWriter();
-        out.printIndent().println(localVarName + ".doTag(xpCH);");
+        out.printIndent().println(localVarName + ".doTag(xpOut);");
         out.printIndent().println(localVarName + " = null;");
 
     }

@@ -20,9 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.el.ELException;
 
-import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
+import org.anodyneos.xp.XpOutput;
 import org.anodyneos.xp.http.HttpXpContext;
 import org.anodyneos.xp.tagext.XpTagSupport;
 import org.xml.sax.SAXException;
@@ -102,7 +102,7 @@ public class UrlTag extends XpTagSupport implements ParamParent {
     // *********************************************************************
     // Tag logic
 
-    public void doTag(XpContentHandler out) throws XpException, SAXException,
+    public void doTag(XpOutput out) throws XpException, SAXException,
             ELException {
         params = new ParamTag.ParamManager();
 

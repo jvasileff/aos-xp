@@ -17,8 +17,8 @@ import javax.servlet.jsp.el.ELException;
 import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.el.VariableResolver;
 
-import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpException;
+import org.anodyneos.xp.XpOutput;
 import org.anodyneos.xp.tagext.XpTagSupport;
 import org.xml.sax.SAXException;
 
@@ -71,7 +71,7 @@ public class SetTag extends XpTagSupport {
         this.var = var;
     }
 
-    public void doTag(XpContentHandler out) throws XpException, ELException, SAXException {
+    public void doTag(XpOutput out) throws XpException, ELException, SAXException {
         if (null == value) {
             if (getXpBody() != null) {
                 // get value from body

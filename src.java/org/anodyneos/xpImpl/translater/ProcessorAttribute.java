@@ -32,7 +32,7 @@ class ProcessorAttribute extends TranslaterProcessor {
     ProcessorResultContent processorResultContent;
     private boolean valueAttributeMode = true;
     private boolean optimizedMode = true;
-    private String savedXPCHVariable;
+    private String savedXPOutVariable;
     private StringBuffer sb;
 
     private String codeName;
@@ -51,10 +51,11 @@ class ProcessorAttribute extends TranslaterProcessor {
             // switch to non-optimized mode
             optimizedMode = false;
             CodeWriter out = getTranslaterContext().getCodeWriter();
-            savedXPCHVariable = getTranslaterContext().getVariableForSavedXPCH();
-            out.printIndent().println( "org.anodyneos.xp.XpContentHandler " + savedXPCHVariable + " = xpCH;");
+            savedXPOutVariable = getTranslaterContext().getVariableForSavedXPOut();
+            out.printIndent().println( "org.anodyneos.xp.XpOutput " + savedXPOutVariable + " = xpOut;");
             //out.printIndent().println( "savedXPCH = xpCH;");
-            out.printIndent().println( "xpCH = new org.anodyneos.xp.XpContentHandler(new org.anodyneos.xp.util.TextContentHandler());" );
+            out.printIndent().println( "xpOut = new org.anodyneos.xp.XpOutput(new org.anodyneos.xp.util.TextContentHandler());" );
+            out.printIndent().println( "xpCH = xpOut.getXpContentHandler();");
 
             processorResultContent = new ProcessorResultContent(getTranslaterContext());
             if (null != sb) {
@@ -158,15 +159,16 @@ class ProcessorAttribute extends TranslaterProcessor {
         } else {
             processorResultContent.flushCharacters();
             out.printIndent().println(
-                  savedXPCHVariable + ".addAttribute("
+                  savedXPOutVariable + ".addAttribute("
                 +       codeURI
                 + "," + codeName
                 + ", ((org.anodyneos.xp.util.TextContentHandler) xpCH.getWrappedContentHandler()).getText()"
                 + ");"
             );
 
-            out.printIndent().println( "xpCH = " + savedXPCHVariable + ";");
-            out.printIndent().println( savedXPCHVariable + " = null;");
+            out.printIndent().println( "xpOut = " + savedXPOutVariable + ";");
+            out.printIndent().println( "xpCH = xpOut.getXpContentHandler();");
+            out.printIndent().println( savedXPOutVariable + " = null;");
         }
     }
 }

@@ -48,10 +48,11 @@ public class ProcessorContent extends TranslaterProcessor {
     public void startElement(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
         CodeWriter out = getTranslaterContext().getCodeWriter();
-        out.printIndent().println("public final void service(org.anodyneos.xp.XpContext xpContext, org.anodyneos.xp.XpContentHandler xpCH) throws org.anodyneos.xp.XpException, javax.servlet.jsp.el.ELException, org.xml.sax.SAXException {");
+        out.printIndent().println("public final void service(org.anodyneos.xp.XpContext xpContext, org.anodyneos.xp.XpOutput xpOut) throws org.anodyneos.xp.XpException, javax.servlet.jsp.el.ELException, org.xml.sax.SAXException {");
         out.indentPlus();
         out.printIndent().println("javax.servlet.jsp.el.ExpressionEvaluator elEvaluator = xpContext.getExpressionEvaluator();");
         out.printIndent().println("javax.servlet.jsp.el.VariableResolver varResolver = xpContext.getVariableResolver();");
+        out.printIndent().println("org.anodyneos.xp.XpContentHandler xpCH = xpOut.getXpContentHandler();");
         out.println();
 
         // the xp document already has some namespace mappings.  Lets output them right before the root element.

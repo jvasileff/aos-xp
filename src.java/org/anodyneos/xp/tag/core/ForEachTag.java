@@ -25,8 +25,8 @@ import java.util.StringTokenizer;
 
 import javax.servlet.jsp.el.ELException;
 
-import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpException;
+import org.anodyneos.xp.XpOutput;
 import org.anodyneos.xp.tagext.XpTagSupport;
 import org.apache.commons.collections.iterators.ArrayIterator;
 import org.apache.commons.collections.iterators.EnumerationIterator;
@@ -40,7 +40,7 @@ import org.xml.sax.SAXException;
  * <code>forEach</code> tag does.
  *
  * @author <a href="mailto:jstrachan@apache.org">James Strachan </a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class ForEachTag extends XpTagSupport {
 
@@ -86,7 +86,7 @@ public class ForEachTag extends XpTagSupport {
     // Tag interface
 
     // -------------------------------------------------------------------------
-    public void doTag(XpContentHandler output) throws XpException,
+    public void doTag(XpOutput output) throws XpException,
             SAXException, ELException {
 
         if (log.isDebugEnabled()) {

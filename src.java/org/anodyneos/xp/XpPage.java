@@ -8,8 +8,9 @@ import org.xml.sax.SAXException;
 
 public interface XpPage {
 
-    public abstract void service(XpContext xpContext, XpContentHandler out)
+    public abstract void service(XpContext xpContext, XpOutput out)
     throws XpException, ELException, SAXException;
+
     public long getLoadTime();
 
     /**

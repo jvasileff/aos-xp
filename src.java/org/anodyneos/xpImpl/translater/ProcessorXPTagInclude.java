@@ -47,7 +47,7 @@ public class ProcessorXPTagInclude extends TranslaterProcessor {
             String absPath = uriFile.getPath();
 
             getTranslaterContext().addDependent(uriFile.toString());
-            out.printIndent().println("new " + Translater.getClassName(uriFile) + "().service(xpContext,xpCH);");
+            out.printIndent().println("new " + Translater.getClassName(uriFile) + "().service(xpContext, xpOut);");
 
         }catch (Exception e){
             throw new SAXException(e);

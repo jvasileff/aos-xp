@@ -16,9 +16,9 @@
 
 package org.anodyneos.xp.tag.fmt;
 
-import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
+import org.anodyneos.xp.XpOutput;
 import org.anodyneos.xp.tagext.XpTagSupport;
 
 /**
@@ -69,7 +69,7 @@ public class SetBundleTag extends XpTagSupport {
     // *********************************************************************
     // Tag logic
 
-    public void doTag(XpContentHandler out) throws XpException {
+    public void doTag(XpOutput out) throws XpException {
         LocalizationContext locCtxt = BundleTag.getLocalizationContext(getXpContext(), basename);
 
         if (var != null) {
