@@ -171,7 +171,7 @@ public class Util {
                   + escapeStringQuoted(parts[0].part)
                   + ", " + type + ".class"
                   + ", varResolver"
-                  + ", null)";
+                  + ", fResolver.getFunctionMapper(xpCH))";
             } else {
                 // need to box/unbox
                 String boxClass = CoerceUtil.boxClass(type);

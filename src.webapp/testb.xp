@@ -21,11 +21,11 @@
                 />
     <xp:content>
         <xp:newBean var="browser" class="org.anodyneos.servlet.util.BrowserDetector"/>
-        <xp:set target="${browser}" property="request" value="${pageContext.request}"/>
+        <c:set target="${browser}" property="request" value="${pageContext.request}"/>
         <html>
             <head/>
             <body>
-                <h1>Test XP Page 1</h1>
+                <h1>Test XP Page</h1>
                 <div>       
                     browserName: ${browser.browserName}
                     <br/>
@@ -34,20 +34,20 @@
                     browserVersionString: ${browser.browserVersionString}
                 </div>
                 <h1>Test AutoHtml</h1>
-                <fmt:autoHtml>
                     alksdjfal ksjaslkdfj alskfj alskfj aslfh alsdfh alskfh
                     alsdfh als aslkfh as jvasileff@marketingcentral.com ldfh
                     alskdfh alskdjfh alskdjfh alskdfh alskdjfh laskjdh flakjs
 
                     alkj shfalsdkfh asldjfh alsdjfh alskdfh alsfh alskfh as
                     lkjfhasldfkj hasldfh l
-                </fmt:autoHtml>
                 
                 <h1>Test Functions</h1>
                 <pre>
+<!--
 \${fn:startsWith('asdf', 'a')} = ${fn:startsWith('asdf', 'a')}
 \${fn:endsWith('asdf', 'b')} = ${fn:endsWith('asdf', 'b')}
 \${fn:join(fn:split('a,b,c', ','), ';')} = ${fn:join(fn:split('a,b,c', ','), ';')}
+-->
                 </pre>
 
 
@@ -90,19 +90,11 @@
 
                 <div>URL Testing</div>
                 <a>
-                    <xp:attribute name="href">
-                        <c:url value="/somePage">
-                            <c:param name="param&amp;1" value="val1"/>
-                        </c:url>
-                    </xp:attribute>
                     Link #1
                 </a>
 
                 <div>Another URL Testing</div>
                 <a>
-                    <c:url value="somePage2" attributeName="href">
-                        <c:param name="param&amp;1" value="val1"/>
-                    </c:url>
                     Link #2
                 </a>
             </body>

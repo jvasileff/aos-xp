@@ -4,7 +4,11 @@ import java.util.Enumeration;
 import java.util.List;
 
 import org.anodyneos.commons.xml.sax.ElementProcessor;
+import org.anodyneos.xp.tagext.FunctionInfo;
+import org.anodyneos.xp.tagext.TagLibraryInfo;
+import org.anodyneos.xp.tagext.TagLibraryRegistry;
 import org.anodyneos.xpImpl.util.CodeWriter;
+import org.anodyneos.xpImpl.util.FunctionUtil;
 import org.anodyneos.xpImpl.util.JavaClass;
 import org.anodyneos.xpImpl.util.Util;
 import org.xml.sax.Attributes;
@@ -63,7 +67,7 @@ class ProcessorPage extends TranslaterProcessor {
         printJavaFooter();
     }
 
-    private void printJavaHeader() {
+    private void printJavaHeader() throws SAXException {
         // package, imports, class header
         JavaClass c = new JavaClass();
         c.setFullClassName(getTranslaterContext().getFullClassName());
@@ -96,6 +100,35 @@ class ProcessorPage extends TranslaterProcessor {
 
         out.println();
         out.printIndent().println("private java.util.Properties outputProperties = new java.util.Properties(defaultProperties);");
+        out.println();
+
+        // functionMapper
+        out.println();
+        TagLibraryRegistry tlr =  getTranslaterContext().getTagLibraryRegistry();
+        String[] uris = tlr.getURIs();
+        out.printIndent().println("private static org.anodyneos.xpImpl.runtime.XpFunctionResolver fResolver = "
+                + "new org.anodyneos.xpImpl.runtime.XpFunctionResolver();");
+        out.printIndent().println("static {");
+        out.indentPlus();
+        for (int i = 0; i < uris.length; i++) {
+            String uri = uris[i];
+            FunctionInfo[] finfos = tlr.getTagLibraryInfo(uri).getFunctionInfos();
+            if (null != finfos) {
+                for (int j = 0; j < finfos.length; j++) {
+                    // TODO: this work should be done when we read the TLD, not now.
+                    String args = FunctionUtil.getParameterCode(finfos[j].getFunctionSignature());
+                    String methodName = FunctionUtil.getMethod(finfos[j].getFunctionSignature());
+                    out.printIndent().println("fResolver.mapFunctionWithURI("
+                            +        Util.escapeStringQuoted(uri)
+                            + ", " + Util.escapeStringQuoted(finfos[j].getName())
+                            + ", " + finfos[j].getFunctionClass().trim() + ".class"
+                            + ", " + Util.escapeStringQuoted(methodName)
+                            + ", " + args
+                            + ");");
+                }
+            }
+        }
+        out.endBlock();
         out.println();
 
         // constructor()

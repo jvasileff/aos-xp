@@ -42,7 +42,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  *
  * @author John Vasileff
  */
-public final class XpContentHandler implements ContentHandler {
+public final class XpContentHandler implements ContentHandler, XpNamespaceMapper {
 
     private static final String NULL_STRING = "null";
 
@@ -657,4 +657,25 @@ public final class XpContentHandler implements ContentHandler {
         characters(String.valueOf(x));
     }
 
+    ////////////////////////////////////////////////////////////////////////////////
+    //
+    // methods for XpNamespaceMapper
+    //
+    ////////////////////////////////////////////////////////////////////////////////
+
+    public String getPrefix(String uri) {
+        return namespaceSupport.getPrefix(uri);
+    }
+
+    public Enumeration getPrefixes() {
+        return namespaceSupport.getPrefixes();
+    }
+
+    public Enumeration getPrefixes(String uri) {
+        return namespaceSupport.getPrefixes(uri);
+    }
+
+    public String getURI(String prefix) {
+        return namespaceSupport.getURI(prefix);
+    }
 }

@@ -9,4 +9,8 @@
         <taglib-uri>http://www.anodyneos.org/xmlns/xp/core</taglib-uri>
         <taglib-location>classpath:org/anodyneos/xp/tag/core/core.xptld</taglib-location>
     </taglib>
+    <taglib>
+        <taglib-uri>http://www.anodyneos.org/xmlns/xp/function</taglib-uri>
+        <taglib-location>fn.xptld</taglib-location>
+    </taglib>
 </registry>

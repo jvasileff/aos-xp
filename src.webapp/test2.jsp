@@ -1,32 +1,14 @@
-<?xml version="1.0"?>
-<!DOCTYPE xp:page [
-    <!ENTITY copy "&#169;">
-    <!ENTITY nbsp "&#160;">
-    <!ENTITY baseURL "..">
-]>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
-<xp:page 
-    xmlns:xp="http://www.anodyneos.org/xmlns/xp"
-    xmlns:fmt="http://www.anodyneos.org/xmlns/xp/fmt"
-    xmlns:c="http://www.anodyneos.org/xmlns/xp/core"
-    xmlns:fn="http://www.anodyneos.org/xmlns/xp/function"
-    xmlns="http://www.w3.org/1999/xhtml"
->
-    <xp:output  indent="yes"
-                indentAmount="2"
-                mediaType="application/xhtml+xml"
-                encoding="us-ascii"
-                method="xml"
-                excludeResultPrefixes="xp fmt c"
-                />
-    <xp:content>
-        <xp:newBean var="browser" class="org.anodyneos.servlet.util.BrowserDetector"/>
-        <xp:set target="${browser}" property="request" value="${pageContext.request}"/>
+        <jsp:useBean id="browser" class="org.anodyneos.servlet.util.BrowserDetector"/>
+        <c:set target="${browser}" property="request" value="${pageContext.request}"/>
         <html>
             <head/>
             <body>
-                <h1>Test XP Page 1</h1>
-                <div>       
+                <h1>Test XP Page</h1>
+                <div>
                     browserName: ${browser.browserName}
                     <br/>
                     browserVersion: ${browser.browserVersion}
@@ -34,15 +16,13 @@
                     browserVersionString: ${browser.browserVersionString}
                 </div>
                 <h1>Test AutoHtml</h1>
-                <fmt:autoHtml>
                     alksdjfal ksjaslkdfj alskfj alskfj aslfh alsdfh alskfh
                     alsdfh als aslkfh as jvasileff@marketingcentral.com ldfh
                     alskdfh alskdjfh alskdjfh alskdfh alskdjfh laskjdh flakjs
 
                     alkj shfalsdkfh asldjfh alsdjfh alskdfh alsfh alskfh as
                     lkjfhasldfkj hasldfh l
-                </fmt:autoHtml>
-                
+
                 <h1>Test Functions</h1>
                 <pre>
 \${fn:startsWith('asdf', 'a')} = ${fn:startsWith('asdf', 'a')}
@@ -90,22 +70,12 @@
 
                 <div>URL Testing</div>
                 <a>
-                    <xp:attribute name="href">
-                        <c:url value="/somePage">
-                            <c:param name="param&amp;1" value="val1"/>
-                        </c:url>
-                    </xp:attribute>
                     Link #1
                 </a>
 
                 <div>Another URL Testing</div>
                 <a>
-                    <c:url value="somePage2" attributeName="href">
-                        <c:param name="param&amp;1" value="val1"/>
-                    </c:url>
                     Link #2
                 </a>
             </body>
         </html>
-    </xp:content>
-</xp:page>
