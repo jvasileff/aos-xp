@@ -88,11 +88,9 @@ public class Translater extends BaseParser {
 
     private static boolean createDir(String javaFile){
         boolean created = false;
-        System.out.println("javaFile = " + javaFile);
         String filePath = javaFile.replaceFirst("[/\\\\]\\w*\\.java","");
 
         File dir = new File(filePath);
-        System.out.println("Creating " + dir.getAbsolutePath());
         if (!dir.exists()){
             created = dir.mkdirs();
         }else{
