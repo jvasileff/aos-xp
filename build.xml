@@ -88,7 +88,7 @@
     ~~  translateSample
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <target name="translateSample" depends="compile">
-        <java taskname="runSample" fork="yes" classname="org.anodyneos.xpImpl.translater.Translater">
+        <java taskname="translateSample" fork="yes" classname="org.anodyneos.xpImpl.translater.Translater">
             <classpath refid="path.compile"/>
             <classpath location="${dir.build.classes}"/>
             <arg value="${dir.src.sample}/Page.xp" />
@@ -130,26 +130,5 @@
         </java>
     </target>
 
-    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ~~  cs
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <target name="cs">
-        <!-- compile -->
-        <javac  destdir="${dir.build.classes.sample}"
-                deprecation="no"
-                includes="**/*.java"
-                debuglevel="${compile.debuglevel}"
-                debug="${compile.debug}">
-            <classpath refid="path.compile"/>
-            <classpath location="${dir.build.classes}"/>
-            <src path="${dir.build.java.sample}"/>
-        </javac>
-        <!-- resources -->
-        <copy toDir="${dir.build.classes.sample}">
-            <fileset dir="${dir.build.java.sample}">
-                <patternset refid="pattern.resources"/>
-            </fileset>
-        </copy>
-    </target>
 </project>
 
