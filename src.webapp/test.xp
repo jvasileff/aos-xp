@@ -20,10 +20,19 @@
                 excludeResultPrefixes="xp xpext fmt c"
                 />
     <xp:content>
+        <xp:newBean var="browser" class="org.anodyneos.servlet.util.BrowserDetector"/>
+        <xp:set target="${browser}" property="request" value="${pageContext.request}"/>
         <html>
             <head/>
             <body>
                 <h1>Test XP Page</h1>
+                <div>       
+                    browserName: ${browser.browserName}
+                    <br/>
+                    browserVersion: ${browser.browserVersion}
+                    <br/>
+                    browserVersionString: ${browser.browserVersionString}
+                </div>
             </body>
         </html>
     </xp:content>
