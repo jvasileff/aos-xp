@@ -1,13 +1,8 @@
 package org.anodyneos.xpImpl.translater;
 
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.anodyneos.commons.xml.sax.ElementProcessor;
-import org.anodyneos.xp.XpOutputKeys;
 import org.anodyneos.xpImpl.util.CodeWriter;
 import org.anodyneos.xpImpl.util.Util;
 import org.xml.sax.Attributes;
@@ -58,12 +53,7 @@ public class ProcessorContent extends TranslaterProcessor {
         // the xp document already has some namespace mappings.  Lets output them right before the root element.
         // skip prefixes included in excludeResultPrefixes output property.
 
-        // TODO: bug... if an xp page outputs an element or attribute with a prefix that is in excludeResultPrefixes,
-        // that prefix must be added at the time of it's use.  This need to be fixed at either translation time or
-        // runtime.
-
-        // TODO: bug... Xalan checks the excluded result prefixes against namespace mappings to make sure they exist; we
-        // should do the same.
+        /* excludePrefixes will be going into XpContentHandler
 
         Set excludedPrefixes = new HashSet();
         Properties outputProperties = getTranslaterContext().getOutputProperties();
@@ -80,26 +70,27 @@ public class ProcessorContent extends TranslaterProcessor {
                }
             }
         }
+        */
 
+        // TODO: Technically, we should be using pushPhantomPrefixMapping here, but we need to either avoid doing
+        // so or make XpContentHandler more efficient so it doesn't have to keep these around.
         NamespaceSupport ns = getTranslaterContext().getNamespaceSupport();
         Enumeration e = ns.getPrefixes();
         while (e.hasMoreElements()) {
             String nsPrefix = (String) e.nextElement();
             String nsURI = ns.getURI(nsPrefix);
-            if (! excludedPrefixes.contains(nsPrefix)) {
-                out.printIndent().println(
-                        "xpCH.startPrefixMapping("
-                    +        Util.escapeStringQuoted(nsPrefix)
-                    + ", " + Util.escapeStringQuoted(nsURI)
-                    + ");");
-            }
+            out.printIndent().println(
+                    "xpCH.pushPhantomPrefixMapping("
+                +        Util.escapeStringQuoted(nsPrefix)
+                + ", " + Util.escapeStringQuoted(nsURI)
+                + ");");
         }
 
         // also handle default prefix...
         String defaultURI = getTranslaterContext().getNamespaceSupport().getURI("");
         if (null != defaultURI) {
             out.printIndent().println(
-                    "xpCH.startPrefixMapping("
+                    "xpCH.pushPhantomPrefixMapping("
                 +        Util.escapeStringQuoted("")
                 + ", " + Util.escapeStringQuoted(defaultURI)
                 + ");");

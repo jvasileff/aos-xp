@@ -30,6 +30,25 @@
         <html testatt1="tatatt1val" xmlns="http://xhtml.com">
             <xp:attribute name="testatt2" value="testattval"/>
 
+            <br/>
+            <br/>
+            <br/>
+            <el>
+                <xp:attribute name="att1" value="att1"/>
+                <xp:attribute name="att2" value="att1"/>
+                <xp:attribute namespace="http://www.espn.com" name="att1" value="att1"/>
+                <xp:attribute name="att3" value="att1"/>
+                <xp:attribute name="att4" value="att1"/>
+                <n0:el2 xmlns:n0="http://www.espn.com"/>
+            </el>
+            <br/>
+            <br/>
+                <xp:myel xmlns:xp="http://newxp.prefix.com">
+                    <myel xmlns=""/>
+                </xp:myel>
+            <br/>
+            <br/>
+            <br/>
             <h1><fmt:message key="test.term"> THIS_SHOULDN'T_APPEAR </fmt:message></h1>
             <h1><fmt:message>test.term</fmt:message></h1>
             <h1><fmt:message>
@@ -123,9 +142,9 @@
             <p/>
 
             <head/>
-            <c:set var="myvar" value="${1+2}"/>
+            <c:set var="myvar" xmlns:setns="http://setnds.com">${1+2}</c:set>
             <c:set var="i" value="${18}"/>
-            <body class="${1+1}">
+            <body xmlns:xyz="http://www.xyz.com" class="${1+1}">
                 <p>
                     \${myvar}: ${myvar}
                     \${1+1}: ${1+1}
