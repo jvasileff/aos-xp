@@ -14,6 +14,8 @@ import org.xml.sax.SAXParseException;
  */
 public class XpTranslationException extends SAXParseException {
 
+    private static final long serialVersionUID = 3904959767838406707L;
+
     /**
      * @param message
      * @param locator

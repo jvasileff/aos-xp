@@ -2,6 +2,8 @@ package org.anodyneos.xp;
 
 public class XpException extends Exception {
 
+    private static final long serialVersionUID = 3904960871644935733L;
+
     public XpException(String msg) {
         super(msg);
     }
