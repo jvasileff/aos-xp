@@ -229,7 +229,6 @@ public class Translater extends BaseParser {
         try{
             URLConnection conn = resolver.openConnection(xpURI);
             if (conn == null){
-                System.out.println(xpURI.toString() + " does not exist");
                 throw new IOException(xpURI.toString() + " does not exist.");
             }
             long xpLastModified = conn.getLastModified();
@@ -250,7 +249,6 @@ public class Translater extends BaseParser {
         try{
             URLConnection conn = resolver.openConnection(xpURI);
             if (conn == null){
-                System.out.println(xpURI.toString() + " does not exist");
                 return false;
             }else{
                 return true;
