@@ -282,6 +282,12 @@ line3
                 </xp:choose>
             </pre>
             <!--<xp:include file="common/footer.xp"/>-->
+
+            <!-- try c:set with body -->
+            <c:set var="testSet">
+                This is the body content... ${cal.time} ...
+            </c:set>
+            <p>${testSet}</p>
         </html>
     </xp:content>
 </xp:page>
