@@ -28,7 +28,6 @@ import javax.servlet.jsp.el.ELException;
 import org.anodyneos.xp.XpContentHandler;
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
-import org.anodyneos.xp.http.HttpXpContext;
 import org.anodyneos.xp.tagext.XpTag;
 import org.anodyneos.xp.tagext.XpTagSupport;
 import org.xml.sax.SAXException;
@@ -148,7 +147,7 @@ public class MessageTag extends XpTagSupport {
                 prefix = parent.getPrefix();
             } else {
                 locCtxt = BundleTag
-                        .getLocalizationContext((HttpXpContext) getXpContext());
+                        .getLocalizationContext(getXpContext());
             }
         } else {
             // localization context taken from 'bundle' attribute
@@ -186,7 +185,7 @@ public class MessageTag extends XpTagSupport {
                             // System.out.println("LOCALE-LESS LOCCTXT: GETTING
                             // FORMATTING LOCALE");
                             Locale locale = SetLocaleTag
-                                    .getFormattingLocale((HttpXpContext) getXpContext());
+                                    .getFormattingLocale(getXpContext());
                             // System.out.println("LOCALE: " + locale);
                             if (locale != null) {
                                 formatter.setLocale(locale);

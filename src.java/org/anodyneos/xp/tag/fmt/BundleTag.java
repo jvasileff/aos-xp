@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.el.ELException;
 
 import org.anodyneos.xp.XpContentHandler;
+import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.http.HttpXpContext;
 import org.anodyneos.xp.tag.Util;
@@ -85,7 +86,7 @@ public class BundleTag extends XpTagSupport {
     // Tag logic
     public void doTag(XpContentHandler out) throws XpException, ELException, SAXException {
 
-        locCtxt = getLocalizationContext(((HttpXpContext) getXpContext()), basename);
+        locCtxt = getLocalizationContext(((XpContext) getXpContext()), basename);
         getXpBody().invoke(out);
     }
 
@@ -98,7 +99,7 @@ public class BundleTag extends XpTagSupport {
      * @param pc
      *            Page in which to look up the default I18N localization context
      */
-    public static LocalizationContext getLocalizationContext(HttpXpContext pc) {
+    public static LocalizationContext getLocalizationContext(XpContext pc) {
         LocalizationContext locCtxt = null;
 
         Object obj = Config.find(pc, Config.FMT_LOCALIZATION_CONTEXT);
@@ -144,7 +145,7 @@ public class BundleTag extends XpTagSupport {
      *         match, or the empty localization context if no resource bundle
      *         match was found
      */
-    public static LocalizationContext getLocalizationContext(HttpXpContext pc, String basename) {
+    public static LocalizationContext getLocalizationContext(XpContext pc, String basename) {
         LocalizationContext locCtxt = null;
         ResourceBundle bundle = null;
 
@@ -218,22 +219,27 @@ public class BundleTag extends XpTagSupport {
      * given base name and best matching locale, or <tt> null </tt> if no
      * resource bundle match was found
      */
-    private static LocalizationContext findMatch(HttpXpContext pageContext, String basename) {
-        LocalizationContext locCtxt = null;
+    private static LocalizationContext findMatch(XpContext xpc, String basename) {
+        if (! (xpc instanceof HttpXpContext)) {
+            // We don't know what the client wants.
+            return null;
+        } else {
+            // Determine locale from client's browser settings.
+            HttpXpContext hxpc = (HttpXpContext) xpc;
 
-        // Determine locale from client's browser settings.
+            LocalizationContext locCtxt = null;
 
-        for (Enumeration enum_ = Util.getRequestLocales((HttpServletRequest) pageContext.getRequest()); enum_
-                .hasMoreElements();) {
-            Locale pref = (Locale) enum_.nextElement();
-            ResourceBundle match = findMatch(basename, pref);
-            if (match != null) {
-                locCtxt = new LocalizationContext(match, pref);
-                break;
+            for (Enumeration enum_ = Util.getRequestLocales((HttpServletRequest) hxpc.getRequest()); enum_
+                    .hasMoreElements();) {
+                Locale pref = (Locale) enum_.nextElement();
+                ResourceBundle match = findMatch(basename, pref);
+                if (match != null) {
+                    locCtxt = new LocalizationContext(match, pref);
+                    break;
+                }
             }
+            return locCtxt;
         }
-
-        return locCtxt;
     }
 
     /*

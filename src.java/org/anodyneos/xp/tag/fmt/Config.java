@@ -20,6 +20,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.http.HttpXpContext;
 
 /**
@@ -36,25 +37,25 @@ public class Config {
      * based preferred locale
      */
     public static final String FMT_LOCALE
-        = "javax.servlet.jsp.jstl.fmt.locale";
+        = "org.anodyneos.xp.tag.fmt.locale";
 
     /**
      * Name of configuration setting for fallback locale
      */
     public static final String FMT_FALLBACK_LOCALE
-        = "javax.servlet.jsp.jstl.fmt.fallbackLocale";
+        = "org.anodyneos.xp.tag.fmt.fallbackLocale";
 
     /**
      * Name of configuration setting for i18n localization context
      */
     public static final String FMT_LOCALIZATION_CONTEXT
-        = "javax.servlet.jsp.jstl.fmt.localizationContext";
+        = "org.anodyneos.xp.tag.fmt.localizationContext";
 
     /**
      * Name of localization setting for time zone
      */
     public static final String FMT_TIME_ZONE
-        = "javax.servlet.jsp.jstl.fmt.timeZone";
+        = "org.anodyneos.xp.tag.fmt.timeZone";
 
     /*
      * SQL actions related configuration data
@@ -64,14 +65,14 @@ public class Config {
      * Name of configuration setting for SQL data source
      */
     public static final String SQL_DATA_SOURCE
-        = "javax.servlet.jsp.jstl.sql.dataSource";
+        = "org.anodyneos.xp.tag.sql.dataSource";
 
     /**
      * Name of configuration setting for maximum number of rows to be included
      * in SQL query result
      */
     public static final String SQL_MAX_ROWS
-        = "javax.servlet.jsp.jstl.sql.maxRows";
+        = "org.anodyneos.xp.tag.sql.maxRows";
 
     /*
      * Private constants
@@ -97,19 +98,8 @@ public class Config {
      * @return The <tt>java.lang.Object</tt> associated with the configuration
      * variable, or null if it is not defined.
      */
-    public static Object get(HttpXpContext pc, String name, int scope) {
-                switch (scope) {
-                case HttpXpContext.PAGE_SCOPE:
-                    return pc.getAttribute(name + PAGE_SCOPE_SUFFIX, scope);
-                case HttpXpContext.REQUEST_SCOPE:
-                    return pc.getAttribute(name + REQUEST_SCOPE_SUFFIX, scope);
-                case HttpXpContext.SESSION_SCOPE:
-                    return get(pc.getSession(), name);
-                case HttpXpContext.APPLICATION_SCOPE:
-                    return pc.getAttribute(name + APPLICATION_SCOPE_SUFFIX, scope);
-                default:
-                    throw new IllegalArgumentException("unknown scope");
-                }
+    public static Object get(XpContext xpc, String name, int scope) {
+        return xpc.getAttribute(name + "." + xpc.resolveScope(scope), scope);
     }
 
     /**
@@ -127,7 +117,7 @@ public class Config {
      * variable, or null if it is not defined.
      */
     public static Object get(ServletRequest request, String name) {
-        return request.getAttribute(name + REQUEST_SCOPE_SUFFIX);
+        return request.getAttribute(name + "." + HttpXpContext.REQUEST_SCOPE_STRING);
     }
 
     /**
@@ -149,7 +139,7 @@ public class Config {
         Object ret = null;
         if (session != null) {
             try {
-                ret = session.getAttribute(name + SESSION_SCOPE_SUFFIX);
+                ret = session.getAttribute(name + "." + HttpXpContext.SESSION_SCOPE_STRING);
             } catch (IllegalStateException ex) {} // when session is invalidated
         }
         return ret;
@@ -170,7 +160,7 @@ public class Config {
      * variable, or null if it is not defined.
      */
     public static Object get(ServletContext context, String name) {
-        return context.getAttribute(name + APPLICATION_SCOPE_SUFFIX);
+        return context.getAttribute(name + "." + XpContext.APPLICATION_SCOPE_STRING);
     }
 
     /**
@@ -186,24 +176,8 @@ public class Config {
      * @param value Configuration variable value
      * @param scope Scope in which the configuration variable is to be set
      */
-    public static void set(HttpXpContext pc, String name, Object value,
-                           int scope) {
-                switch (scope) {
-                case HttpXpContext.PAGE_SCOPE:
-                    pc.setAttribute(name + PAGE_SCOPE_SUFFIX, value, scope);
-                    break;
-                case HttpXpContext.REQUEST_SCOPE:
-                    pc.setAttribute(name + REQUEST_SCOPE_SUFFIX, value, scope);
-                    break;
-                case HttpXpContext.SESSION_SCOPE:
-                    pc.setAttribute(name + SESSION_SCOPE_SUFFIX, value, scope);
-                    break;
-                case HttpXpContext.APPLICATION_SCOPE:
-                    pc.setAttribute(name + APPLICATION_SCOPE_SUFFIX, value, scope);
-                    break;
-                default:
-                    throw new IllegalArgumentException("unknown scope");
-                }
+    public static void set(XpContext pc, String name, Object value, int scope) {
+        pc.setAttribute(name, name + "." + pc.resolveScope(scope), scope);
     }
 
     /**
@@ -220,7 +194,7 @@ public class Config {
      * @param value Configuration variable value
      */
     public static void set(ServletRequest request, String name, Object value) {
-                request.setAttribute(name + REQUEST_SCOPE_SUFFIX, value);
+        request.setAttribute(name + "." + HttpXpContext.REQUEST_SCOPE_STRING, value);
     }
 
     /**
@@ -237,7 +211,7 @@ public class Config {
      * @param value Configuration variable value
      */
     public static void set(HttpSession session, String name, Object value) {
-                session.setAttribute(name + SESSION_SCOPE_SUFFIX, value);
+        session.setAttribute(name + "." + HttpXpContext.SESSION_SCOPE_STRING, value);
     }
 
     /**
@@ -254,7 +228,7 @@ public class Config {
      * @param value Configuration variable value
      */
     public static void set(ServletContext context, String name, Object value) {
-                context.setAttribute(name + APPLICATION_SCOPE_SUFFIX, value);
+        context.setAttribute(name + "." + XpContext.APPLICATION_SCOPE_STRING, value);
     }
 
     /**
@@ -270,23 +244,8 @@ public class Config {
      * @param scope Scope from which the configuration variable is to be
      * removed
      */
-    public static void remove(HttpXpContext pc, String name, int scope) {
-                switch (scope) {
-                case HttpXpContext.PAGE_SCOPE:
-                    pc.removeAttribute(name + PAGE_SCOPE_SUFFIX, scope);
-                    break;
-                case HttpXpContext.REQUEST_SCOPE:
-                    pc.removeAttribute(name + REQUEST_SCOPE_SUFFIX, scope);
-                    break;
-                case HttpXpContext.SESSION_SCOPE:
-                    pc.removeAttribute(name + SESSION_SCOPE_SUFFIX, scope);
-                    break;
-                case HttpXpContext.APPLICATION_SCOPE:
-                    pc.removeAttribute(name + APPLICATION_SCOPE_SUFFIX, scope);
-                    break;
-                default:
-                    throw new IllegalArgumentException("unknown scope");
-                }
+    public static void remove(XpContext pc, String name, int scope) {
+        pc.removeAttribute(name + "." + pc.resolveScope(scope), scope);
     }
 
     /**
@@ -301,7 +260,7 @@ public class Config {
      * @param name Configuration variable name
      */
     public static void remove(ServletRequest request, String name) {
-        request.removeAttribute(name + REQUEST_SCOPE_SUFFIX);
+        request.removeAttribute(name + "." + HttpXpContext.REQUEST_SCOPE_STRING);
     }
 
     /**
@@ -316,7 +275,7 @@ public class Config {
      * @param name Configuration variable name
      */
     public static void remove(HttpSession session, String name) {
-                session.removeAttribute(name + SESSION_SCOPE_SUFFIX);
+        session.removeAttribute(name + "." + HttpXpContext.SESSION_SCOPE_STRING);
     }
 
     /**
@@ -331,7 +290,7 @@ public class Config {
      * @param name Configuration variable name
      */
     public static void remove(ServletContext context, String name) {
-                context.removeAttribute(name + APPLICATION_SCOPE_SUFFIX);
+        context.removeAttribute(name + "." + XpContext.APPLICATION_SCOPE_STRING);
     }
 
     /**
@@ -352,24 +311,15 @@ public class Config {
      * @return The <tt>java.lang.Object</tt> associated with the configuration
      * setting identified by <tt>name</tt>, or null if it is not defined.
      */
-    public static Object find(HttpXpContext pc, String name) {
-        Object ret = get(pc, name, HttpXpContext.PAGE_SCOPE);
-        if (ret == null) {
-            ret = get(pc, name, HttpXpContext.REQUEST_SCOPE);
-            if (ret == null) {
-                if (pc.getSession() != null) {
-                    // check session only if a session is present
-                    ret = get(pc, name, HttpXpContext.SESSION_SCOPE);
-                }
-                if (ret == null) {
-                    ret = get(pc, name, HttpXpContext.APPLICATION_SCOPE);
-                    if (ret == null) {
-                        ret = pc.getServletContext().getInitParameter(name);
-                    }
-                }
+    public static Object find(XpContext pc, String name) {
+        int[] scopes = pc.getScopes();
+        Object ret = null;
+        for (int i = 0; i < scopes.length; i++) {
+            ret = get(pc, name, scopes[i]);
+            if (null != ret) {
+                break;
             }
         }
-
         return ret;
     }
 }

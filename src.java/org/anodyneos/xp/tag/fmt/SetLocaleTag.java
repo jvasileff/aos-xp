@@ -25,6 +25,7 @@ import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 
 import org.anodyneos.xp.XpContentHandler;
+import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.http.HttpXpContext;
 import org.anodyneos.xp.tag.Util;
@@ -63,7 +64,7 @@ public class SetLocaleTag extends XpTagSupport {
 
     public SetLocaleTag() {
         value = variant = null;
-        scope = HttpXpContext.PAGE_SCOPE;
+        scope = XpContext.PAGE_SCOPE;
     }
 
     // *********************************************************************
@@ -104,8 +105,7 @@ public class SetLocaleTag extends XpTagSupport {
             locale = (Locale) value;
         }
 
-        Config.set((HttpXpContext) getXpContext(), Config.FMT_LOCALE, locale,
-                scope);
+        Config.set(getXpContext(), Config.FMT_LOCALE, locale, scope);
         // setResponseLocale(pageContext, locale);
     }
 
@@ -147,8 +147,7 @@ public class SetLocaleTag extends XpTagSupport {
         String country = null;
         int index = -1;
 
-        if (((index = locale.indexOf(HYPHEN)) > -1)
-                || ((index = locale.indexOf(UNDERSCORE)) > -1)) {
+        if (((index = locale.indexOf(HYPHEN)) > -1) || ((index = locale.indexOf(UNDERSCORE)) > -1)) {
             language = locale.substring(0, index);
             country = locale.substring(index + 1);
         }
@@ -192,8 +191,7 @@ public class SetLocaleTag extends XpTagSupport {
      *
      * @return the formatting locale to use
      */
-    static Locale getFormattingLocale(HttpXpContext pc, XpTag fromTag,
-            boolean format, Locale[] avail) {
+    static Locale getFormattingLocale(XpContext pc, XpTag fromTag, boolean format, Locale[] avail) {
 
         LocalizationContext locCtxt = null;
 
@@ -253,7 +251,7 @@ public class SetLocaleTag extends XpTagSupport {
 
     /**
      * Setup the available formatting locales that will be used by
-     * getFormattingLocale(HttpXpContext).
+     * getFormattingLocale(XpContext).
      */
     static Locale[] availableFormattingLocales;
     static {
@@ -269,8 +267,7 @@ public class SetLocaleTag extends XpTagSupport {
             }
         }
         availableFormattingLocales = new Locale[vec.size()];
-        availableFormattingLocales = (Locale[]) vec
-                .toArray(availableFormattingLocales);
+        availableFormattingLocales = (Locale[]) vec.toArray(availableFormattingLocales);
         /*
          * for (int i=0; i <availableFormattingLocales.length; i++) {
          * System.out.println("AvailableLocale[" + i + "] " +
@@ -285,7 +282,7 @@ public class SetLocaleTag extends XpTagSupport {
      * @param pc The page context containing the formatting action @return the
      * formatting locale to use
      */
-    static Locale getFormattingLocale(HttpXpContext pc) {
+    static Locale getFormattingLocale(XpContext pc) {
         /*
          * Establish formatting locale by comparing the preferred locales (in
          * order of preference) against the available formatting locales, and
@@ -331,7 +328,7 @@ public class SetLocaleTag extends XpTagSupport {
      * configuration parameter, or <tt> null </tt> if no scoped attribute or
      * configuration parameter with the given name exists
      */
-    static Locale getLocale(HttpXpContext pageContext, String name) {
+    static Locale getLocale(XpContext pageContext, String name) {
         Locale loc = null;
 
         Object obj = Config.find(pageContext, name);
@@ -359,20 +356,24 @@ public class SetLocaleTag extends XpTagSupport {
      *
      * @return Best matching locale, or <tt> null </tt> if no match was found
      */
-    private static Locale findFormattingMatch(HttpXpContext pageContext,
-            Locale[] avail) {
-        Locale match = null;
-        for (Enumeration enum_ = Util
-                .getRequestLocales((HttpServletRequest) pageContext
-                        .getRequest()); enum_.hasMoreElements();) {
-            Locale locale = (Locale) enum_.nextElement();
-            match = findFormattingMatch(locale, avail);
-            if (match != null) {
-                break;
+    private static Locale findFormattingMatch(XpContext xpc, Locale[] avail) {
+        if (!(xpc instanceof HttpXpContext)) {
+            // We don't know what the client wants.
+            return null;
+        } else {
+            // Determine from client's browser settings.
+            HttpXpContext hxpc = (HttpXpContext) xpc;
+            Locale match = null;
+            for (Enumeration enum_ = Util.getRequestLocales((HttpServletRequest) hxpc.getRequest()); enum_
+                    .hasMoreElements();) {
+                Locale locale = (Locale) enum_.nextElement();
+                match = findFormattingMatch(locale, avail);
+                if (match != null) {
+                    break;
+                }
             }
+            return match;
         }
-
-        return match;
     }
 
     /*
@@ -400,15 +401,13 @@ public class SetLocaleTag extends XpTagSupport {
                 // Exact match
                 match = avail[i];
                 break;
-            } else if (!"".equals(pref.getVariant())
-                    && "".equals(avail[i].getVariant())
+            } else if (!"".equals(pref.getVariant()) && "".equals(avail[i].getVariant())
                     && pref.getLanguage().equals(avail[i].getLanguage())
                     && pref.getCountry().equals(avail[i].getCountry())) {
                 // Language and country match; different variant
                 match = avail[i];
                 langAndCountryMatch = true;
-            } else if (!langAndCountryMatch
-                    && pref.getLanguage().equals(avail[i].getLanguage())
+            } else if (!langAndCountryMatch && pref.getLanguage().equals(avail[i].getLanguage())
                     && ("".equals(avail[i].getCountry()))) {
                 // Language match
                 if (match == null) {
