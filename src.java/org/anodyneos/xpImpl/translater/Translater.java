@@ -161,7 +161,13 @@ public class Translater extends BaseParser {
         }catch (IOException ioe){
             throw new XpTranslationException(ioe);
         }catch (SAXException se){
-            throw new XpTranslationException(se);
+            if (se.getException() != null){
+                throw new XpTranslationException(se.getException());
+            }else if (se.getCause() != null){
+                throw new XpTranslationException(se.getCause());
+            }else{
+                throw new XpTranslationException(se);
+            }
         }
     }
 
