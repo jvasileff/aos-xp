@@ -19,6 +19,7 @@ public class ProcessorResultContent extends TranslaterProcessor {
     public static final String E_ATTRIBUTE = "attribute";
     public static final String E_IF = "if";
     public static final String E_SET = "set";
+    public static final String E_REMOVE = "remove";
 
     public ProcessorResultContent(TranslaterContext ctx) {
         super(ctx);
@@ -36,6 +37,8 @@ public class ProcessorResultContent extends TranslaterProcessor {
                 return new ProcessorXPTagIf(getTranslaterContext());
             } else if (E_SET.equals(localName)) {
                 return new ProcessorXPTagSet(getTranslaterContext());
+            } else if (E_REMOVE.equals(localName)) {
+                return new ProcessorXPTagRemove(getTranslaterContext());
             } else {
                 return super.getProcessorFor(uri, localName, qName);
             }
