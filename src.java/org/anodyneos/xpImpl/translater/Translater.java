@@ -104,17 +104,17 @@ public class Translater extends BaseParser {
      * @return TranslaterResult
      * @throws Exception
      */
-    public static TranslaterResult translate(String xpRoot, String tempRoot,
+    public static TranslaterResult translate(String tempRoot,
             URI xpURI, String registryFile, UnifiedResolver resolver) throws Exception{
         Translater obj = new Translater();
 
-        InputSource is = new InputSource(new java.io.File(registryFile).toURL().toString());
+        InputSource is = resolver.resolveEntity(null,registryFile);
         TagLibraryRegistry registry = new RegistryParser().process(is, resolver);
 
-        return obj.translate(xpRoot,tempRoot,xpURI,registry,resolver);
+        return obj.translate(tempRoot,xpURI,registry,resolver);
     }
 
-    public TranslaterResult translate(String xpRoot, String tempRoot,
+    public TranslaterResult translate(String tempRoot,
             URI xpURI, TagLibraryRegistry registry, UnifiedResolver resolver) throws Exception{
 
 
@@ -140,7 +140,7 @@ public class Translater extends BaseParser {
         for (int i=0; i<dependents.size();i++){
             String dependent = (String)dependents.get(i);
             URI uriDep = new URI(dependent);
-            translate(xpRoot,tempRoot,uriDep,registry,resolver);
+            translate(tempRoot,uriDep,registry,resolver);
         }
 
         return result;
@@ -243,22 +243,6 @@ public class Translater extends BaseParser {
 
     }
 
-    public static URI getURIFromClassName(String className){
-        String path = className.replace('.','/');
-        path = path.concat(".class");
-        try{
-            path = concatPaths("webapp:///",path);
-            URI uri = new URI(path);
-
-            return uri;
-
-        }catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
-
-
-    }
     public static String getClassName(URI xpURI){
         String fullPath = xpURI.getPath();
         fullPath = fullPath.replace('-','_');   // TODO replace with more robust replacement
@@ -270,7 +254,7 @@ public class Translater extends BaseParser {
     }
 
     /**
-     * concats pathPrefix and pathSuffix, with a /
+     * concats pathPrefix and pathSuffix, with a / between the two
      *
      * @param pathPrefix
      * @param pathSuffix
