@@ -34,13 +34,13 @@ public class StandaloneVariableResolverImpl implements VariableResolver {
     }
 
     private class PageScopeMap extends EnumeratedMap {
-        StandaloneXpContext ctx;
+        StandaloneXpContext psmCtx;
         public PageScopeMap(StandaloneXpContext ctx) {
-            this.ctx = ctx;
+            this.psmCtx = ctx;
         }
 
         public Enumeration enumerateKeys() {
-            return ctx.getAttributeNamesInScope(StandaloneXpContext.PAGE_SCOPE);
+            return psmCtx.getAttributeNamesInScope(StandaloneXpContext.PAGE_SCOPE);
         }
 
 
@@ -50,7 +50,7 @@ public class StandaloneVariableResolverImpl implements VariableResolver {
 
         public Object getValue(Object pKey) {
             if (pKey instanceof String) {
-                return ctx.getAttribute((String) pKey, StandaloneXpContext.PAGE_SCOPE);
+                return psmCtx.getAttribute((String) pKey, StandaloneXpContext.PAGE_SCOPE);
             } else {
                 return null;
             }
@@ -58,13 +58,13 @@ public class StandaloneVariableResolverImpl implements VariableResolver {
 
     }
     private class ApplicationScopeMap extends EnumeratedMap {
-        StandaloneXpContext ctx;
+        StandaloneXpContext asmCtx;
         public ApplicationScopeMap(StandaloneXpContext ctx) {
-            this.ctx = ctx;
+            this.asmCtx = ctx;
         }
 
         public Enumeration enumerateKeys() {
-            return ctx.getAttributeNamesInScope(StandaloneXpContext.APPLICATION_SCOPE);
+            return asmCtx.getAttributeNamesInScope(StandaloneXpContext.APPLICATION_SCOPE);
         }
 
         public boolean isMutable() {
@@ -73,7 +73,7 @@ public class StandaloneVariableResolverImpl implements VariableResolver {
 
         public Object getValue(Object pKey) {
             if (pKey instanceof String) {
-                return ctx.getAttribute((String) pKey, StandaloneXpContext.APPLICATION_SCOPE);
+                return asmCtx.getAttribute((String) pKey, StandaloneXpContext.APPLICATION_SCOPE);
             } else {
                 return null;
             }

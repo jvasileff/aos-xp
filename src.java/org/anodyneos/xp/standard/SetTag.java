@@ -130,13 +130,13 @@ public class SetTag extends XpTagSupport {
      * Convert an object to an expected type according to the conversion
      * rules of the Expression Language.
      */
-    private Object convertToExpectedType( final Object value, Class expectedType )
+    private Object convertToExpectedType( final Object val, Class expectedType )
            throws ELException {
         ExpressionEvaluator evaluator = getXpContext().getExpressionEvaluator();
         return evaluator.evaluate( "${result}", expectedType,
             new VariableResolver() {
                 public Object resolveVariable( String pName ) {
-                    return value;
+                    return val;
                 }
             }, null );
     }

@@ -48,18 +48,18 @@ public class DebugCH implements ContentHandler {
     /* (non-Javadoc)
      * @see org.xml.sax.ContentHandler#characters(char[], int, int)
      */
-    public void characters(char[] ch, int start, int length) throws SAXException {
+    public void characters(char[] chArray, int start, int length) throws SAXException {
         pw.println("[DEBUG] characters()");
-        this.ch.characters(ch, start, length);
+        this.ch.characters(chArray, start, length);
 
     }
 
     /* (non-Javadoc)
      * @see org.xml.sax.ContentHandler#ignorableWhitespace(char[], int, int)
      */
-    public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
+    public void ignorableWhitespace(char[] chArray, int start, int length) throws SAXException {
         pw.println("[DEBUG] ignorableWhitespace()");
-        this.ch.ignorableWhitespace(ch, start, length);
+        this.ch.ignorableWhitespace(chArray, start, length);
 
     }
 

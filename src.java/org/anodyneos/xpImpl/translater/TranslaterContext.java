@@ -115,7 +115,7 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
         return ((StringWriter) fragments.get(index)).toString();
     }
 
-    public String getVariableForTag(String className) {
+    public String getVariableForTag(String newClassName) {
         return "tag" + tagVariableCounter++;
     }
 

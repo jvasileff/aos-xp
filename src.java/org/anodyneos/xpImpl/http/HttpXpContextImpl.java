@@ -54,11 +54,11 @@ public class HttpXpContextImpl extends HttpXpContext {
         return ((HttpServletRequest)servletRequest).getSession();
     }
 
-    public void initialize(Servlet servlet, ServletRequest servletRequest,
-            ServletResponse servletResponse) {
-        this.servlet = servlet;
-        this.servletRequest = servletRequest;
-        this.servletResponse = servletResponse;
+    public void initialize(Servlet iServlet, ServletRequest iServletRequest,
+            ServletResponse iServletResponse) {
+        this.servlet = iServlet;
+        this.servletRequest = iServletRequest;
+        this.servletResponse = iServletResponse;
         this.variableResolver = new HttpVariableResolverImpl(this);
     }
 
