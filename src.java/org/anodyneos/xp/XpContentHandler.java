@@ -44,6 +44,8 @@ import org.xml.sax.helpers.NamespaceSupport;
  */
 public final class XpContentHandler implements ContentHandler {
 
+    private static final String NULL_STRING = "null";
+
     private static final Log logger = LogFactory.getLog(XpContentHandler.class);
 
     // instance variables to test for logging for performance.
@@ -603,6 +605,56 @@ public final class XpContentHandler implements ContentHandler {
             prefix = "n" + prefixNum++;
         } while (null != namespaceSupport.getURI(prefix));
         return prefix;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //
+    // characters(xxx) convenience methods
+    //
+    ////////////////////////////////////////////////////////////////////////////////
+
+    public void characters(String s) throws SAXException {
+        if (null != s) {
+            characters(s.toCharArray(), 0, s.length());
+        } else {
+            characters(NULL_STRING.toCharArray(), 0, NULL_STRING.length());
+        }
+    }
+
+    public void characters(Object x) throws SAXException {
+        if (null != x) {
+            characters(x.toString());
+        } else {
+            characters((String) null);
+        }
+    }
+
+    public void characters(char x) throws SAXException {
+        characters(String.valueOf(x));
+    }
+
+    public void characters(byte x) throws SAXException {
+        characters(String.valueOf(x));
+    }
+
+    public void characters(boolean x) throws SAXException {
+        characters(String.valueOf(x));
+    }
+
+    public void characters(int x) throws SAXException {
+        characters(String.valueOf(x));
+    }
+
+    public void characters(long x) throws SAXException {
+        characters(String.valueOf(x));
+    }
+
+    public void characters(float x) throws SAXException {
+        characters(String.valueOf(x));
+    }
+
+    public void characters(double x) throws SAXException {
+        characters(String.valueOf(x));
     }
 
 }

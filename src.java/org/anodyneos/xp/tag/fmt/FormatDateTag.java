@@ -183,7 +183,7 @@ public class FormatDateTag extends XpTagSupport {
         if (var != null) {
             getXpContext().setAttribute(var, formatted, scope);
         } else {
-            out.characters(formatted);
+            out.write(formatted);
         }
 
         // do not invoke body for this tag

@@ -220,7 +220,7 @@ public class ParseDateTag extends XpTagSupport {
         if (var != null) {
             getXpContext().setAttribute(var, parsed, scope);
         } else {
-            out.characters(parsed);
+            out.write(parsed);
         }
 
         // do not invoke body for this tag.

@@ -128,7 +128,7 @@ public class UrlTag extends XpTagSupport implements ParamParent {
         if (var != null) {
             getXpContext().setAttribute(var, result, scope);
         } else if (attributeName == null){
-            out.characters(result);
+            out.write(result);
         }
 
         // always set an attribute if asked to do so

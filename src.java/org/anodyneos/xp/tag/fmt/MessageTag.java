@@ -137,7 +137,7 @@ public class MessageTag extends XpTagSupport {
         }
 
         if ((key == null) || key.equals("")) {
-            out.characters("??????");
+            out.write("??????");
         }
 
         String prefix = null;
@@ -206,7 +206,7 @@ public class MessageTag extends XpTagSupport {
         if (var != null) {
             getXpContext().setAttribute(var, message, scope);
         } else {
-            out.characters(message);
+            out.write(message);
         }
     }
 

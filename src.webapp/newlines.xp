@@ -25,13 +25,13 @@
                 <form method="post">
                     <c:set var="myvar" value="pre ${'mid'} post"/>
                     <!--<xp:attribute name="action" value="http://localhost:8080/aos-servlet/echoRaw"/>-->
-                    <textarea rows="20" cols="80" name="text">${param.text}</textarea>
+                    <textarea rows="10" cols="80" name="text">${param.text}</textarea>
                     <br/>
                     <input type="submit"/>
                 </form>
                 <br/>
                 <form method="post">
-                    <textarea rows="20" cols="80" name="text">1
+                    <textarea rows="10" cols="80" name="text">1
 23
 4
 6
@@ -42,6 +42,33 @@
                     <br/>
                     <input type="submit"/>
                 </form>
+                <h1>CRLF Quirks</h1>
+                <c:set var="myvar" value="${'1&#13;&#10;2&#10;&#13;4&#13;5'}"/>
+                <c:set var="myvar2">${'1&#13;&#10;2&#10;&#13;4&#13;5'}</c:set>
+                <c:set var="myvar3">${myvar}</c:set>
+<pre><![CDATA[<c:set var="myvar" value="\${'1&#13;&#10;2&#10;&#13;4&#13;5'}"/>
+<c:set var="myvar2">\${'1&#13;&#10;2&#10;&#13;4&#13;5'}</c:set>
+<c:set var="myvar3">\${myvar}</c:set>
+]]></pre>
+                <h3>myvar</h3>
+                <pre>${myvar}</pre>
+                <h3>myvar2</h3>
+                <pre>${myvar2}</pre>
+                <h3>myvar3</h3>
+                <pre>${myvar3}</pre>
+                <h3>Are they equal?</h3>
+<pre>\${myvar == myvar}   : ${myvar == myvar}
+\${myvar2 == myvar2} : ${myvar2 == myvar2}
+\${myvar2 == myvar3} : ${myvar2 == myvar3}
+\${myvar == myvar2}  : ${myvar == myvar2}
+</pre>
+                <p>
+                    If myvar and myvar2 are equal, the mode of XpOutput has
+                    been set correctly.  If not equal: since myvar2's content
+                    was provided as output content it was normalized.  myvar on
+                    the other hand was set using the <code>value</code>
+                    attribute thereby skipping the normalize step.
+                </p>
             </body>
         </html>
     </xp:content>

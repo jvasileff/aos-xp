@@ -254,7 +254,7 @@ public class FormatNumberTag extends XpTagSupport {
         if (var != null) {
             getXpContext().setAttribute(var, formatted, scope);
         } else {
-            out.characters(formatted);
+            out.write(formatted);
         }
 
         return; // do note invoke body for this tag;

@@ -310,15 +310,15 @@ public class Util {
         for(int i = 0; i < parts.length; i++) {
             Util.TextPart part = parts[i];
             if (part.isEL) {
-                String codeValue = elExpressionCode(new TextPart[] { part },
-                        "String");
-                //out.printIndent().println("xpOut.characters(" + codeValue + ");");
-                out.printIndent().println("xpOut.characters(org.anodyneos.xp.util.XpCoerce.normalizeCRLF(" + codeValue + "));");
+                String codeValue = elExpressionCode(new TextPart[] { part }, "String");
+                // We use xpOut.write instead of xpCH.characters since EL expression
+                // may have invalid CRLF convention and xpOut.write can normalize correctly.
+                out.printIndent().println("xpOut.write(" + codeValue + ");");
             } else {
                 // since we are getting the String after elSplit, it does not need further
                 // unescaping, so we will use the regular "escapeStringQuoted"
                 String codeValue = escapeStringQuoted(part.part);
-                out.printIndent().println("xpOut.characters(" + codeValue + ");");
+                out.printIndent().println("xpCH.characters(" + codeValue + ");");
             }
         }
     }

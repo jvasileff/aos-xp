@@ -101,7 +101,7 @@ public class AutoHtmlTag extends XpTagSupport {
             // Write contents of sb to node.
             try {
                 if (null != sb) {
-                    out.characters(sb.toString().toCharArray(), 0, sb.length());
+                    out.write(sb.toString().toCharArray(), 0, sb.length());
                     sb.setLength(0);
                 }
             } catch (SAXException e) {
@@ -118,7 +118,7 @@ public class AutoHtmlTag extends XpTagSupport {
                 // "a" element
                 out.startElement("http://www.w3.org/1999/xhtml", "xhtml:a");
                 out.addAttribute("", "href", href);
-                out.characters(display.toCharArray(), 0, display.length());
+                out.write(display.toCharArray(), 0, display.length());
                 out.endElement("http://www.w3.org/1999/xhtml", "xhtml:a");
             } catch (SAXException e) {
                 logger.error("FIXME: Thrown away SAXException.", e);
