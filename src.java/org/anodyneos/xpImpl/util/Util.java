@@ -312,12 +312,12 @@ public class Util {
             if (part.isEL) {
                 String codeValue = elExpressionCode(new TextPart[] { part },
                         "String");
-                out.printIndent().println("xpCH.characters(" + codeValue + ");");
+                out.printIndent().println("xpOut.characters(" + codeValue + ");");
             } else {
                 // since we are getting the String after elSplit, it does not need further
                 // unescaping, so we will use the regular "escapeStringQuoted"
                 String codeValue = escapeStringQuoted(part.part);
-                out.printIndent().println("xpCH.characters(" + codeValue + ");");
+                out.printIndent().println("xpOut.characters(" + codeValue + ");");
             }
         }
     }
