@@ -1,27 +1,31 @@
 package org.anodyneos.xpImpl.runtime;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.anodyneos.commons.net.URI;
+import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.xp.XpPage;
 import org.anodyneos.xpImpl.compiler.JavaCompiler;
 import org.anodyneos.xpImpl.compiler.SunJavaCompiler;
 import org.anodyneos.xpImpl.translater.Translater;
 import org.anodyneos.xpImpl.translater.TranslaterContext;
 import org.anodyneos.xpImpl.translater.TranslaterResult;
-import org.anodyneos.xpImpl.runtime.XpClassLoader;
-
 
 public class XpCachingLoader extends ClassLoader{
+    public static final long NEVER_LOADED = -1;
     private ClassLoader parentLoader;
     private String classPath;
     private String classRoot;
     private String javaRoot;
     private String xpRoot;
     private String xpRegistry;
+    private UnifiedResolver resolver;
+
     private final Map xpCache =
         Collections.synchronizedMap(new HashMap());
     private static XpCachingLoader me = new XpCachingLoader();
@@ -34,24 +38,29 @@ public class XpCachingLoader extends ClassLoader{
 
     public Class loadClass(String name) throws ClassNotFoundException {
         if (name.startsWith(TranslaterContext.DEFAULT_PACKAGE + ".")){
-            return getXpPage(name).getClass();
+
+           return getXpPage(Translater.getURIFromClassName(name)).getClass();
+
         }else{
             return Thread.currentThread().getContextClassLoader().loadClass(name);
         }
     }
-    public XpPage getXpPage(String xpName){
+    public XpPage getXpPage(URI xpURI){
         try{
-            if (xpNeedsReloading(xpName,-1)){
-                translateXp(xpName);
-                compileXp(xpName);
-                xpCache.remove(xpName);
+
+            XpPage xpPage = (XpPage)xpCache.get(xpURI.toString());
+            long loadTime = NEVER_LOADED;
+            if (xpPage != null ){
+                loadTime = xpPage.getLoadTime();
             }
 
-            XpPage xpPage = (XpPage)xpCache.get(xpName);
-
-            if (xpPage == null){
-                xpPage = loadPage(xpName);
-                xpCache.put(xpName,xpPage);
+            if ((xpPage == null )
+                    || (xpPage != null && xpNeedsReloading(xpURI, loadTime, xpPage.getClass().getClassLoader()))){
+                translateXp(xpURI);
+                compileXp(xpURI);
+                xpCache.remove(xpURI.toString());
+                xpPage = loadPage(xpURI);
+                xpCache.put(xpURI.toString(),xpPage);
             }
 
             return xpPage;
@@ -62,82 +71,50 @@ public class XpCachingLoader extends ClassLoader{
         }
     }
 
-    private XpPage loadPage(String xpName) throws Exception {
+    private XpPage loadPage(URI xpURI) throws Exception {
         XpClassLoader loader = new XpClassLoader(this);
         loader.setRoot(getClassRoot());
-        Class cls = loader.loadClass(getXpClassName(xpName));
+        Class cls = loader.loadClass(Translater.getClassName(xpURI));
         return (XpPage)cls.newInstance();
     }
 
-    public static String getXpClassName(String xpFileName){
-        String retVal = xpFileName.replaceFirst("\\.xp","").replace('/','.');
-        if (retVal.startsWith(".")){
-            retVal = retVal.substring(1,retVal.length());
-        }
-        if (!retVal.startsWith(TranslaterContext.DEFAULT_PACKAGE + ".")){
-            retVal = TranslaterContext.DEFAULT_PACKAGE + "." + retVal;
-        }
-        return retVal;
-    }
-    private boolean xpNeedsReloading(String xpFileName, long loadTime){
-        File xpFile = new File (getXpFileName(xpFileName));
-        File classFile = new File(getClassFileName(xpFileName));
-        if (classFile.exists()){
-            if (xpFile.exists()){
+    private boolean xpNeedsReloading(URI xpURI, long loadTime, ClassLoader loader){
+        System.out.println("Checking to see if " + xpURI.toString() + " needs reloading");
+        if (Translater.xpIsOutOfDate(xpURI,getClassRoot(),getResolver(),loadTime)) {
+            return true;
+        } else {
 
-                XpPage xpPage = (XpPage)xpCache.get(xpFileName);
+            try{
+                Class xpClass = Class.forName(Translater.getClassName(xpURI),true,loader);
 
-                if (xpPage != null){
-                    loadTime = xpPage.getLoadTime();
-                }
+                Method getDependents = xpClass.getDeclaredMethod("getDependents",(Class[])null);
 
-                if (xpFile.lastModified() > loadTime && loadTime > 0){
-                    // the xp file is newer than what's been cached
-                    return true;
-                }else if (classFile.lastModified() >= xpFile.lastModified()){
-                    // the class file is up to date,check dependents
-                    try{
+                List dependents = (List)getDependents.invoke((Object)null,(Object[])null);
 
-                        if (xpPage == null){
-                            xpPage = loadPage(xpFileName);
-                        }
-
-                        List dependents = xpPage.getDependents();
-                        for (int i=0;i<dependents.size();i++){
-                            String dependent = (String)dependents.get(i);
-                            if (xpNeedsReloading(dependent,loadTime)){
-                                return true;
-                            }
-                        }
-                    }catch (Exception e){
-                            e.printStackTrace();
-                            return false;
+                for (int i=0; i<dependents.size();i++){
+                    String dependent = (String)dependents.get(i);
+                    URI uriDep = new URI(dependent);
+                    if (xpNeedsReloading(uriDep,loadTime,loader)){
+                        return true;
                     }
-                    // none of the dependents are out of date, no need to reload
-                    return false;
-
-                }else{
-                    // the source file is newer than the class file and we've already got that file loaded
-                    return true;
                 }
 
-            }else{
-                // the class file exists, but there's no source.  Let's just work with what we've got
-                return false;
-            }
-        }else{
-            // the class file does not exist, and we have the source
-            if (xpFile.exists()){
+            }catch (Exception e){
+                // something happened
+                System.out.println("Unable to inspect children of "
+                        + xpURI.toString() + " to see if they would cause a reload.");
+                e.printStackTrace();
                 return true;
-            }else{
-                // no class file and no source, tough luck
-                return false;
             }
         }
+        // neither the file itself nor any dependents are out of date
+        return false;
+
     }
 
-    private void compileXp(String xpName) {
 
+    private void compileXp(URI xpURI) throws Exception {
+        System.out.println("-----------------------Compiling " + xpURI.toString());
         String classpath = System.getProperty("java.class.path");
 
         classpath += File.pathSeparator + getClassRoot();
@@ -145,46 +122,24 @@ public class XpCachingLoader extends ClassLoader{
 
         JavaCompiler compiler = new SunJavaCompiler(classpath,getClassRoot());
 
-        compiler.compile(getJavaFileName(xpName),System.err);
+        compiler.compile(Translater.getJavaFile(getJavaRoot(),xpURI),System.err);
     }
 
-    private void translateXp(String xpName) throws Exception{
-        TranslaterResult result = Translater.translate(getXpRoot(),
-                                                getXpFileName(xpName), getJavaFileName(xpName),getXpRegistry());
+    private void translateXp(URI xpURI) throws Exception{
+        System.out.println("Translating " + xpURI.toString());
+        if (getResolver() == null){
+            throw new IllegalStateException("XpCachingLoader requires resolver to be set.");
+        }
 
+        TranslaterResult result = Translater.translate(getXpRoot(),getJavaRoot(), xpURI, getXpRegistry(),resolver);
         List dependents = result.getDependents();
 
         for (int i=0; i<dependents.size();i++){
             String dependent = (String)dependents.get(i);
-            // TODO figure out a way to prevent/detect circular references
-            if (xpNeedsReloading(dependent,-1)){
-                translateXp(dependent);
-                compileXp(dependent);
-            }
+            URI uriDep = new URI(dependent);
+            System.out.println("Translated dependent " + uriDep);
+            //compileXp(uriDep);
         }
-    }
-
-    private String getClassFileName(String xpName){
-        String root = getClassRoot();
-        if (!(root.endsWith("/") || root.endsWith("\\"))){
-            root += File.separator;
-        }
-        return (root + TranslaterContext.DEFAULT_PACKAGE + "/" + xpName.replaceFirst("\\.xp",".class"));
-    }
-
-    private String getJavaFileName(String xpName){
-        String temp = xpName.replaceFirst("\\.xp",".java");
-        if (temp.startsWith("/")){
-            temp = temp.substring(1,temp.length());
-        }
-        String root = getJavaRoot();
-        if (!(root.endsWith("/") || root.endsWith("\\"))){
-            root += File.separator;
-        }
-        return (root + TranslaterContext.DEFAULT_PACKAGE + "/" + temp);
-    }
-    private String getXpFileName(String xpName){
-        return (getXpRoot() + xpName);
     }
 
     public String getClassRoot() {
@@ -222,5 +177,18 @@ public class XpCachingLoader extends ClassLoader{
     }
     public void setParentLoader(ClassLoader parentLoader) {
         this.parentLoader = parentLoader;
+    }
+
+    /**
+     * @return Returns the resolver.
+     */
+    public UnifiedResolver getResolver() {
+        return resolver;
+    }
+    /**
+     * @param resolver The resolver to set.
+     */
+    public void setResolver(UnifiedResolver resolver) {
+        this.resolver = resolver;
     }
 }

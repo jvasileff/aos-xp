@@ -2,14 +2,20 @@ package org.anodyneos.xpImpl.translater;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLConnection;
+import java.util.List;
 
 import org.anodyneos.commons.net.ClassLoaderURIHandler;
+import org.anodyneos.commons.net.URI;
 import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.commons.xml.sax.BaseParser;
 import org.anodyneos.xp.tagext.TagLibraryRegistry;
 import org.anodyneos.xpImpl.registry.RegistryParser;
 import org.anodyneos.xpImpl.util.CodeWriter;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 
@@ -29,8 +35,11 @@ public class Translater extends BaseParser {
             OutputStream os;
             Translater obj = new Translater();
             long start = System.currentTimeMillis();
+            UnifiedResolver resolver = new UnifiedResolver();
+            resolver.addProtocolHandler("classpath", new ClassLoaderURIHandler(RegistryParser.class
+                    .getClassLoader()));
 
-            translate(args[CL_XP_ROOT],args[CL_XP_PAGE],args[CL_JAVA_FILE],args[CL_REGISTRY_FILE]);
+            translate(args[CL_XP_ROOT],args[CL_XP_PAGE],args[CL_JAVA_FILE],args[CL_REGISTRY_FILE],resolver);
 
             System.out.println("Completed in " + (System.currentTimeMillis() - start) + " milliseconds.");
         } catch (SAXParseException e) {
@@ -46,7 +55,8 @@ public class Translater extends BaseParser {
         }
     }
 
-    public static TranslaterResult translate(String xpRoot, String xpPage, String javaFile, String registryFile) throws Exception{
+    public static TranslaterResult translate(String xpRoot, String xpPage,
+            String javaFile, String registryFile, EntityResolver er) throws Exception{
         OutputStream os;
         Translater obj = new Translater();
 
@@ -79,16 +89,224 @@ public class Translater extends BaseParser {
                     " because the directory structure could not be created.");
         }
 
-        TranslaterResult result = obj.process(new InputSource(xpPage), os, registry, className);
+        TranslaterResult result = obj.process(new InputSource(xpPage), os, registry, className, er);
         os.close();
 
         return result;
     }
 
+    /**
+     * @param xpRoot - The physical directory where the xp are located
+     * @param tempRoot - The physical directory where the java file is to be based
+     * @param xpURI - The URI of the desired xp
+     * @param registryFile - RegistryFile of TLDs
+     * @param resolver - UnifiedResolver
+     * @return TranslaterResult
+     * @throws Exception
+     */
+    public static TranslaterResult translate(String xpRoot, String tempRoot,
+            URI xpURI, String registryFile, UnifiedResolver resolver) throws Exception{
+        Translater obj = new Translater();
+
+        InputSource is = new InputSource(new java.io.File(registryFile).toURL().toString());
+        TagLibraryRegistry registry = new RegistryParser().process(is, resolver);
+
+        return obj.translate(xpRoot,tempRoot,xpURI,registry,resolver);
+    }
+
+    public TranslaterResult translate(String xpRoot, String tempRoot,
+            URI xpURI, TagLibraryRegistry registry, UnifiedResolver resolver) throws Exception{
+
+
+        String className = getClassName(xpURI); // i.e. xp.WEB_INF.common.header
+
+        InputSource xpSource = resolver.resolveEntity(null,xpURI.toString());
+        String javaFile = getJavaFile(tempRoot, xpURI);
+
+        OutputStream os;
+        if (createDir(javaFile)){
+            os = new FileOutputStream(javaFile);
+        }else{
+            throw new Exception("Unable to create file: " + javaFile +
+                    " because the directory structure could not be created.");
+        }
+
+        TranslaterResult result = process(xpSource, os, registry, className, resolver);
+        os.close();
+
+        // now translate the dependents (There is no check to see if they are out of date)
+        // this is necessary in order to obtain the dependent list
+        List dependents = result.getDependents();
+        for (int i=0; i<dependents.size();i++){
+            String dependent = (String)dependents.get(i);
+            URI uriDep = new URI(dependent);
+            translate(xpRoot,tempRoot,uriDep,registry,resolver);
+        }
+
+        return result;
+    }
+
+
+    public TranslaterResult process(InputSource is, OutputStream os, TagLibraryRegistry taglibRegistry,
+            String fullClassName, EntityResolver er) throws Exception {
+        CodeWriter out = new CodeWriter(os);
+        TranslaterContext ctx = new TranslaterContext(is, out, taglibRegistry);
+        ctx.setFullClassName(fullClassName);
+        TranslaterProcessor p = new ProcessorPage(ctx);
+        process(is, p, er);
+        out.flush();
+
+        return (TranslaterResult) ctx;
+    }
+
+    /**
+     * Check to see if xp is newer than java
+     * @param xpURI
+     * @param tempRoot
+     * @param resolver
+     * @return
+     */
+    public static boolean xpNeedsTranslating(URI xpURI, String tempRoot, UnifiedResolver resolver){
+
+        File javaFile = new File(getJavaFile(tempRoot,xpURI));
+        if (javaFile.exists()){
+            return xpIsOutOfDate(xpURI,tempRoot,resolver,javaFile.lastModified());
+        }else{
+            // the java file does not exist, so the xp needs translating
+            return true;
+        }
+    }
+
+    /**
+     * Check to see if xp is newer than class
+     *
+     * @param xpURI
+     * @param tempRoot
+     * @param resolver
+     * @return
+     */
+    public static boolean xpNeedsCompiling(URI xpURI, String tempRoot, UnifiedResolver resolver){
+
+        File javaFile = new File(getClassFile(tempRoot,xpURI));
+        if (javaFile.exists()){
+            return xpIsOutOfDate(xpURI,tempRoot,resolver,javaFile.lastModified());
+        }else{
+            // the java file does not exist, so the xp needs translating
+            return true;
+        }
+    }
+
+    public static boolean xpIsOutOfDate(URI xpURI, String tempRoot, UnifiedResolver resolver, long loadTime){
+
+        InputStream is = null;
+        try{
+            URLConnection conn = resolver.openConnection(xpURI);
+            try{
+                is = conn.getInputStream();
+            }catch (NullPointerException npe){
+                throw new IOException(xpURI.toString() + " does not exist.");
+            }
+            long xpLastModified = conn.getLastModified();
+
+            if (loadTime >= xpLastModified){
+                return false;
+
+            }else{
+                return true;
+            }
+
+        }catch (IOException ioe){
+            System.out.println("[ERROR]Unable to load xp file " + xpURI.toString() +
+                    " to see if it is out of date. " + ioe.getMessage());
+            return true;
+        } finally {
+            try { if(is != null) is.close(); } catch (Exception e) { }
+        }
+
+    }
+
+
+    public static String getJavaFile(String tempRoot, URI xpURI){
+        String fullPath = concatPaths(TranslaterContext.DEFAULT_PACKAGE + "/",xpURI.getPath());
+        fullPath = fullPath.replace('-','_');   // TODO replace with more robust replacement
+        fullPath = concatPaths(tempRoot,fullPath);
+        fullPath = fullPath.replaceAll("\\.xp",".java");
+        return fullPath;
+
+    }
+    public static String getClassFile(String tempRoot, URI xpURI){
+        String fullPath = concatPaths(TranslaterContext.DEFAULT_PACKAGE + "/",xpURI.getPath());
+        fullPath = fullPath.replace('-','_');   // TODO replace with more robust replacement
+        fullPath = concatPaths(tempRoot,fullPath);
+        fullPath = fullPath.replaceAll("\\.xp",".class");
+        return fullPath;
+
+    }
+
+    public static URI getURIFromClassName(String className){
+        String path = className.replace('.','/');
+        path = path.concat(".class");
+        try{
+            path = concatPaths("webapp:///",path);
+            URI uri = new URI(path);
+
+            return uri;
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+
+
+    }
+    public static String getClassName(URI xpURI){
+        String fullPath = xpURI.getPath();
+        fullPath = fullPath.replace('-','_');   // TODO replace with more robust replacement
+        fullPath = concatPaths(TranslaterContext.DEFAULT_PACKAGE + "/",fullPath);
+        fullPath = fullPath.replaceAll("\\.xp","");
+        fullPath = fullPath.replace('/','.');
+        return fullPath;
+
+    }
+
+    /**
+     * concats pathPrefix and pathSuffix, with a /
+     *
+     * @param pathPrefix
+     * @param pathSuffix
+     * @return pathPrefix + pathSuffix
+     * @throws Exception
+     */
+    public static String concatPaths(String pathPrefix, String pathSuffix){
+        String c = null;
+        if (pathPrefix == null){
+            c = pathSuffix;
+        }else if (pathSuffix == null){
+            c = pathPrefix;
+        }else{
+            // start with the prefix
+            c = pathPrefix;
+            if (pathPrefix.endsWith("/")){
+                if (pathSuffix.startsWith("/")){
+                    // if the prefix ends in / and the suffix begins with / then strip the / from the suffix
+                    pathSuffix = pathSuffix.substring(1,pathSuffix.length());
+                }
+            }else{
+                if (!pathSuffix.startsWith("/")){
+                    // if the prefix does NOT end in / and the suffix does NOT begin with / then append a / to c
+                    c = c.concat("/");
+                }
+            }
+            // and add then concatenate the two together
+            c = c.concat(pathSuffix);
+        }
+        return c;
+    }
+
     private static boolean createDir(String javaFile){
+
         boolean created = false;
         String filePath = javaFile.replaceFirst("[/\\\\]\\w*\\.java","");
-
         File dir = new File(filePath);
         if (!dir.exists()){
             created = dir.mkdirs();
@@ -97,18 +315,6 @@ public class Translater extends BaseParser {
         }
 
         return created;
-    }
-
-    public TranslaterResult process(InputSource is, OutputStream os,
-            TagLibraryRegistry taglibRegistry, String fullClassName) throws Exception {
-        CodeWriter out = new CodeWriter(os);
-        TranslaterContext ctx = new TranslaterContext(is, out, taglibRegistry);
-        ctx.setFullClassName(TranslaterContext.DEFAULT_PACKAGE + "."+fullClassName);
-        TranslaterProcessor p = new ProcessorPage(ctx);
-        process(is, p);
-        out.flush();
-
-        return (TranslaterResult) ctx;
     }
 
 }

@@ -141,7 +141,7 @@ class ProcessorPage extends TranslaterProcessor {
         out.endBlock();
         out.println();
 
-        out.printIndent().println("public java.util.List getDependents(){");
+        out.printIndent().println("public static java.util.List getDependents(){");
         out.indentPlus();
         out.printIndent().println("java.util.List dependents = new java.util.ArrayList();");
         List dependents = getTranslaterContext().getDependents();
