@@ -74,14 +74,6 @@ public class Config {
     public static final String SQL_MAX_ROWS
         = "org.anodyneos.xp.tag.sql.maxRows";
 
-    /*
-     * Private constants
-     */
-    private static final String PAGE_SCOPE_SUFFIX = ".page";
-    private static final String REQUEST_SCOPE_SUFFIX = ".request";
-    private static final String SESSION_SCOPE_SUFFIX = ".session";
-    private static final String APPLICATION_SCOPE_SUFFIX = ".application";
-
     /**
      * Looks up a configuration variable in the given scope.
      *
@@ -177,7 +169,7 @@ public class Config {
      * @param scope Scope in which the configuration variable is to be set
      */
     public static void set(XpContext pc, String name, Object value, int scope) {
-        pc.setAttribute(name, name + "." + pc.resolveScope(scope), scope);
+        pc.setAttribute(name + "." + pc.resolveScope(scope), value, scope);
     }
 
     /**

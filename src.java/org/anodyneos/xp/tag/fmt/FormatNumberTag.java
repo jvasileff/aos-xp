@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
  * @author Jan Luehe
  */
 
-public abstract class FormatNumberTag extends XpTagSupport {
+public class FormatNumberTag extends XpTagSupport {
 
     // *********************************************************************
     // Private constants

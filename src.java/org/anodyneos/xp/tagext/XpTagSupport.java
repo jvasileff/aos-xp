@@ -30,6 +30,7 @@ public abstract class XpTagSupport implements XpTag {
     public abstract void doTag(XpContentHandler out) throws XpException, ELException, SAXException;
 
     public static final XpTag findAncestorWithClass(XpTag fromTag, Class theClass) {
+        /*
         if (null == fromTag || null == theClass) {
             return null;
         } else {
@@ -43,6 +44,14 @@ public abstract class XpTagSupport implements XpTag {
             }
             return fromTag;
         }
+        */
+        while (fromTag != null) {
+            if (theClass.isInstance(fromTag)) {
+                return fromTag;
+            }
+            fromTag = fromTag.getParent();
+        }
+        return null;
     }
 
     public final XpTag getParent() {

@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
  * @author Jan Luehe
  */
 
-public abstract class ParseNumberTag extends XpTagSupport {
+public class ParseNumberTag extends XpTagSupport {
 
     // *********************************************************************
     // Private constants

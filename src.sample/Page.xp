@@ -8,7 +8,7 @@
     xmlns:testxpns="http://testxpns.test.er"
 >
     <xp:output
-        encoding="utf-8"
+        encoding="US-ASCII"
         indent="yes"
         mediaType="text/xml"
         method="xml"
@@ -18,11 +18,111 @@
     />
 
     <xp:content>
+        <!--
+            <fmt:setLocale value="fr_FR"/>
+            <fmt:setLocale value="en_US"/>
+        -->
+            <fmt:setLocale value="en_GB"/>
+
+        <fmt:setBundle basename="sample"/>
         <c:newBean var="date" class="java.util.Date"/>
         <c:set var="start" value="${date.time}"/>
         <c:set var="end" scope="application" value="${date.time}"/>
         <html testatt1="tatatt1val">
             <xp:attribute name="testatt2" value="testattval"/>
+
+            <h1><fmt:message key="test.term"> THIS_SHOULDN'T_APPEAR </fmt:message></h1>
+            <h1><fmt:message>test.term</fmt:message></h1>
+            <h1><fmt:message>
+                term.with.three
+                <fmt:param>x</fmt:param>
+                <fmt:param>xx</fmt:param>
+                <fmt:param>
+                    xxx
+                    <fmt:formatDate type="both" timeZone="America/Los_Angeles" dateStyle="full" timeStyle="full" value="${date}"/>
+                </fmt:param>
+            </fmt:message></h1>
+            <p/>
+            <p/>
+            ****** <fmt:formatDate type="both" timeZone="America/Los_Angeles" dateStyle="full" timeStyle="full" value="${date}"/>
+            <p/>
+            <p/>
+                    <fmt:formatDate type="date" value="${date}" timeZone="America/Los_Angeles" />
+            <p/>
+            <p/>
+                <fmt:parseDate type="date" var="parsedDate">
+                    <fmt:formatDate type="date" value="${date}" timeZone="America/Los_Angeles" />
+                </fmt:parseDate>
+                <fmt:formatDate value="${parsedDate}" type="both" timeZone="America/Los_Angeles" dateStyle="full" timeStyle="full"/>
+            <p/>
+            <fmt:setLocale value="fr_FR"/>
+            <h1>------ fr_FR ------</h1>
+            <p/>
+                <p><fmt:formatDate value="${date}" type="date" dateStyle="short"/></p>
+                <p><fmt:formatDate value="${date}" type="date" dateStyle="medium"/></p>
+                <p><fmt:formatDate value="${date}" type="date" dateStyle="long"/></p>
+                <p><fmt:formatDate value="${date}" type="date" dateStyle="full"/></p>
+            <p/>
+            <p/>
+                <p><fmt:formatDate value="${date}" type="time" timeStyle="short"/></p>
+                <p><fmt:formatDate value="${date}" type="time" timeStyle="medium"/></p>
+                <p><fmt:formatDate value="${date}" type="time" timeStyle="long"/></p>
+                <p><fmt:formatDate value="${date}" type="time" timeStyle="full"/></p>
+            <p/>
+            <p/>
+                <p><fmt:formatNumber value="23422" type="currency" currencyCode="EUR"/></p>
+                <p><fmt:formatNumber value="23423" type="currency" currencyCode="FRF"/></p>
+                <p><fmt:formatNumber value="23424" type="currency" currencyCode="USD"/></p>
+                <p><fmt:formatNumber value="23424" type="currency" currencyCode="GBP"/></p>
+            <p/>
+            <p/>
+            <p/>
+            <fmt:setLocale value="en_US"/>
+            <h1>------ en_US ------</h1>
+            <p/>
+                <p><fmt:formatDate value="${date}" type="date" dateStyle="short"/></p>
+                <p><fmt:formatDate value="${date}" type="date" dateStyle="medium"/></p>
+                <p><fmt:formatDate value="${date}" type="date" dateStyle="long"/></p>
+                <p><fmt:formatDate value="${date}" type="date" dateStyle="full"/></p>
+            <p/>
+            <p/>
+                <p><fmt:formatDate value="${date}" type="time" timeStyle="short"/></p>
+                <p><fmt:formatDate value="${date}" type="time" timeStyle="medium"/></p>
+                <p><fmt:formatDate value="${date}" type="time" timeStyle="long"/></p>
+                <p><fmt:formatDate value="${date}" type="time" timeStyle="full"/></p>
+            <p/>
+            <p/>
+                <p><fmt:formatNumber value="23422" type="currency" currencyCode="EUR"/></p>
+                <p><fmt:formatNumber value="23423" type="currency" currencyCode="FRF"/></p>
+                <p><fmt:formatNumber value="23424" type="currency" currencyCode="USD"/></p>
+                <p><fmt:formatNumber value="23424" type="currency" currencyCode="GBP"/></p>
+            <p/>
+            <p/>
+            <p/>
+            <fmt:setLocale value="en_GB"/>
+            <h1>------ en_GB ------</h1>
+            <p/>
+                <p><fmt:formatDate value="${date}" type="date" dateStyle="short"/></p>
+                <p><fmt:formatDate value="${date}" type="date" dateStyle="medium"/></p>
+                <p><fmt:formatDate value="${date}" type="date" dateStyle="long"/></p>
+                <p><fmt:formatDate value="${date}" type="date" dateStyle="full"/></p>
+            <p/>
+            <p/>
+                <p><fmt:formatDate value="${date}" type="time" timeStyle="short"/></p>
+                <p><fmt:formatDate value="${date}" type="time" timeStyle="medium"/></p>
+                <p><fmt:formatDate value="${date}" type="time" timeStyle="long"/></p>
+                <p><fmt:formatDate value="${date}" type="time" timeStyle="full"/></p>
+            <p/>
+            <p/>
+                <p><fmt:formatNumber value="23422" type="currency" currencyCode="EUR"/></p>
+                <p><fmt:formatNumber value="23423" type="currency" currencyCode="FRF"/></p>
+                <p><fmt:formatNumber value="23424" type="currency" currencyCode="USD"/></p>
+                <p><fmt:formatNumber value="23424" type="currency" currencyCode="GBP"/></p>
+            <p/>
+            <p/>
+            <p/>
+            <p/>
+
             <head/>
             <c:set var="myvar" value="${1+2}"/>
             <c:set var="i" value="${18}"/>

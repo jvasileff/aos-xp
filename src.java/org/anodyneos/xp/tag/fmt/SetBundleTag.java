@@ -16,9 +16,9 @@
 
 package org.anodyneos.xp.tag.fmt;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
-
+import org.anodyneos.xp.XpContentHandler;
+import org.anodyneos.xp.XpContext;
+import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.tagext.XpTagSupport;
 
 /**
@@ -28,7 +28,7 @@ import org.anodyneos.xp.tagext.XpTagSupport;
  * @author Jan Luehe
  */
 
-public abstract class SetBundleTag extends XpTagSupport {
+public class SetBundleTag extends XpTagSupport {
 
     // *********************************************************************
     // Protected state
@@ -47,7 +47,7 @@ public abstract class SetBundleTag extends XpTagSupport {
 
     public SetBundleTag() {
         basename = null;
-        scope = PageContext.PAGE_SCOPE;
+        scope = XpContext.PAGE_SCOPE;
     }
 
     // for tag attribute
@@ -69,7 +69,7 @@ public abstract class SetBundleTag extends XpTagSupport {
     // *********************************************************************
     // Tag logic
 
-    public void doTag() throws JspException {
+    public void doTag(XpContentHandler out) throws XpException {
         LocalizationContext locCtxt = BundleTag.getLocalizationContext(getXpContext(), basename);
 
         if (var != null) {

@@ -14,7 +14,8 @@ public class XMLStreamer {
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
 
-        transformer.setOutputProperty(OutputKeys.ENCODING, "ISO-8859-1");
+        // TODO: follow setting from <xp:output> tag.
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");

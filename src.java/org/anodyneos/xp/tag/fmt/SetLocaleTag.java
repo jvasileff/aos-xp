@@ -358,8 +358,9 @@ public class SetLocaleTag extends XpTagSupport {
      */
     private static Locale findFormattingMatch(XpContext xpc, Locale[] avail) {
         if (!(xpc instanceof HttpXpContext)) {
-            // We don't know what the client wants.
-            return null;
+            // We don't know what the client wants, return system locale.
+            // TODO: should we do this?
+            return Locale.getDefault();
         } else {
             // Determine from client's browser settings.
             HttpXpContext hxpc = (HttpXpContext) xpc;

@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
  * @author Jan Luehe
  */
 
-public abstract class SetTimeZoneTag extends XpTagSupport {
+public class SetTimeZoneTag extends XpTagSupport {
 
     // *********************************************************************
     // Protected state
