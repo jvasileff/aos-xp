@@ -22,7 +22,6 @@ import org.xml.sax.SAXParseException;
  *
  * TODO: provide proper context wrapping if necessary (review spec);  generate new variables instead of reusing savedXPCH
  * TODO: trim and crlf processing: support trim attribute, make sure result has &#10; instead of CRLF (attrs not supposed to be on two lines in XML.)
- * TODO: support expressions for name and namespace
  */
 class ProcessorAttribute extends TranslaterProcessor {
 
@@ -36,8 +35,8 @@ class ProcessorAttribute extends TranslaterProcessor {
     private String savedXPCHVariable;
     private StringBuffer sb;
 
-    private String attName;
-    private String attURI;
+    private String codeName;
+    private String codeURI;
 
     public ProcessorAttribute(TranslaterContext ctx) {
         super(ctx);
@@ -70,11 +69,25 @@ class ProcessorAttribute extends TranslaterProcessor {
             Attributes attributes) throws SAXException {
         CodeWriter out = getTranslaterContext().getCodeWriter();
         String value = attributes.getValue(A_VALUE);
-        attName = attributes.getValue(A_NAME);
-        attURI = attributes.getValue(A_NAMESPACE);
+        String attName = attributes.getValue(A_NAME);
+        String attURI = attributes.getValue(A_NAMESPACE);
 
         if(null == attURI) {
             attURI = "";
+        }
+
+        if(Util.hasEL(attName)) {
+            // EL expression may exist.  Process all unescaped expressions, concatinate, etc...
+            codeName = Util.elExpressionCode(attName, "String");
+        } else {
+            codeName = Util.escapeStringQuotedEL(attName);
+        }
+
+        if(Util.hasEL(attURI)) {
+            // EL expression may exist.  Process all unescaped expressions, concatinate, etc...
+            codeURI = Util.elExpressionCode(attURI, "String");
+        } else {
+            codeURI = Util.escapeStringQuotedEL(attURI);
         }
 
         if (null == value) {
@@ -137,8 +150,8 @@ class ProcessorAttribute extends TranslaterProcessor {
             }
             out.printIndent().println(
                   "xpCH.addManagedAttribute("
-                +       Util.escapeStringQuoted(attName)
-                + "," + Util.escapeStringQuoted(attURI)
+                +       codeName
+                + "," + codeURI
                 + "," + codeValue
                 + ");"
             );
@@ -147,8 +160,8 @@ class ProcessorAttribute extends TranslaterProcessor {
             processorResultContent.flushCharacters();
             out.printIndent().println(
                   savedXPCHVariable + ".addManagedAttribute("
-                +       Util.escapeStringQuoted(attName)
-                + "," + Util.escapeStringQuoted(attURI)
+                +       codeName
+                + "," + codeURI
                 + ", ((org.anodyneos.xp.util.TextContentHandler) xpCH.getWrappedContentHandler()).getText()"
                 + ");"
             );
