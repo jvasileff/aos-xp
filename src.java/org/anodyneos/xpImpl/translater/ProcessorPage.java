@@ -77,6 +77,10 @@ class ProcessorPage extends TranslaterProcessor {
         out.println();
         out.printIndent().println("static {");
         out.indentPlus();
+
+        /*
+            TODO: should these properties have defaults?  It is probably better for them not to since the serializer (XSL) has its own defaults.
+
         out.printIndent().println("defaultProperties.setProperty(\"cdataSectionElements\", \"\");");
         out.printIndent().println("defaultProperties.setProperty(\"doctypePublic\", \"\");");
         out.printIndent().println("defaultProperties.setProperty(\"doctypeSystem\", \"\");");
@@ -87,6 +91,7 @@ class ProcessorPage extends TranslaterProcessor {
         out.printIndent().println("defaultProperties.setProperty(\"omitXmlDeclaration\", \"no\");");
         out.printIndent().println("defaultProperties.setProperty(\"xhtmlCompat\", \"\");");
         out.printIndent().println("defaultProperties.setProperty(\"xsltURI\", \"\");");
+        */
         out.endBlock();
 
         out.println();
