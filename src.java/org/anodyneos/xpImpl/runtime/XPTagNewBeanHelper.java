@@ -20,7 +20,7 @@ public class XPTagNewBeanHelper {
     public static void newBean(XpContext xpContext, String var, String scope, String className) throws XpException, ELException {
 
         try {
-            Object obj = Beans.instantiate(null, className);
+            Object obj = Beans.instantiate(Thread.currentThread().getContextClassLoader(), className);
             xpContext.setAttribute(var, obj);
         } catch (ClassNotFoundException e) {
             throw new XpException(e);
