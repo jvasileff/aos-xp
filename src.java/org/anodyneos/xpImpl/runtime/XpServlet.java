@@ -77,8 +77,8 @@ public class XpServlet extends HttpServlet{
 
         UnifiedResolver resolver = new UnifiedResolver();
         resolver.setDefaultLookupEnabled(false);
-        resolver.addProtocolHandler("classloader",
-                new ClassLoaderURIHandler(this.getClass().getClassLoader()));
+        resolver.addProtocolHandler("classpath",
+                new ClassLoaderURIHandler(Thread.currentThread().getContextClassLoader()));
         resolver.addProtocolHandler("webapp",
                 new ServletContextURIHandler(servletConfig.getServletContext()));
 
@@ -93,7 +93,7 @@ public class XpServlet extends HttpServlet{
         cache.setJavaRoot(scratchDirPath);
         String xpRegistry = servletConfig.getInitParameter(XP_REGISTRY);
         if (xpRegistry == null){
-            xpRegistry = "webapp:///WEB-INF/xp/registry.xpreg";
+            xpRegistry = "webapp:///WEB-INF/registry.xpreg";
         }
         cache.setXpRegistry(xpRegistry);
         String xpCacheAutoload = servletConfig.getInitParameter(XP_CACHE_AUTOLOAD);
