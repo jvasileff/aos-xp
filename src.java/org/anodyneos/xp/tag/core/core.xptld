@@ -7,7 +7,7 @@
     <tag>
         <description>Sets the result of an expression evaluation in a 'scope'</description>
         <name>set</name>
-        <tag-class>org.anodyneos.xp.standard.SetTag</tag-class>
+        <tag-class>org.anodyneos.xp.tag.core.SetTag</tag-class>
         <attribute>
             <description>
                 Name of the exported scoped variable to hold the value
@@ -62,7 +62,7 @@
             and supporting subsetting and other functionality
         </description>
         <name>forEach</name>
-        <tag-class>org.anodyneos.xp.standard.ForEachTag</tag-class>
+        <tag-class>org.anodyneos.xp.tag.core.ForEachTag</tag-class>
         <attribute>
             <description>
                 Collection of items to iterate over.
@@ -212,7 +212,7 @@
             scripting variable representing the evaluation of this condition
         </description>
         <name>if</name>
-        <tag-class>org.anodyneos.xp.standard.IfTag</tag-class>
+        <tag-class>org.anodyneos.xp.tag.core.IfTag</tag-class>
         <attribute>
             <description>
                 The test condition that determines whether or not the body
@@ -249,7 +249,7 @@
             &lt;otherwise&gt;
         </description>
         <name>choose</name>
-        <tag-class>org.anodyneos.xp.standard.ChooseTag</tag-class>
+        <tag-class>org.anodyneos.xp.tag.core.ChooseTag</tag-class>
     </tag>
 
     <tag>
@@ -258,7 +258,7 @@
             evalutes to 'true'
         </description> 
         <name>when</name>
-        <tag-class>org.anodyneos.xp.standard.WhenTag</tag-class>
+        <tag-class>org.anodyneos.xp.tag.core.WhenTag</tag-class>
         <attribute>
             <description>
                 The test condition that determines whether or not the body content
@@ -277,7 +277,7 @@
             only if all of the prior conditions evaluated to 'false'
         </description>
         <name>otherwise</name>
-        <tag-class>org.anodyneos.xp.standard.OtherwiseTag</tag-class>
+        <tag-class>org.anodyneos.xp.tag.core.OtherwiseTag</tag-class>
     </tag>
 
     <tag>
@@ -285,7 +285,7 @@
             Create a new java bean
         </description> 
         <name>newBean</name>
-        <tag-class>org.anodyneos.xp.standard.NewBeanTag</tag-class>
+        <tag-class>org.anodyneos.xp.tag.core.NewBeanTag</tag-class>
         <attribute>
             <name>var</name>
             <required>true</required>
@@ -311,7 +311,7 @@
             Logs content handler actions to System.err.
         </description>
         <name>debug</name>
-        <tag-class>org.anodyneos.xp.standard.DebugTag</tag-class>
+        <tag-class>org.anodyneos.xp.tag.core.DebugTag</tag-class>
     </tag>
 
 </taglib>
