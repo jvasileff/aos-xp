@@ -5,7 +5,7 @@ import org.anodyneos.xp.standalone.StandaloneXpFactory;
 
 public class StandaloneXpFactoryImpl extends StandaloneXpFactory {
 
-    // todo: pool?
+    // TODO: pool?
 
     public StandaloneXpFactoryImpl() {
         // super();
