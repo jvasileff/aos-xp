@@ -37,6 +37,9 @@ import org.xml.sax.helpers.NamespaceSupport;
  *
  * 5. Tracking of prefix to namespace URI mappings.
  *
+ * 6. Convenient StartElement and EndElement methods that take uri and qName. See
+ * comments for parameter rules and prefix calculation.
+ *
  * @author John Vasileff
  */
 public final class XpContentHandler implements ContentHandler {
@@ -466,6 +469,14 @@ public final class XpContentHandler implements ContentHandler {
         wrappedContentHandler.setDocumentLocator(locator);
     }
 
+    public void endDocument() throws SAXException {
+        // TODO should calls to this method be ignored?
+    }
+
+    public void startDocument() throws SAXException {
+        // TODO should calls to this method be ignored?
+    }
+
     ////////////////////////////////////////////////////////////////////////////////
     //
     // Xp specific getters/setters
@@ -592,61 +603,6 @@ public final class XpContentHandler implements ContentHandler {
             prefix = "n" + prefixNum++;
         } while (null != namespaceSupport.getURI(prefix));
         return prefix;
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////
-    //
-    // characters(xxx) convenience methods
-    //
-    ////////////////////////////////////////////////////////////////////////////////
-
-    public void characters(String s) throws SAXException {
-        flush();
-        if (null != s) {
-            characters(s.toCharArray(), 0, s.length());
-        }
-    }
-
-    public void characters(Object x) throws SAXException {
-        if (null != x) {
-            characters(x.toString());
-        }
-    }
-
-    public void characters(char x) throws SAXException {
-        characters(String.valueOf(x));
-    }
-
-    public void characters(byte x) throws SAXException {
-        characters(String.valueOf(x));
-    }
-
-    public void characters(boolean x) throws SAXException {
-        characters(String.valueOf(x));
-    }
-
-    public void characters(int x) throws SAXException {
-        characters(String.valueOf(x));
-    }
-
-    public void characters(long x) throws SAXException {
-        characters(String.valueOf(x));
-    }
-
-    public void characters(float x) throws SAXException {
-        characters(String.valueOf(x));
-    }
-
-    public void characters(double x) throws SAXException {
-        characters(String.valueOf(x));
-    }
-
-    public void endDocument() throws SAXException {
-        // TODO should calls to this method be ignored?
-    }
-
-    public void startDocument() throws SAXException {
-        // TODO should calls to this method be ignored?
     }
 
 }
