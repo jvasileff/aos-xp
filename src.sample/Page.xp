@@ -27,7 +27,8 @@
         <c:newBean var="date" class="java.util.Date"/>
         <c:set var="start" value="${date.time}"/>
         <c:set var="end" scope="global" value="${date.time}"/>
-        <html>
+        <html testatt1="tatatt1val">
+            <xp:attribute name="testatt2" value="testattval"/>
             <head/>
             <c:set var="myvar" value="${1+2}"/>
             <c:set var="i" value="${18}"/>
@@ -83,6 +84,24 @@
                 <c:set value="${1000.00}" var="testvar"/>
                 <pre>${testvar}</pre>
             </body>
+
+            <b>xp:attribute NAMESPACE TEST: see how it works without xp:attribute</b>
+            <myns:nstest xmlns:myns="http://myns.com" xmlns:myns2="http://myns2.com" myns2:att1="att1val"/>
+            
+            <b>xp:attribute NAMESPACE TEST: no prefix provided but namespace specified</b>
+            <myns:nstest xmlns:myns="http://myns.com" inlineatt="val">
+                <xp:attribute name="att1" namespace="http://nstest.com" value="att1val"/>
+            </myns:nstest>
+            
+            <b>xp:attribute NAMESPACE TEST: no prefix or namespace provided</b>
+            <myns:nstest xmlns:myns="http://myns.com">
+                <xp:attribute name="att1" value="att1val"/>
+            </myns:nstest>
+            
+            <b>xp:attribute NAMESPACE TEST: prefix provided and namespace specified</b>
+            <myns:nstest xmlns:myns="http://myns.com">
+                <xp:attribute name="myns2:att1" namespace="http://myns2.com" value="att1val"/>
+            </myns:nstest>
         </html>
     </xp:content>
 </xp:page>
