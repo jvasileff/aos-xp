@@ -45,6 +45,9 @@
     <property name="servlet.jar" location="${dir.jars}/servlet-api-2.3/servlet.jar"/>
     <property name="tools.jar" location="${env.JAVA_HOME}/lib/tools.jar"/>
 
+    <property name="xalan.jar" location="${dir.jars}/xalan-2.6.2/xalan.jar"/>
+    <property name="xercesImpl.jar" location="${dir.jars}/xerces-2.6.0/xercesImpl.jar"/>
+
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  prepare.post
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -63,6 +66,9 @@
         <copy toDir="${dir.build.ide.lib}" file="${junit.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${servlet.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${tools.jar}"/>
+
+        <copy toDir="${dir.build.ide.lib}" file="${xalan.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${xercesImpl.jar}"/>
 
         <!-- paths -->
         <path id="path.compile">
