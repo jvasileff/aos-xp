@@ -158,33 +158,6 @@ class ProcessorPage extends TranslaterProcessor {
         out.printIndent().println("return loadTime;");
         out.endBlock();
 
-
-        out.println();
-        out.printIndent().println("private org.anodyneos.xp.XpPage getIncludedPage(String xpName){");
-        out.indentPlus();
-        out.printIndent().println("try {");
-        out.indentPlus();
-        out.printIndent().println("if (this.getClass().getClassLoader() instanceof org.anodyneos.xpImpl.runtime.XpClassLoader){");
-        out.indentPlus();
-        out.printIndent().println("org.anodyneos.xpImpl.runtime.XpClassLoader myLoader = (org.anodyneos.xpImpl.runtime.XpClassLoader)this.getClass().getClassLoader();");
-        out.printIndent().println("return ((org.anodyneos.xp.XpPage)myLoader.getParent().loadClass(xpName).newInstance());");
-        out.endBlock();
-        out.printIndent().println("else{");
-        out.indentPlus();
-        out.printIndent().println("return ((org.anodyneos.xp.XpPage)this.getClass().getClassLoader().loadClass(xpName).newInstance());");
-        out.endBlock();
-        out.endBlock();
-        out.printIndent().println("catch (Exception e){");
-        out.indentPlus();
-        out.printIndent().println("e.printStackTrace();");
-        out.printIndent().println("return null;");
-        out.endBlock();
-
-        // end the main class
-        out.endBlock();
-        out.println();
-
-
         if(getTranslaterContext().getFragmentCount() > 0) {
             // Output Fragments
             out.flush();
