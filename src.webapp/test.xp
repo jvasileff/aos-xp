@@ -33,6 +33,15 @@
                     <br/>
                     browserVersionString: ${browser.browserVersionString}
                 </div>
+                <h1>Test AutoHtml</h1>
+                <fmt:autoHtml>
+                    alksdjfal ksjaslkdfj alskfj alskfj aslfh alsdfh alskfh
+                    alsdfh als aslkfh as jvasileff@marketingcentral.com ldfh
+                    alskdfh alskdjfh alskdjfh alskdfh alskdjfh laskjdh flakjs
+
+                    alkj shfalsdkfh asldjfh alsdjfh alskdfh alsfh alskfh as
+                    lkjfhasldfkj hasldfh l
+                </fmt:autoHtml>
             </body>
         </html>
     </xp:content>

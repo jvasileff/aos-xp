@@ -74,6 +74,7 @@
         <include name="**/*.js"/>
         <include name="**/*.jsp"/>
         <include name="**/*.properties"/>
+        <include name="**/*.xptld"/>
     </patternset>
 
     <!-- paths -->
