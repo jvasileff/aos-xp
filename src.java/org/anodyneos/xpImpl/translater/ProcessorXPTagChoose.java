@@ -5,9 +5,6 @@ import org.anodyneos.xpImpl.util.CodeWriter;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import sun.tools.tree.CaseStatement;
-
-
 /**
  * ChooseTag similar to xsl.
  *
