@@ -29,6 +29,10 @@ public class ProcessorResultContent extends TranslaterProcessor {
      * all xp:attributes wich will be written out along with the startElement
      * once they are all read in (before text, new elements, etc).  After endElement, we
      * will call endPrefixMapping as necessary.
+     *
+     * TODO: !!! This was a mistake, need to have XpContentHandler handle attributes so
+     * they can be wrapped in if statements.  Probably need an element stack in XpContentHandler
+     * in order to save calls for endPrefixMapping.
      */
     private List attributeProcessors = new ArrayList();
     private String elURI;
