@@ -5,7 +5,8 @@ import org.anodyneos.xpImpl.util.CodeWriter;
 import org.anodyneos.xpImpl.util.JavaClass;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
+import java.util.List;
+import java.util.ArrayList;
 /**
  * ProcessorPage handles the xp:page element.
  *
@@ -87,6 +88,44 @@ class ProcessorPage extends TranslaterProcessor {
 
     private void printJavaFooter() {
         CodeWriter out = getTranslaterContext().getCodeWriter();
+
+        // implementing methods of XpPage interface
+        out.println();
+        out.printIndent().println("public java.util.List getDependents(){");
+        out.indentPlus();
+        out.printIndent().println("java.util.List dependents = new java.util.ArrayList();");
+        List dependents = getTranslaterContext().getDependents();
+        for (int i = 0; i < dependents.size(); i++){
+            out.printIndent().println("dependents.add(\"" + dependents.get(i) + "\");");
+        }
+        out.printIndent().println("return dependents;");
+        out.endBlock();
+
+
+        out.println();
+        out.printIndent().println("private org.anodyneos.xp.XpPage getIncludedPage(String xpName){");
+        out.indentPlus();
+        out.printIndent().println("try {");
+        out.indentPlus();
+        out.printIndent().println("if (this.getClass().getClassLoader() instanceof org.anodyneos.xpImpl.runtime.XpClassLoader){");
+        out.indentPlus();
+        out.printIndent().println("org.anodyneos.xpImpl.runtime.XpClassLoader myLoader = (org.anodyneos.xpImpl.runtime.XpClassLoader)this.getClass().getClassLoader();");
+        out.printIndent().println("return ((org.anodyneos.xp.XpPage)myLoader.getParent().loadClass(xpName).newInstance());");
+        out.endBlock();
+        out.printIndent().println("else{");
+        out.indentPlus();
+        out.printIndent().println("return ((org.anodyneos.xp.XpPage)this.getClass().getClassLoader().loadClass(xpName).newInstance());");
+        out.endBlock();
+        out.endBlock();
+        out.printIndent().println("catch (Exception e){");
+        out.indentPlus();
+        out.printIndent().println("e.printStackTrace();");
+        out.printIndent().println("return null;");
+        out.endBlock();
+
+        // end the main class
+        out.endBlock();
+
 
         if(getTranslaterContext().getFragmentCount() > 0) {
             // Output Fragments
