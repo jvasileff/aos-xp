@@ -112,7 +112,7 @@
                     <c:if test="${false}" var="result">${result}</c:if> ${false}=false \${false}=false </xp:attribute>
             </myns:nstest>
             <myns:nstest xmlns:myns="http://myns.com">
-                <xp:attribute name="myns2:att1" namespace="http://myns2.com">
+                <xp:attribute name="myns${5+1}:att1" namespace="http://myns${2*3}.com">
 line1
 line2
 line3
@@ -125,6 +125,68 @@ line1
 line2 ${1+1}
 line3
             </mytag>
+
+            <b/>
+            <b>TEST BUILTIN IF</b>
+            <b/>
+            <xp:if test="true"> TRUE_SHOULD_PRINT </xp:if>
+            <xp:if test="tru${'E'}"> TRUE_SHOULD_PRINT </xp:if>
+            <xp:if test="tru${'G'}"> WOOPS </xp:if>
+            <xp:if test="false"> WOOPS </xp:if>
+            <xp:if test="fa${2+1}lse"> WOOPS </xp:if>
+            <xp:if test="${false}"> WOOPS </xp:if>
+            <xp:if test="${false}" var="result" scope="page"> WOOPS </xp:if>
+            ${result}
+            <xp:if test="${true}" var="result">
+                <b>Good</b>
+                <xp:if test="${true}" var="result">
+                    Good
+                </xp:if>
+                <xp:if test="${false}" var="result">
+                    WOOPS
+                </xp:if>
+            </xp:if>
+            
+            <b/>
+            <b/>
+            <b>TEST BUILTIN SET</b>
+            <b/>
+            <xp:newBean var="cal" class="java.util.GregorianCalendar"/>
+            <xp:set value="0" target="${cal}" property="timeInMillis"/>
+            <pre>${cal.time}</pre>
+            <xp:set value="${end}" target="${cal}" property="timeInMillis"/>
+            <pre>${cal.time}</pre>
+            <xp:set value="${1000.00}" var="testvar"/>
+            <pre>${testvar}</pre>
+            <b/>
+            <b/>
+            <b>TEST BUILTIN REMOVE</b>
+            <b/>
+            <xp:set value="${1000.00}" var="testvar"/>
+            <pre>${testvar}</pre>
+            <xp:remove var="testvar"/>
+            <pre>${testvar}</pre>
+            <xp:set value="${1000.00}" var="testvarX" scope="page"/>
+            <pre>${testvarX}</pre>
+            <xp:remove var="testvarX" scope="page"/>
+            <pre>${testvarX}</pre>
+
+            
+            <b/>
+            <b/>
+            <b>TEST BUILTIN CHOOSE</b>
+            <b/>
+
+            <pre>
+                <xp:choose>
+                    <xp:when test="${1==2}">first</xp:when>
+                    <xp:when test="false">second</xp:when>
+                    <xp:when test="${1==1}"><b>third</b></xp:when>
+                    <xp:when test="false">fourth</xp:when>
+                    <xp:when test="false">fifth</xp:when>
+                    <xp:otherwise>_otherwise_</xp:otherwise>
+                </xp:choose>
+            </pre>
         </html>
     </xp:content>
 </xp:page>
