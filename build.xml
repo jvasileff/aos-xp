@@ -97,6 +97,8 @@
             <arg value="${dir.src.sample}/registry.xpreg" />
         </java>
         <mkdir dir="${dir.build.java.sample}/common"/>
+
+        <!-- note, this "standalone" version does not use the caching class loader, so it does not auto translate/compile -->
         <java taskname="translateSample" fork="yes" classname="org.anodyneos.xpImpl.translater.Translater">
             <classpath refid="path.compile"/>
             <classpath location="${dir.build.classes}"/>
@@ -105,6 +107,7 @@
             <arg value="${dir.build.java.sample}/common/footer.java" />
             <arg value="${dir.src.sample}/registry.xpreg" />
         </java>
+
     </target>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
