@@ -8,8 +8,10 @@ import javax.servlet.jsp.el.VariableResolver;
 public interface XpContext {
 
     public static final int PAGE_SCOPE = 1;
+    public static final int APPLICATION_SCOPE = 2;
 
     public static final String PAGE_SCOPE_STRING = "page";
+    public static final String APPLICATION_SCOPE_STRING = "application";
 
     //void initialize();
     void release();

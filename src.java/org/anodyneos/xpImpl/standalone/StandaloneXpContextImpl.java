@@ -20,7 +20,7 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
     private Map[] scopeMaps = new Map[] { new HashMap(), new HashMap() };
 
     private Map pageScopeMap = new HashMap();
-    private Map globalScopeMap = new HashMap();
+    private Map applicationScopeMap = new HashMap();
     private VariableResolver variableResolver;
     private ExpressionEvaluator expEval = new ExpressionEvaluatorImpl(false);
 
@@ -45,8 +45,8 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
         switch (scope) {
             case PAGE_SCOPE:
                 return pageScopeMap.get(name);
-            case GLOBAL_SCOPE:
-                return globalScopeMap.get(name);
+            case APPLICATION_SCOPE:
+                return applicationScopeMap.get(name);
             default:
                 throw new IllegalArgumentException("invalid scope: " + scope);
         }
@@ -61,8 +61,8 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
             case PAGE_SCOPE:
                 pageScopeMap.remove(name);
                 break;
-            case GLOBAL_SCOPE:
-                globalScopeMap.remove(name);
+            case APPLICATION_SCOPE:
+                applicationScopeMap.remove(name);
                 break;
             default:
                 throw new IllegalArgumentException("invalid scope: " + scope);
@@ -81,8 +81,8 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
                 case PAGE_SCOPE:
                     pageScopeMap.put(name,obj);
                     break;
-                case GLOBAL_SCOPE:
-                    globalScopeMap.put(name,obj);
+                case APPLICATION_SCOPE:
+                    applicationScopeMap.put(name,obj);
                     break;
                 default:
                     throw new IllegalArgumentException("invalid scope: " + scope);
@@ -96,8 +96,8 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
             case PAGE_SCOPE:
                 keys = pageScopeMap.keySet();
                 break;
-            case GLOBAL_SCOPE:
-                keys = globalScopeMap.keySet();
+            case APPLICATION_SCOPE:
+                keys = applicationScopeMap.keySet();
                 break;
             default:
                 throw new IllegalArgumentException("invalid scope: " + scope);
@@ -126,13 +126,13 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
     public Object findAttribute(String name) {
         Object o;
         o = getAttribute(name, PAGE_SCOPE);
-        if(null == o) { o = getAttribute(name, GLOBAL_SCOPE); }
+        if(null == o) { o = getAttribute(name, APPLICATION_SCOPE); }
         return o;
     }
 
     public int getAttributesScope(String name) {
         if(null != getAttribute(name, PAGE_SCOPE)) { return PAGE_SCOPE; }
-        if(null != getAttribute(name, GLOBAL_SCOPE)) { return GLOBAL_SCOPE; }
+        if(null != getAttribute(name, APPLICATION_SCOPE)) { return APPLICATION_SCOPE; }
         return 0;
     }
 
@@ -145,8 +145,8 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
     }
 
     public int resolveScope(String scope) {
-        if (GLOBAL_SCOPE_STRING.equals(scope)) {
-           return GLOBAL_SCOPE;
+        if (APPLICATION_SCOPE_STRING.equals(scope)) {
+           return APPLICATION_SCOPE;
         } else if (PAGE_SCOPE_STRING.equals(scope)) {
             return PAGE_SCOPE;
         } else {

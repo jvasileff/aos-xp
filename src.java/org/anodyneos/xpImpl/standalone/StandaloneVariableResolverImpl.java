@@ -26,8 +26,8 @@ public class StandaloneVariableResolverImpl implements VariableResolver {
     public Object resolveVariable(String pName) throws ELException {
         if (StandaloneXpContext.PAGE_SCOPE_STRING.equals(pName)) {
             return new PageScopeMap(ctx);
-        } else if (StandaloneXpContext.GLOBAL_SCOPE_STRING.equals(pName)) {
-            return new GlobalScopeMap(ctx);
+        } else if (StandaloneXpContext.APPLICATION_SCOPE_STRING.equals(pName)) {
+            return new ApplicationScopeMap(ctx);
         } else {
             return ctx.getAttribute(pName);
         }
@@ -57,14 +57,14 @@ public class StandaloneVariableResolverImpl implements VariableResolver {
         }
 
     }
-    private class GlobalScopeMap extends EnumeratedMap {
+    private class ApplicationScopeMap extends EnumeratedMap {
         StandaloneXpContext ctx;
-        public GlobalScopeMap(StandaloneXpContext ctx) {
+        public ApplicationScopeMap(StandaloneXpContext ctx) {
             this.ctx = ctx;
         }
 
         public Enumeration enumerateKeys() {
-            return ctx.getAttributeNamesInScope(StandaloneXpContext.GLOBAL_SCOPE);
+            return ctx.getAttributeNamesInScope(StandaloneXpContext.APPLICATION_SCOPE);
         }
 
         public boolean isMutable() {
@@ -73,7 +73,7 @@ public class StandaloneVariableResolverImpl implements VariableResolver {
 
         public Object getValue(Object pKey) {
             if (pKey instanceof String) {
-                return ctx.getAttribute((String) pKey, StandaloneXpContext.GLOBAL_SCOPE);
+                return ctx.getAttribute((String) pKey, StandaloneXpContext.APPLICATION_SCOPE);
             } else {
                 return null;
             }

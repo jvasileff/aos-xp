@@ -75,7 +75,7 @@
                 <pre>${(end - start)/1000} seconds</pre>
                 <pre>${(pageScope.end - start)/1000} seconds</pre>
                 <pre>${end}</pre>
-                <pre>${globalScope.end}</pre>
+                <pre>${applicationScope.end}</pre>
                 <c:newBean var="cal" class="java.util.GregorianCalendar"/>
                 <c:set value="0" target="${cal}" property="timeInMillis"/>
                 <pre>${cal.time}</pre>
