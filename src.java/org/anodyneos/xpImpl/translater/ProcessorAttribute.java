@@ -8,8 +8,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Attribute element must have name and either expr attribute or text contents.
- * @TODO: add support for attribute value being the CDATA content of this element.
- * @TODO: add support for namespace
+ * TODO: add support for attribute value being the CDATA content of this element.
  */
 class ProcessorAttribute extends TranslaterProcessor {
 
@@ -17,12 +16,9 @@ class ProcessorAttribute extends TranslaterProcessor {
     public static final String A_NAMESPACE = "namespace";
     public static final String A_VALUE = "value";
 
-    String attLocalName;
-    String attQName;
-    String attURI;
-    String attPrefix = null;
-    boolean declareNamespace = false;
-    String attCodeValue;
+    private String attName;
+    private String attURI;
+    private String attCodeValue;
 
     public ProcessorAttribute(TranslaterContext ctx) {
         super(ctx);
@@ -35,45 +31,12 @@ class ProcessorAttribute extends TranslaterProcessor {
     public void startElement(String uri, String localName, String qName,
             Attributes attributes) throws SAXException {
         CodeWriter out = getTranslaterContext().getCodeWriter();
-        String name = attributes.getValue(A_NAME);
-        String namespace = attributes.getValue(A_NAMESPACE);
         String value = attributes.getValue(A_VALUE);
+        attName = attributes.getValue(A_NAME);
+        attURI = attributes.getValue(A_NAMESPACE);
 
-        if(null != namespace && namespace.length()==0) {
-            namespace = null;
-        }
-
-        if(name.indexOf(':') == -1) {
-            if (null != namespace) {
-                // no prefix provided but namespace specified
-                attLocalName = name;
-                // TODO: choose a prefix that isn't being used.  Need to have XPContentHandler track prefixes.
-                attPrefix = "ns0";
-                attQName = attPrefix + ":" + name;
-                attURI = namespace;
-                declareNamespace = true;
-            } else {
-                // no prefix or namespace
-                attLocalName = name;
-                attQName = name;
-                attURI = "";
-            }
-        } else {
-            if (null != namespace) {
-                // prefix provided and namespace specified
-                attPrefix = name.substring(0, name.indexOf(":"));
-                attLocalName = name.substring(name.indexOf(":") + 1);
-                attQName = name;
-                attURI = namespace;
-                declareNamespace = true;
-            } else {
-                // prefix provided and no namespace specified
-                // TODO: do we need validation on the namespace here or does the consumer
-                // of our SAX messages perform checks?
-                attLocalName = name;
-                attQName = name;
-                attURI = "";
-            }
+        if(null == attURI) {
+            attURI = "";
         }
 
         if(Util.hasEL(value)) {
@@ -89,6 +52,15 @@ class ProcessorAttribute extends TranslaterProcessor {
         //sb.append(ch, start, length);
     //}
 
-    //public void endElement(String uri, String localName, String qName) {
-    //}
+    public void endElement(String uri, String localName, String qName) {
+        CodeWriter out = getTranslaterContext().getCodeWriter();
+        //addManagedAttribute(String name, String namespaceURI, String value)
+        out.printIndent().println(
+              "xpCH.addManagedAttribute("
+            +       Util.escapeStringQuoted(attName)
+            + "," + Util.escapeStringQuoted(attURI)
+            + "," + attCodeValue
+            + ");"
+        );
+    }
 }

@@ -44,7 +44,7 @@ public final class XpContentHandler implements ContentHandler {
     public void endElement(String namespaceURI, String localName, String qName) throws SAXException {
         flush();
         El el = (El) elStack.pop();
-        // TODO: provide consistency checks in debug mode
+        // TODO: provide consistency checks/assertions in debug mode
         contentHandler.endElement(namespaceURI, localName, qName);
         List prefixMappings = el.getManagedPrefixMappings();
         if (prefixMappings != null) {

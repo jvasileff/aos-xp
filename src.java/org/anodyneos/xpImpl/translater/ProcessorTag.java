@@ -51,33 +51,23 @@ public class ProcessorTag extends TranslaterProcessor {
 
     public ElementProcessor getProcessorFor(String uri, String localName, String qName)
             throws SAXException {
-        if (! bodyFragmentStarted && URI_XP.equals(uri) && E_ATTRIBUTE.equals(localName)) {
-            // attribute for action tag.  Needs this for validation.
-            if (null != sb && sb.toString().trim().equals("")) {
-                throw new SAXException(qName + " element not allowed after non-whitespace CDATA");
-            }
-            sb = null;
-            // @TODO
-            //return new ProcessorTagAttribute(getTranslaterContext(), this);
-            return null;
-        } else {
-            ElementProcessor p = bodyFragmentProcessor.getProcessorFor(uri, localName, qName);
-            // since no exception, start fragment if not already started. Dump characters.
-            // Return p (p may be the bodyFragmentProcessor itself if the content is result
-            // content, but bodyFragmentProcessor made the decision.)
-            if (! bodyFragmentStarted) {
-                bodyFragmentId = getTranslaterContext().startFragment();
-                bodyFragmentStarted = true;
-            }
-            if(null != sb) {
-                char[] chars = sb.toString().toCharArray();
-                bodyFragmentProcessor.characters(chars, 0, chars.length);
-                sb = null;
-                // make sure to flush characters in processor
-                bodyFragmentProcessor.flushCharacters();
-            }
-            return p;
+        // TODO: consider xp:tagAttribute to allow subelements to provide values for tag attributes.
+        ElementProcessor p = bodyFragmentProcessor.getProcessorFor(uri, localName, qName);
+        // since no exception, start fragment if not already started. Dump characters.
+        // Return p (p may be the bodyFragmentProcessor itself if the content is result
+        // content, but bodyFragmentProcessor made the decision.)
+        if (! bodyFragmentStarted) {
+            bodyFragmentId = getTranslaterContext().startFragment();
+            bodyFragmentStarted = true;
         }
+        if(null != sb) {
+            char[] chars = sb.toString().toCharArray();
+            bodyFragmentProcessor.characters(chars, 0, chars.length);
+            sb = null;
+            // make sure to flush characters in processor
+            bodyFragmentProcessor.flushCharacters();
+        }
+        return p;
     }
 
     public void startElement(String uri, String localName, String qName, Attributes attributes)
