@@ -23,8 +23,8 @@ public class RegistryParser extends BaseParser {
         InputSource is = new InputSource(new java.io.File(args[0]).toURL().toString());
 
         UnifiedResolver resolver = new UnifiedResolver();
-        resolver.addProtocolHandler("classpath", new ClassLoaderURIHandler(RegistryParser.class
-                .getClassLoader()));
+        resolver.addProtocolHandler("classpath",
+                new ClassLoaderURIHandler(Thread.currentThread().getContextClassLoader()));
 
         TagLibraryRegistry r = obj.process(is, resolver);
         TagLibraryInfo[] libs = r.getTagLibraryInfos();

@@ -39,8 +39,8 @@ public class Translater extends BaseParser {
             Translater obj = new Translater();
             long start = System.currentTimeMillis();
             UnifiedResolver resolver = new UnifiedResolver();
-            resolver.addProtocolHandler("classpath", new ClassLoaderURIHandler(RegistryParser.class
-                    .getClassLoader()));
+            resolver.addProtocolHandler("classpath",
+                    new ClassLoaderURIHandler(Thread.currentThread().getContextClassLoader()));
 
             translate(args[CL_XP_ROOT],args[CL_XP_PAGE],args[CL_JAVA_FILE],args[CL_REGISTRY_FILE],resolver);
 
@@ -66,7 +66,7 @@ public class Translater extends BaseParser {
         // registry
         UnifiedResolver resolver = new UnifiedResolver();
         resolver.addProtocolHandler("classpath",
-                new ClassLoaderURIHandler(RegistryParser.class.getClassLoader()));
+                new ClassLoaderURIHandler(Thread.currentThread().getContextClassLoader()));
         InputSource is = new InputSource(new java.io.File(registryFile).toURL().toString());
         TagLibraryRegistry registry = new RegistryParser().process(is, resolver);
 
