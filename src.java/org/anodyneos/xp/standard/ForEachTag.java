@@ -14,6 +14,7 @@ import org.anodyneos.xp.tagext.XpTagSupport;
 import org.xml.sax.SAXException;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * @author jvas
@@ -44,19 +45,47 @@ public final class ForEachTag extends XpTagSupport {
         saveVars();
         if (items != null){
 
-            Object[] arrItems;
+            if (items instanceof Iterator) {
+                Iterator iter = (Iterator) items;
+                int index;
 
-            if (!(items instanceof Object[])){
-                // TODO test with various collection types
-                arrItems = ((Collection)items).toArray();
-            }else{
-                arrItems = (Object[])items;
-            }
-            for (int i = 0; i < arrItems.length; i+=step) {
-                if (null != var) {
-                    getXpContext().setAttribute(var, arrItems[i]);
+                for (index = 0; index < begin && iter.hasNext(); index++ ) {
+                    iter.next();
                 }
-                getXpBody().invoke(out);
+
+                int count = 0;
+                //while (iter.hasNext() && index <= end) {
+                while (iter.hasNext()) {
+                    Object value = iter.next();
+                    if (var != null) {
+                        getXpContext().setAttribute(var, value);
+                    }
+                    boolean finished = false;
+                    index++;
+                    for ( int i = 1; i < step && !finished; i++, index++ ) {
+                        if ( ! iter.hasNext() ) {
+                           finished = true;
+                        } else {
+                            iter.next();
+                        }
+                    }
+                    getXpBody().invoke(out);
+                }
+            } else {
+                Object[] arrItems;
+
+                if (!(items instanceof Object[])){
+                    // TODO test with various collection types
+                    arrItems = ((Collection)items).toArray();
+                }else{
+                    arrItems = (Object[])items;
+                }
+                for (int i = 0; i < arrItems.length; i+=step) {
+                    if (null != var) {
+                        getXpContext().setAttribute(var, arrItems[i]);
+                    }
+                    getXpBody().invoke(out);
+                }
             }
 
         }else{
