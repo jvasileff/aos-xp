@@ -1,6 +1,6 @@
 # TOMCAT
 #catalina.home:/opt/zeus/repository/build/jakarta-tomcat-5.0.19
-catalina.home:/opt/zeus/repository/build/jakarta-tomcat-5.5.4
+catalina.home:/opt/zeus/repository/build/jakarta-tomcat-5.5.7
 catalina.username: admin
 catalina.password: admin
 catalina.url.manager: http://localhost:8080/manager
