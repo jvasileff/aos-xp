@@ -124,6 +124,13 @@ public class UrlTag extends XpTagSupport implements ParamParent {
             result = response.encodeURL(result);
         }
 
+        // JIRA ZP-6
+        // for some containers, "result" looks like: /zeus-proto/;jsessionid=AAECA83C53178F746DAFB5CE56CE9EA3
+        // when the initial (pre session cookie) page is requested.
+        // so we need to strip out the stuff after the semicolon
+        int semicolonIndex = result.indexOf(';');
+        result = semicolonIndex != -1 ? result.substring(0, semicolonIndex) : result;
+
         // store or print the output
         if (var != null) {
             getXpContext().setAttribute(var, result, scope);
@@ -133,6 +140,7 @@ public class UrlTag extends XpTagSupport implements ParamParent {
 
         // always set an attribute if asked to do so
         if (attributeName != null) {
+
             out.addAttribute(attributeNamespace, attributeName, result);
         }
 
