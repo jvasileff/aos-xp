@@ -21,11 +21,11 @@ public final class XpOutput {
     }
 
     public XpOutput(ContentHandler ch) {
-        this.ch = new XpContentHandler(ch);
+        this.ch = XpContentHandlerFactory.getDefaultFactory().getXpContentHandler(ch);
     }
 
     public XpOutput(ContentHandler ch, int mode) {
-        this.ch = new XpContentHandler(ch);
+        this.ch = XpContentHandlerFactory.getDefaultFactory().getXpContentHandler(ch);
         setMode(mode);
     }
 
