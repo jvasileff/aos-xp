@@ -27,6 +27,7 @@ import org.xml.sax.helpers.NamespaceSupport;
 public class ProcessorContent extends TranslaterProcessor {
 
     private StringBuffer sb;
+    private int phantomPrefixCount = 0;
 
     private ProcessorResultContent resultContentProcessor;
 
@@ -84,6 +85,7 @@ public class ProcessorContent extends TranslaterProcessor {
                 +        Util.escapeStringQuoted(nsPrefix)
                 + ", " + Util.escapeStringQuoted(nsURI)
                 + ");");
+            phantomPrefixCount++;
         }
 
         // also handle default prefix...
@@ -94,6 +96,7 @@ public class ProcessorContent extends TranslaterProcessor {
                 +        Util.escapeStringQuoted("")
                 + ", " + Util.escapeStringQuoted(defaultURI)
                 + ");");
+            phantomPrefixCount++;
         }
     }
 
@@ -103,8 +106,14 @@ public class ProcessorContent extends TranslaterProcessor {
     }
 
     public void endElement(String uri, String localName, String qName) {
-        // end method block
         CodeWriter out = getTranslaterContext().getCodeWriter();
+
+        // close out phantom prefixes
+        for (int i=0; i < phantomPrefixCount; i++) {
+            out.printIndent().println("xpCH.popPhantomPrefixMapping();");
+        }
+
+        // end method block
         out.endBlock();
         out.println();
     }

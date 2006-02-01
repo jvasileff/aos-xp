@@ -128,7 +128,9 @@ public final class XpContentHandlerImpl implements XpContentHandler {
             logger.debug("pushPhantomPrefixMapping(\"" + prefix + "\", \"" + uri + "\") called");
         }
         // this method cannot be called between startPrefixMapping and startElement events.
-        flush(EVENT_PUSH_PHANTOM_PREFIX_MAPPING);
+
+        // FIXME: commenting out following line with no idea of side effects:
+        //flush(EVENT_PUSH_PHANTOM_PREFIX_MAPPING);
         namespaceMappings.pushPhantomPrefix(prefix, uri);
     }
 

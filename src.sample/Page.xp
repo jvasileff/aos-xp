@@ -4,7 +4,6 @@
     xmlns:xp="http://www.anodyneos.org/xmlns/xp"
     xmlns:fmt="http://www.anodyneos.org/xmlns/xp/fmt"
     xmlns:c="http://www.anodyneos.org/xmlns/xp/core"
-    xmlns:testxpns="http://testxpns.test.er"
     xmlns="http://xhtml.com"
 >
     <xp:output
@@ -16,298 +15,140 @@
         xhtmlCompat="yes"
     />
 
+    <!--
+    <xp:output
+        type="xml|html"
+        doctype-system="xxx"
+        doctype-public="xxx"
+        xhtml-compat="true|false">
+
+    <xp:xsl url="xx">
+    <xp:xsl url="xx">
+    -->
+
     <xp:content>
-        <!--
-            <fmt:setLocale value="fr_FR"/>
-            <fmt:setLocale value="en_US"/>
-        -->
-            <fmt:setLocale value="en_GB"/>
+        <html>
 
-        <fmt:setBundle basename="sample"/>
-        <c:newBean var="date" class="java.util.Date"/>
-        <c:set var="start" value="${date.time}"/>
-        <c:set var="end" scope="application" value="${date.time}"/>
-        <html testatt1="tatatt1val" xmlns="http://xhtml.com">
-            <xp:attribute name="testatt2" value="testattval"/>
+            <h1>====== NAMESPACE TEST 1 ======</h1>
+            <!--
+                Output should look like:
 
-            <br/>
-            <br/>
-            <br/>
-            <el>
-                <xp:attribute name="att1" value="att1"/>
-                <xp:attribute name="att2" value="att1"/>
-                <xp:attribute namespace="http://www.espn.com" name="att1" value="att1"/>
-                <xp:attribute name="att3" value="att1"/>
-                <xp:attribute name="att4" value="att1"/>
-                <n0:el2 xmlns:n0="http://www.espn.com"/>
-            </el>
-            <br/>
-            <br/>
-                <xp:myel xmlns:xp="http://newxp.prefix.com">
-                    <myel xmlns=""/>
-                </xp:myel>
-            <br/>
-            <br/>
-            <br/>
-            <h1><fmt:message key="test.term"> THIS_SHOULDN'T_APPEAR </fmt:message></h1>
-            <h1><fmt:message>test.term</fmt:message></h1>
-            <h1><fmt:message>
-                term.with.three
-                <fmt:param>x</fmt:param>
-                <fmt:param>xx</fmt:param>
-                <fmt:param>
-                    xxx
-                    <fmt:formatDate type="both" timeZone="America/Los_Angeles" dateStyle="full" timeStyle="full" value="${date}"/>
-                </fmt:param>
-            </fmt:message></h1>
-            <p/>
-            <p/>
-            ****** <fmt:formatDate type="both" timeZone="America/Los_Angeles" dateStyle="full" timeStyle="full" value="${date}"/>
-            <p/>
-            <p/>
-                    <fmt:formatDate type="date" value="${date}" timeZone="America/Los_Angeles" />
-            <p/>
-            <p/>
-                <fmt:parseDate type="date" var="parsedDate">
-                    <fmt:formatDate type="date" value="${date}" timeZone="America/Los_Angeles" />
-                </fmt:parseDate>
-                <fmt:formatDate value="${parsedDate}" type="both" timeZone="America/Los_Angeles" dateStyle="full" timeStyle="full"/>
-            <p/>
-            <fmt:setLocale value="fr_FR"/>
-            <h1>------ fr_FR ------</h1>
-            <p/>
-                <p><fmt:formatDate value="${date}" type="date" dateStyle="short"/></p>
-                <p><fmt:formatDate value="${date}" type="date" dateStyle="medium"/></p>
-                <p><fmt:formatDate value="${date}" type="date" dateStyle="long"/></p>
-                <p><fmt:formatDate value="${date}" type="date" dateStyle="full"/></p>
-            <p/>
-            <p/>
-                <p><fmt:formatDate value="${date}" type="time" timeStyle="short"/></p>
-                <p><fmt:formatDate value="${date}" type="time" timeStyle="medium"/></p>
-                <p><fmt:formatDate value="${date}" type="time" timeStyle="long"/></p>
-                <p><fmt:formatDate value="${date}" type="time" timeStyle="full"/></p>
-            <p/>
-            <p/>
-                <p><fmt:formatNumber value="23422" type="currency" currencyCode="EUR"/></p>
-                <p><fmt:formatNumber value="23423" type="currency" currencyCode="FRF"/></p>
-                <p><fmt:formatNumber value="23424" type="currency" currencyCode="USD"/></p>
-                <p><fmt:formatNumber value="23424" type="currency" currencyCode="GBP"/></p>
-            <p/>
-            <p/>
-            <p/>
-            <fmt:setLocale value="en_US"/>
-            <h1>------ en_US ------</h1>
-            <p/>
-                <p><fmt:formatDate value="${date}" type="date" dateStyle="short"/></p>
-                <p><fmt:formatDate value="${date}" type="date" dateStyle="medium"/></p>
-                <p><fmt:formatDate value="${date}" type="date" dateStyle="long"/></p>
-                <p><fmt:formatDate value="${date}" type="date" dateStyle="full"/></p>
-            <p/>
-            <p/>
-                <p><fmt:formatDate value="${date}" type="time" timeStyle="short"/></p>
-                <p><fmt:formatDate value="${date}" type="time" timeStyle="medium"/></p>
-                <p><fmt:formatDate value="${date}" type="time" timeStyle="long"/></p>
-                <p><fmt:formatDate value="${date}" type="time" timeStyle="full"/></p>
-            <p/>
-            <p/>
-                <p><fmt:formatNumber value="23422" type="currency" currencyCode="EUR"/></p>
-                <p><fmt:formatNumber value="23423" type="currency" currencyCode="FRF"/></p>
-                <p><fmt:formatNumber value="23424" type="currency" currencyCode="USD"/></p>
-                <p><fmt:formatNumber value="23424" type="currency" currencyCode="GBP"/></p>
-            <p/>
-            <p/>
-            <p/>
-            <fmt:setLocale value="en_GB"/>
-            <h1>------ en_GB ------</h1>
-            <p/>
-                <p><fmt:formatDate value="${date}" type="date" dateStyle="short"/></p>
-                <p><fmt:formatDate value="${date}" type="date" dateStyle="medium"/></p>
-                <p><fmt:formatDate value="${date}" type="date" dateStyle="long"/></p>
-                <p><fmt:formatDate value="${date}" type="date" dateStyle="full"/></p>
-            <p/>
-            <p/>
-                <p><fmt:formatDate value="${date}" type="time" timeStyle="short"/></p>
-                <p><fmt:formatDate value="${date}" type="time" timeStyle="medium"/></p>
-                <p><fmt:formatDate value="${date}" type="time" timeStyle="long"/></p>
-                <p><fmt:formatDate value="${date}" type="time" timeStyle="full"/></p>
-            <p/>
-            <p/>
-                <p><fmt:formatNumber value="23422" type="currency" currencyCode="EUR"/></p>
-                <p><fmt:formatNumber value="23423" type="currency" currencyCode="FRF"/></p>
-                <p><fmt:formatNumber value="23424" type="currency" currencyCode="USD"/></p>
-                <p><fmt:formatNumber value="23424" type="currency" currencyCode="GBP"/></p>
-            <p/>
-            <p/>
-            <p/>
-            <p/>
+                    <noNS1 att1="">
+                      <elWithNS1 xmlns:ns1="http://ns1.example.com">
+                        <ns1:innerElWithNS1/>
+                        <ns1:innerElWithNS1/>
+                      </elWithNS1>
+                    </noNS1>
+            -->
+            <noNS1>
+                <c:if test="${true}" xmlns:ns1="http://ns1.example.com">
+                    <xp:attribute name="att1"/>
+                    <elWithNS1>
+                        <ns1:innerElWithNS1/>
+                        <ns1:innerElWithNS1/>
+                    </elWithNS1>
+                </c:if>
+            </noNS1>
 
+
+            <h1>====== NAMESPACE TEST 2 ======</h1>
+            <!--
+                Output should look like:
+
+                    <noNS1 att1="">
+                      <elWithNS1 xmlns:ns1="http://ns1.example.com">
+                        <ns1:innerElWithNS1/>
+                        <ns1:innerElWithNS1/>
+                      </elWithNS1>
+                    </noNS1>
+
+                *** TODO *** Add to this test an EL function with a namespace
+                defined in the yp:if element
+            -->
+            <noNS1>
+                <yp:if test="${true}" xmlns:ns1="http://ns1.example.com" xmlns:yp="http://www.anodyneos.org/xmlns/xp">
+                    <yp:attribute name="att1"/>
+                    <elWithNS1>
+                        <ns1:innerElWithNS1/>
+                        <ns1:innerElWithNS1/>
+                    </elWithNS1>
+                </yp:if>
+            </noNS1>
+            
+            
+            <h1>====== NAMESPACE TEST 3 ======</h1>
+            <!--
+                Generated code should have phantom calls before and after text
+                inside xp:if
+            -->
+            <noNS1>
+                <xp:if test="${true}" xmlns:ns1="http://ns1.example.com">
+                    This is some inner text.
+                </xp:if>
+            </noNS1>
+            
+            <h1>====== NAMESPACE TEST 4 ======</h1>
+            <!--
+                Output should look like:
+
+                    <noNS1 att1="">
+                      <elWithNS1 xmlns:ns1="http://ns1.example.com">
+                        <ns1:innerElWithNS1/>
+                        <ns1:innerElWithNS1/>
+                      </elWithNS1>
+                    </noNS1>
+            -->
+            <noNS1>
+                <xp:if test="${true}" xmlns:ns1="http://ns1.example.com">
+                    <xp:attribute name="att1"/>
+                    <elWithNS1>
+                        <ns1:innerElWithNS1/>
+                        <ns1:innerElWithNS1/>
+                    </elWithNS1>
+                </xp:if>
+            </noNS1>
+
+
+            <!-- this one should use "ns1", not generate ns0 for the att1 -->
+            <!--
+            <noNS1>
+                <c:if test="${true}" xmlns:ns1="http://ns1.example.com">
+                    <xp:attribute name="att1" namespace="http://ns1.example.com"/>
+                    <elWithNS1>
+                        <ns1:el2WithNS1/>
+                        <ns1:el3WithNS1/>
+                    </elWithNS1>
+                </c:if>
+            </noNS1>
+            -->
+
+            <!--
+            <fmt:timeZone timeZone="America/New_York" e="\${er} ${expr}"/>
+            <fmt:timeZone timeZone="America/New_York" e="\${er}\${\${"/>
+            <fmt:timeZone timeZone="America/New_York"/>
+            <fmt:timeZone timeZone="America/New_York"/>
+            <fmt:timeZone timeZone="America/New_York"/>
+            <fmt:timeZone timeZone="America/New_York"/>
             <head/>
-            <c:set var="myvar" xmlns:setns="http://setnds.com">${1+2}</c:set>
-            <c:set var="i" value="${18}"/>
-            <body xmlns:xyz="http://www.xyz.com" class="${1+1}">
-                <p>
-                    \${myvar}: ${myvar}
-                    \${1+1}: ${1+1}
-                </p>
-                <c:forEach begin="0" end="10" step="2" var="i">
-                    <h1>${i}</h1>
-                </c:forEach>
-                <h1>${i}</h1>
-                <c:if test="${false}" var="result">
-                    WOOPS
-                </c:if>
-                ${result}
-                <c:if test="${true}" var="result">
-                    Good
-                    <c:if test="${true}" var="result">
-                        Good
-                    </c:if>
-                    <c:if test="${false}" var="result">
-                        WOOPS
-                    </c:if>
-                </c:if>
-                <nobr>${result}</nobr>
-                <pre>
-                    <c:choose>
-                        <c:when test="false">first</c:when>
-                        <c:when test="false">second</c:when>
-                        <c:when test="false">third</c:when>
-                        <c:when test="false">fourth</c:when>
-                        <c:when test="false">fifth</c:when>
-                        <c:otherwise>_otherwise_</c:otherwise>
-                    </c:choose>
-                </pre>
-                <c:debug>
-                    <c:newBean var="date" class="java.util.Date"/>
-                    <c:set var="end" value="${date.time}"/>
-                    <pre>${date}</pre>
-                    <pre>${date.time}</pre>
-                    <pre>\${(end - start)/1000} seconds</pre>
-                </c:debug>
-                <pre>${(end - start)/1000} seconds</pre>
-                <pre>${(pageScope.end - start)/1000} seconds</pre>
-                <pre>${end}</pre>
-                <pre>${applicationScope.end}</pre>
-                <c:newBean var="cal" class="java.util.GregorianCalendar"/>
-                <c:set value="0" target="${cal}" property="timeInMillis"/>
-                <pre>${cal.time}</pre>
-                <c:set value="${end}" target="${cal}" property="timeInMillis"/>
-                <pre>${cal.time}</pre>
-                <c:set value="${1000.00}" var="testvar"/>
-                <pre>${testvar}</pre>
+            <body class="${expr}">
+                <h1>
+                    Heading...
+                    ${myexpression}
+                    \$
+                    $
+                </h1>
+                \${ $ \$ asdfasdf
+                ${expr1}${expr2}${expr3}
             </body>
-
-            <b>xp:attribute NAMESPACE TEST: see how it works without xp:attribute</b>
-            <myns:nstest xmlns:myns="http://myns.com" xmlns:myns2="http://myns2.com" myns2:att1="att1val"/>
-            
-            <b>xp:attribute NAMESPACE TEST: no prefix provided but namespace specified</b>
-            <myns:nstest xmlns:myns="http://myns.com" inlineatt="val">
-                <xp:attribute name="att1" namespace="http://nstest.com" value="att1val"/>
-            </myns:nstest>
-            
-            <b>xp:attribute NAMESPACE TEST: no prefix or namespace provided</b>
-            <myns:nstest xmlns:myns="http://myns.com">
-                <xp:attribute name="att1" value="att1val"/>
-            </myns:nstest>
-            
-            <b>xp:attribute NAMESPACE TEST: prefix provided and namespace specified</b>
-            <myns:nstest xmlns:myns="http://myns.com">
-                <c:if test="${true}">
-                    <xp:attribute name="myns2:att1" namespace="http://myns2.com">AT<b>T${2 + 2}</b>VAL1</xp:attribute>
-                </c:if>
-            </myns:nstest>
-            <b/>
-            <b/>
-            <myns:nstest xmlns:myns="http://myns.com">
-                <xp:attribute name="myns2:att1" namespace="http://myns2.com">
-                    <c:if test="${true}" var="result">${result}</c:if>
-                    <c:if test="${false}" var="result">${result}</c:if> ${false}=false \${false}=false </xp:attribute>
-            </myns:nstest>
-            <myns:nstest xmlns:myns="http://myns.com">
-                <xp:attribute name="myns${5+1}:att1" namespace="http://myns${2*3}.com">
-line1
-line2
-line3
-                </xp:attribute>
-                <xp:attribute name="testNoPrefixAttr1" namespace="http://myns${2*3}.com" value="asdf${1}"/>
-                <xp:attribute name="testNoPrefixAttr2" namespace="http://mynsx${2*3}.com" value="asdf${2}"/>
-            </myns:nstest>
-            <b/>
-            <b/>
-            <mytag>
-line1
-line2 ${1+1}
-line3
-            </mytag>
-
-            <b/>
-            <b>TEST BUILTIN IF</b>
-            <b/>
-            <xp:if test="true"> TRUE_SHOULD_PRINT </xp:if>
-            <xp:if test="tru${'E'}"> TRUE_SHOULD_PRINT </xp:if>
-            <xp:if test="tru${'G'}"> WOOPS </xp:if>
-            <xp:if test="false"> WOOPS </xp:if>
-            <xp:if test="fa${2+1}lse"> WOOPS </xp:if>
-            <xp:if test="${false}"> WOOPS </xp:if>
-            <xp:if test="${false}" var="result" scope="page"> WOOPS </xp:if>
-            ${result}
-            <xp:if test="${true}" var="result">
-                <b>Good</b>
-                <xp:if test="${true}" var="result">
-                    Good
-                </xp:if>
-                <xp:if test="${false}" var="result">
-                    WOOPS
-                </xp:if>
-            </xp:if>
-            
-            <b/>
-            <b/>
-            <b>TEST BUILTIN SET</b>
-            <b/>
-            <xp:newBean var="cal" class="java.util.GregorianCalendar"/>
-            <xp:set value="0" target="${cal}" property="timeInMillis"/>
-            <pre>${cal.time}</pre>
-            <xp:set value="${end}" target="${cal}" property="timeInMillis"/>
-            <pre>${cal.time}</pre>
-            <xp:set value="${1000.00}" var="testvar"/>
-            <pre>${testvar}</pre>
-            <b/>
-            <b/>
-            <b>TEST BUILTIN REMOVE</b>
-            <b/>
-            <xp:set value="${1000.00}" var="testvar"/>
-            <pre>${testvar}</pre>
-            <xp:remove var="testvar"/>
-            <pre>${testvar}</pre>
-            <xp:set value="${1000.00}" var="testvarX" scope="page"/>
-            <pre>${testvarX}</pre>
-            <xp:remove var="testvarX" scope="page"/>
-            <pre>${testvarX}</pre>
-
-            
-            <b/>
-            <b/>
-            <b>TEST BUILTIN CHOOSE</b>
-            <b/>
-
-            <pre>
-                <xp:choose>
-                    <xp:when test="${1==2}">first</xp:when>
-                    <xp:when test="false">second</xp:when>
-                    <xp:when test="${1==1}"><b>third</b></xp:when>
-                    <xp:when test="false">fourth</xp:when>
-                    <xp:when test="false">fifth</xp:when>
-                    <xp:otherwise>_otherwise_</xp:otherwise>
-                </xp:choose>
-            </pre>
-            <!--<xp:include file="common/footer.xp"/>-->
-
-            <!-- try c:set with body -->
-            <c:set var="testSet">
-                This is the body content... ${cal.time} ...
-            </c:set>
-            <p>${testSet}</p>
+            -->
         </html>
+        <!--
+        <c:set>
+            <h1/>
+        </c:set>
+        <c:set>
+            <h1/>
+        </c:set>
+        -->
     </xp:content>
 </xp:page>

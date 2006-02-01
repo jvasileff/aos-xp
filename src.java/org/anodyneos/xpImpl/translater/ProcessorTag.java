@@ -32,7 +32,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  *
  * @author jvas
  */
-public class ProcessorTag extends TranslaterProcessor {
+public class ProcessorTag extends HelperProcessorNonResultContent {
 
     private StringBuffer sb;
 
@@ -89,22 +89,16 @@ public class ProcessorTag extends TranslaterProcessor {
         return p;
     }
 
-    public void startElement(String uri, String localName, String qName, Attributes attributes)
+    public void startElementNonResultContent(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
 
-        // TODO: TranslaterProcessor (our super-class) buffers startPrefixMapping calls.  We cannot call
-        // xpCH.startPrefixMapping since we are not going to call xpCH.startElement, but we need to figure out a way
-        // to communicate these "phantom" mappings to the xpCH so that the mappings are available in case they are
-        // used at runtime to evaluate EL expressions in attributes of this method.
-        // for now, lets just "trash" them:
-        getTranslaterContext().clearBufferedStartPrefixMappings();
-
         TranslaterContext ctx = getTranslaterContext();
+        CodeWriter out = ctx.getCodeWriter();
+
         this.tagInfo = ctx.getTagLibraryRegistry().getTagLibraryInfo(uri).getTagInfo(localName);
         this.attributeInfos = toMap(tagInfo.getTagAttributeInfos());
         String tagImplClass = tagInfo.getClassName();
         this.localVarName = ctx.getVariableForTag(tagImplClass);
-        CodeWriter out = ctx.getCodeWriter();
 
         // instantiate tag
         out.printIndent().println(tagImplClass + " " + localVarName + " = new " + tagImplClass + "();");
@@ -146,7 +140,7 @@ public class ProcessorTag extends TranslaterProcessor {
         sb.append(ch, start, length);
     }
 
-    public void endElement(String uri, String localName, String qName) throws SAXException {
+    public void endElementNonResultContent(String uri, String localName, String qName) throws SAXException {
         // end element
         if (null != sb && ! sb.toString().trim().equals("")) {
             if (! bodyFragmentStarted) {
