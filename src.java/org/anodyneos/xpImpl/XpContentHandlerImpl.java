@@ -27,10 +27,10 @@ import org.xml.sax.helpers.AttributesImpl;
  * necessary. The default value is false (same as XMLReader's default.)
  *
  * 3. Start and end prefix mapping calls to the wrapped ContentHandler are
- * managed by this class. Calls to startPrefixMapping() may be made at any time
- * and will take effect when the next call to startElement is made. Calls to
+ * managed by this class.  Calls to startPrefixMapping may only be followed by
+ * additional calls to startPrefixMapping or startElement(). Calls to
  * endPrefixMapping() are ignored - this class will track mappings and make the
- * necessary calls to the wrapped ContentHandler as necessary.
+ * necessary calls to the wrapped ContentHandler.
  *
  * 4. Convenience methods such as characters(String s).
  *
@@ -42,9 +42,6 @@ import org.xml.sax.helpers.AttributesImpl;
  * @author John Vasileff
  *
  * TODO: implement text-only output stack.
- *
- * TODO: do not allow direct instantiation, use a factory.  This should be an interface with only the methods
- * needed by tag authors.  Implementation specific methods should be hidden.
  *
  * TODO: fix documentation - much of it is out of date.
  *
@@ -73,7 +70,7 @@ public final class XpContentHandlerImpl implements XpContentHandler {
      */
     private NamespaceMappings namespaceMappings = new NamespaceMappings();
 
-    private boolean lastEventWasStartPrefixMapping = false;
+    private int lastEvent = -1;
 
     /**
      * holds values for the next element, set by startElement().  When flush() is called, these values
@@ -104,15 +101,6 @@ public final class XpContentHandlerImpl implements XpContentHandler {
     private static final int EVENT_PUSH_PHANTOM_PREFIX_MAPPING = 10;
     private static final int EVENT_POP_PHANTOM_PREFIX_MAPPING = 11;
 
-    /**
-     * holds a stack of phantom prefix mappings.  If there are no new phantom prefixes, the stack depth is not
-     * increased if it is currently empty.  Contents are Maps, map keys are prefix names, values are uris.
-     * ISSUE: this won't work: we need to be able to unwind all prefixes, even if a prefix is declared twice.
-     * ISSUE#2: we need both start and end as we do not have convenient element boundaries to help us. OR, we
-     * can rely on the XP code to push and pop phantom contexts.  But we still need to track which phantom prefixes
-     * have been converted to "real" prefixes so we can ignore the top part of the stack.
-     */
-
     public XpContentHandlerImpl(ContentHandler contentHandler) {
         this.wrappedContentHandler = contentHandler;
     }
@@ -127,10 +115,7 @@ public final class XpContentHandlerImpl implements XpContentHandler {
         if(logDebugEnabled) {
             logger.debug("pushPhantomPrefixMapping(\"" + prefix + "\", \"" + uri + "\") called");
         }
-        // this method cannot be called between startPrefixMapping and startElement events.
-
-        // FIXME: commenting out following line with no idea of side effects:
-        //flush(EVENT_PUSH_PHANTOM_PREFIX_MAPPING);
+        flush(EVENT_PUSH_PHANTOM_PREFIX_MAPPING);
         namespaceMappings.pushPhantomPrefix(prefix, uri);
     }
 
@@ -138,7 +123,6 @@ public final class XpContentHandlerImpl implements XpContentHandler {
         if(logDebugEnabled) {
             logger.debug("popPhantomPrefixMapping() called");
         }
-        // this method cannot be called between startPrefixMapping and startElement events.
         flush(EVENT_POP_PHANTOM_PREFIX_MAPPING);
         namespaceMappings.popPhantomPrefix();
     }
@@ -150,8 +134,8 @@ public final class XpContentHandlerImpl implements XpContentHandler {
     ////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * startPrefixMapping() must be called just prior to other startPrefixMapping calls that must be followed
-     * by a startElement() call.
+     * startPrefixMapping() must be followed only by zero or more startPrefixMapping
+     * calls followed by a startElement() call
      */
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
         if(logDebugEnabled) {
@@ -231,7 +215,7 @@ public final class XpContentHandlerImpl implements XpContentHandler {
     ////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * This method tries to be forgiving, the following rules apply:
+     * This method tries to be forgiving within reason; the following rules apply:
      *
      * 1. When uri == null && qName has a prefix: The prefix must be in scope.
      * The namespace URI in the output will be that of the namespace associated
@@ -240,8 +224,8 @@ public final class XpContentHandlerImpl implements XpContentHandler {
      * 2. When uri == null && qName has no prefix: The qName is used as is with
      * no namespace URI.
      *
-     * 3. When uri == "": The attribute will have no namespace and be output
-     * without a prefix.
+     * 3. When uri == "": If a prefix exists, an exception is thrown.  Otherwise,
+     * the attribute will have no namespace and be output without a prefix.
      *
      * 4. When uri == someURI: A prefix will be given to the attribute in the
      * following priority:
@@ -249,9 +233,9 @@ public final class XpContentHandlerImpl implements XpContentHandler {
      * 4.A) the provided prefix if one was provided and it is currently mapped to
      * the uri.
      *
-     * 4.B) a prefix that is currently mapped to the URI.
+     * 4.B) any prefix that is currently mapped to the URI.
      *
-     * 4.C) the provided prefix if it is not currently mapped to another URI.
+     * 4.C) the provided prefix if it is not currently mapped to some other URI.
      *
      * 4.D) a generated prefix. In the case of C or D, a new namespace mapping
      * will be created.
@@ -295,29 +279,38 @@ public final class XpContentHandlerImpl implements XpContentHandler {
                     myQName = localName;
                     myURI = "";
                 } else {
-                    // the prefix must be in scope
+                    // a prefix was provided
+                    // the prefix must be in scope to determine URI
                     // the prefix may be a phantom
-                    myURI = namespaceMappings.getURI(prefix, false);
-                    if (null != myURI) {
-                        myQName = qName;
+                    String u = namespaceMappings.getURI(prefix, true);
+                    if (null == u) {
+                        throw new SAXException("Cannot find URI for '" + qName + "' and none was provided.");
                     } else {
-                        // TODO: we can probably simplify this code if we allow phantom prefixes to promote to
-                        // their parent element when possible in the NamespaceMapper.
-                        String u = namespaceMappings.getURI(prefix, true);
-                        if (null == u) {
-                            throw new SAXException("Cannot find URI for '" + qName + "' and none was provided.");
+                        String existingURI = namespaceMappings.getURI(prefix, false);
+                        if (null == existingURI) {
+                            myQName = prefix + ":" + localName;
+                            myURI = u;
+                            // declare the phantom prefix
+                            namespaceMappings.declarePrefix(prefix, myURI);
+                        } else if (existingURI.equals(u)) {
+                            // no need to make new declaration
+                            myQName = prefix + ":" + localName;
+                            myURI = u;
                         } else {
-                            String p = namespaceMappings.getPrefix(u, true);
-                            // p is only a candidate, but if it conflicts with an existing prefix, we don't want it
-                            if (null == p || null != namespaceMappings.getURI(p, false)) {
-                                p = genPrefix();
-                            }
-                            myQName = p + ":" + localName;
+                            // existingURI does not match calculated URI for provided prefix
+                            String genP = genPrefix();
+                            myQName = genP + ":" + localName;
+                            myURI = u;
+                            // declare the generated prefix
+                            namespaceMappings.declarePrefix(genP, myURI);
                         }
                     }
                 }
             } else if (uri.length() == 0) {
-                // use "" URI and no prefix
+                if (prefix.length() != 0) {
+                    throw new SAXException("Prefix not allowed for '" + qName + "' when namespace URI = ''.");
+                }
+                // else, use "" URI and no prefix
                 myQName = localName;
                 myURI = "";
             } else {
@@ -329,10 +322,10 @@ public final class XpContentHandlerImpl implements XpContentHandler {
                     myURI = uri;
                 } else {
                     // don't search phantoms
-                    String p = namespaceMappings.getPrefix(uri, false);
-                    if (null != p) {
+                    final String existingPrefix = namespaceMappings.getPrefix(uri, false);
+                    if (null != existingPrefix) {
                         // Case B: we already have a perfectly good prefix
-                        myQName = p + ":" + localName;
+                        myQName = existingPrefix + ":" + localName;
                         myURI = uri;
                     // don't search phantoms
                     } else if (prefix.length() != 0 && (null == namespaceMappings.getURI(prefix, false))) {
@@ -344,8 +337,13 @@ public final class XpContentHandlerImpl implements XpContentHandler {
                         myQName = qName;
                         myURI = uri;
                     } else {
-                        // Case D: punt... generate a new prefix for the attribute
-                        p = genPrefix();
+                        // Case D1: try a phantom prefix
+                        // Case D2: or, generate a new prefix
+                        String p = namespaceMappings.getPrefix(uri, true);
+                        // p may be a phantom-prefix; if it conflicts with a non-phantom prefix, we can't use it
+                        if (null == p || null != namespaceMappings.getURI(p, false)) {
+                            p = genPrefix();
+                        }
                         if (logDebugEnabled) {
                             logger.debug("   addAttribute calls declarePrefix('" + p + "', '" + uri + "')");
                         }
@@ -370,7 +368,7 @@ public final class XpContentHandlerImpl implements XpContentHandler {
      * the current default namespace URI.
      *
      * 3. When uri == "": The element will have no namespace and the default xmlns
-     * will be set to "no namespace".
+     * will be set to "".
      *
      * 4. When uri == someURI: A prefix will be given to the attribute in the
      * following priority:
@@ -389,9 +387,7 @@ public final class XpContentHandlerImpl implements XpContentHandler {
      * will be created.
      */
     public void startElement(String uri, String qName) throws SAXException {
-        // we don't have to call flush() as long as we let other methods do the SAX specific work.  This method
-        // does not _have_ to be in this class - it doesn't violate the contract of calling startPrefixMapping
-        // prior to startElement.
+        // we don't have to call flush() as long as we let other methods do the SAX specific work.
 
         if(logDebugEnabled) {
             logger.debug("startElement(" + uri + ", " + qName + ") called");
@@ -433,6 +429,7 @@ public final class XpContentHandlerImpl implements XpContentHandler {
         endElement(myURI, localName, myQName);
     }
 
+    // this method may return undeclared or phantom prefixes
     private String[] resolveElementPrefix(final String uri, final String qName) throws SAXException {
         final String myQName;
         final String myURI;
@@ -443,20 +440,15 @@ public final class XpContentHandlerImpl implements XpContentHandler {
             throw new SAXException("Could not determine localName for element: '" + qName + "'.");
         }
 
-        // FIXME: looks like we sometimes create new mappings without sending
-        // wrappedCh.startPrefixMapping
         if (null == uri) {
             if (prefix.length() == 0) {
                 myQName = localName;
-                // don't search phantoms
-                String u = namespaceMappings.getURI("", false);
+                String u = namespaceMappings.getURI("", true);
                 if (null == u) {
                     u = "";
                 }
                 myURI = u;
             } else {
-                // the prefix must be in scope
-                // it is OK to search phantoms since they will be real for the new element.
                 // FIXME: this is ok for startElement, but are there any issues for endElement?  Really endElement
                 // needs to be improved anyway to make sure the same prefix is used on both ends.
                 myURI = namespaceMappings.getURI(prefix, true);
@@ -471,24 +463,20 @@ public final class XpContentHandlerImpl implements XpContentHandler {
             myURI = "";
         } else {
             // we have a uri, lets find a good prefix
-            // we must search phantoms since they are about to be real.
             if (uri.equals(namespaceMappings.getURI("", true))) {
                 // Case A: the uri is currently the default namespace; don't use a prefix
                 myQName = localName;
                 myURI = uri;
-            // we must search phantoms since they are about to be real.
             } else if (prefix.length() != 0 && uri.equals(namespaceMappings.getURI(prefix, true))) {
                 // Case B: prefix was provided and uri matches
                 myQName = qName;
                 myURI = uri;
             } else {
-                // we must search phantoms since they are about to be real.
                 String p = namespaceMappings.getPrefix(uri, true);
                 if (null != p) {
                     // Case C: we already have a perfectly good prefix
                     myQName = p + ":" + localName;
                     myURI = uri;
-                // we must search phantoms since they are about to be real.
                 } else if (prefix.length() != 0 && (null == namespaceMappings.getURI(prefix, true))) {
                     // Case D: the provided prefix will do; create new namespace mapping
                     myQName = qName;
@@ -577,97 +565,113 @@ public final class XpContentHandlerImpl implements XpContentHandler {
     //
     ////////////////////////////////////////////////////////////////////////////////
 
-    private void flush(int event) throws SAXException {
+    private void flush(final int event) throws SAXException {
         // NOTE: to handle http://xml.org/sax/features/namespace-prefixes, we will first
-        // remove all "xmlns" and xmlns:xxx" attributes, then add required attributes from namespaceSupport if the
-        // feature is set to "true"
+        // remove all "xmlns" and xmlns:xxx" attributes, then add required attributes from
+        // namespaceSupport if the feature is set to "true"
 
-        // This method is called at the start of _every_ event except addAttribute.  There are two main concerns:
+        // This method is called at the start of _every_ event except addAttribute.
+        // There are two main concerns:
         //
-        // 1. bufferedElLocalName != null.  We need to declare prefixes and output
+        // 1. if bufferedElLocalName != null we need to declare prefixes and output
         // the element with accumulated attributes.
         //
-        // 2. Another element has come or is about to come: We need to pushContext() if we haven't yet, but wait until
-        // we process bufferedEl if it exits.
+        // 2. if another element has come or is about to come: We need to pushContext()
+        // if we haven't yet, but wait until we process bufferedEl if it exits.
 
-        if (lastEventWasStartPrefixMapping && event != EVENT_START_PREFIX_MAPPING && event != EVENT_START_ELEMENT) {
-            throw new IllegalStateException("Only startPrefixMapping() or startElement()" +
-                    " SAX events may follow startPrefixMapping()");
-        }
+        try {
 
-        // Note: flush() is called by startElement PRIOR to setting bufferedElLocalName.  So, this test is for a
-        // a bufferedElLocalName set by a previous startElement call.
-
-        if (null != bufferedElLocalName) {
-            if(logDebugEnabled) {
-                logger.debug("   outputing bufferd element");
-            }
-            for (int i = 0; i < bufferedElAttributes.getLength(); i++) {
-                String qName = bufferedElAttributes.getQName(i);
-                if (qName.equals("xmlns") || qName.startsWith("xmlns:")) {
-                    bufferedElAttributes.removeAttribute(i);
-                }
+            if (EVENT_START_PREFIX_MAPPING == lastEvent &&
+                    EVENT_START_PREFIX_MAPPING != event && EVENT_START_ELEMENT != event) {
+                throw new IllegalStateException("Only startPrefixMapping() or startElement()" +
+                        " SAX events may follow startPrefixMapping()");
             }
 
-            // start prefix mappings; namespaceMappings.push() was already called at startElement()
-            // we don't want phantoms - since push() was already called, they are alread available anyway.
-            Enumeration e = namespaceMappings.getDeclaredPrefixes(false);
-            while (e.hasMoreElements()) {
-                String prefix = (String) e.nextElement();
-                String uri = namespaceMappings.getURI(prefix, false);
-                if (null == uri) {
-                    uri = "";
-                }
+            if (EVENT_PUSH_PHANTOM_PREFIX_MAPPING == event || EVENT_POP_PHANTOM_PREFIX_MAPPING == event) {
+                // do nothing; these can be called at any time except between startPrefixMapping and startElement
+                return;
+            }
+
+            // Note: flush() is called by startElement PRIOR to setting bufferedElLocalName.  So, this test is for a
+            // a bufferedElLocalName set by a previous startElement call.
+
+            if (null != bufferedElLocalName) {
                 if(logDebugEnabled) {
-                    logger.debug("      wrappedContentHandler.startPrefixMapping("
-                            + "'"   + prefix + "'"
-                            + ", '" + uri + "'"
-                            + ")");
+                    logger.debug("   outputing bufferd element");
                 }
-                wrappedContentHandler.startPrefixMapping(prefix, uri);
-                if (namespacePrefixes) {
-                    String qName;
-                    if (prefix.length() == 0) {
-                        qName = "xmlns";
-                    } else {
-                        qName = "xmlns:" + prefix;
+                for (int i = 0; i < bufferedElAttributes.getLength(); i++) {
+                    String qName = bufferedElAttributes.getQName(i);
+                    if (qName.equals("xmlns") || qName.startsWith("xmlns:")) {
+                        bufferedElAttributes.removeAttribute(i);
+                    }
+                }
+
+                // start prefix mappings
+
+                // namespaceMappings.push() was already called by the startElement()
+                // that saved the bufferedElLocalName we are about to output
+
+                // we don't want to output new phantoms; since push() was already called, phantoms
+                // that are relevent to bufferedEl have already been "promoted" to declared status
+
+                Enumeration e = namespaceMappings.getDeclaredPrefixes(false);
+                while (e.hasMoreElements()) {
+                    String prefix = (String) e.nextElement();
+                    String uri = namespaceMappings.getURI(prefix, false);
+                    if (null == uri) {
+                        uri = "";
                     }
                     if(logDebugEnabled) {
-                        logger.debug("      adding namespace-prefix attribute " + qName + "= '" + uri + "')");
+                        logger.debug("      wrappedContentHandler.startPrefixMapping("
+                                + "'"   + prefix + "'"
+                                + ", '" + uri + "'"
+                                + ")");
                     }
-                    bufferedElAttributes.addAttribute("", "", qName, "CDATA", uri);
+                    wrappedContentHandler.startPrefixMapping(prefix, uri);
+                    if (namespacePrefixes) {
+                        String qName;
+                        if (prefix.length() == 0) {
+                            qName = "xmlns";
+                        } else {
+                            qName = "xmlns:" + prefix;
+                        }
+                        if(logDebugEnabled) {
+                            logger.debug("      adding namespace-prefix attribute " + qName + "= '" + uri + "')");
+                        }
+                        bufferedElAttributes.addAttribute("", "", qName, "CDATA", uri);
+                    }
                 }
-            }
-            if(logDebugEnabled) {
-                logger.debug("      wrappedContentHandler.startElement("
-                        + "'"   + bufferedElNamespaceURI + "'"
-                        + ", '" + bufferedElLocalName + "'"
-                        + ", '" + bufferedElQName + "'"
-                        + ", bufferedElAttributes"
-                        + ")");
+                if(logDebugEnabled) {
+                    logger.debug("      wrappedContentHandler.startElement("
+                            + "'"   + bufferedElNamespaceURI + "'"
+                            + ", '" + bufferedElLocalName + "'"
+                            + ", '" + bufferedElQName + "'"
+                            + ", bufferedElAttributes"
+                            + ")");
+                }
+
+                wrappedContentHandler.startElement(bufferedElNamespaceURI, bufferedElLocalName,
+                        bufferedElQName, bufferedElAttributes);
+                bufferedElNamespaceURI = null;
+                bufferedElLocalName = null;
+                bufferedElQName = null;
+                bufferedElAttributes.clear();
             }
 
-            wrappedContentHandler.startElement(bufferedElNamespaceURI, bufferedElLocalName,
-                    bufferedElQName, bufferedElAttributes);
-            bufferedElNamespaceURI = null;
-            bufferedElLocalName = null;
-            bufferedElQName = null;
-            bufferedElAttributes.clear();
-        }
-
-        switch (event) {
-            case EVENT_START_PREFIX_MAPPING:
-                if (! lastEventWasStartPrefixMapping) {
-                    namespaceMappings.pushContext();
-                }
-                lastEventWasStartPrefixMapping = true;
-                break;
-            case EVENT_START_ELEMENT:
-                if (! lastEventWasStartPrefixMapping) {
-                    namespaceMappings.pushContext();
-                }
-                lastEventWasStartPrefixMapping = false;
-                break;
+            switch (event) {
+                case EVENT_START_PREFIX_MAPPING:
+                    if (EVENT_START_PREFIX_MAPPING != lastEvent) {
+                        namespaceMappings.pushContext();
+                    }
+                    break;
+                case EVENT_START_ELEMENT:
+                    if (EVENT_START_PREFIX_MAPPING != lastEvent) {
+                        namespaceMappings.pushContext();
+                    }
+                    break;
+            }
+        } finally {
+            lastEvent = event;
         }
     }
 
@@ -697,7 +701,7 @@ public final class XpContentHandlerImpl implements XpContentHandler {
         }
     }
 
-    private int prefixNum = 0;
+    private int prefixNum = 100;
     private String genPrefix() {
         String prefix;
         do {

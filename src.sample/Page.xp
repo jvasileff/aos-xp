@@ -28,6 +28,53 @@
 
     <xp:content>
         <html>
+            <h1>====== NAMESPACE TEST -1 ======</h1>
+            <test0 xmlns:ns1="http://origns1.example.com">
+                <c:if test="${true}" xmlns:ns1="http://ns1.example.com">
+                    <ns1:ns1el/>
+                </c:if>
+            </test0>
+
+            <h1>====== NAMESPACE TEST 0 ======</h1>
+            <test0>
+                <c:if test="${true}" xmlns:ns1="http://ns1.example.com">
+                    <xp:attribute name="ns1:att1"/>
+                    <xp:attribute name="ns1:att2" namespace="http://ns1.example.com"/>
+                    <xp:attribute name="ns1:att3" namespace="http://newerns1.example.com"/>
+                    <elWithNS1>
+                        <ns1:innerElWithNS1/>
+                        <ns1:innerElWithNS1/>
+                    </elWithNS1>
+                </c:if>
+            </test0>
+            
+            <h1>====== NAMESPACE TEST 0b ======</h1>
+            <test0 xmlns:ns1="http://ns1.example.com" ns1:att0="">
+                <c:if test="${true}" xmlns:ns1="http://ns1.example.com">
+                    <xp:attribute name="ns1:att1"/>
+                    <xp:attribute name="ns1:att2" namespace="http://ns1.example.com"/>
+                    <xp:attribute name="ns1:att3" namespace="http://newerns1.example.com"/>
+                    <elWithNS1>
+                        <ns1:innerElWithNS1/>
+                        <ns1:innerElWithNS1/>
+                    </elWithNS1>
+                </c:if>
+            </test0>
+            
+            <h1>====== NAMESPACE TEST 0c ======</h1>
+            <test0 xmlns:ns1="http://origns1.example.com" ns1:att0="">
+                <c:if test="${true}" xmlns:ns1="http://ns1.example.com">
+                    <xp:attribute name="ns1:att1"/>
+                    <xp:attribute name="ns1:att2" namespace="http://ns1.example.com"/>
+                    <xp:attribute name="ns1:att3" namespace="http://newerns1.example.com"/>
+                    <elWithNS1>
+                        <ns1:innerElWithNS1/>
+                        <ns1:innerElWithNS1/>
+                    </elWithNS1>
+                </c:if>
+            </test0>
+
+
 
             <h1>====== NAMESPACE TEST 1 ======</h1>
             <!--

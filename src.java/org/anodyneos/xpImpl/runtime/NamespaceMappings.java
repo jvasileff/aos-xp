@@ -119,6 +119,22 @@ public final class NamespaceMappings {
         prefixStack.pop();
     }
 
+    /*
+    public void promotePhantomPrefix(String prefix) {
+        final String declaredURI = getURI(prefix, false);
+        final String currentURI = getURI(prefix, true);
+        // do not allow promotions if real prefix already exists and is mapped to diff URI
+        if (null != declaredURI && ! declaredURI.equals(currentURI)) {
+            throw new IllegalStateException("Cannot promote phantom prefix '"+prefix+"'; prefix already exists.");
+        }
+        // do not allow promotions if phantom prefix does not exist
+        if (null == currentURI) {
+            throw new IllegalStateException("Phantom prefix '"+prefix+"' does not exist.");
+        }
+        declarePrefix(prefix, currentURI);
+    }
+    */
+
     public boolean declarePrefix(String prefix, String uri) {
         // Note: calls to declarePrefix may over-write phantomPrefixes that were
         // added during push(). This should

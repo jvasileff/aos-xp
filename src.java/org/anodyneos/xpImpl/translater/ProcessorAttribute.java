@@ -73,9 +73,9 @@ class ProcessorAttribute extends TranslaterProcessor {
         String attName = attributes.getValue(A_NAME);
         String attURI = attributes.getValue(A_NAMESPACE);
 
-        if(null == attURI) {
+        /*if(null == attURI) {
             attURI = "";
-        }
+        }*/
 
         if(Util.hasEL(attName)) {
             // EL expression may exist.  Process all unescaped expressions, concatinate, etc...
@@ -84,7 +84,9 @@ class ProcessorAttribute extends TranslaterProcessor {
             codeName = Util.escapeStringQuotedEL(attName);
         }
 
-        if(Util.hasEL(attURI)) {
+        if (null == attURI) {
+            codeURI = "null";
+        } else if(Util.hasEL(attURI)) {
             // EL expression may exist.  Process all unescaped expressions, concatinate, etc...
             codeURI = Util.elExpressionCode(attURI, "String");
         } else {
