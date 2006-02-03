@@ -195,7 +195,7 @@ public class FormatNumberTag extends XpTagSupport {
             input = value;
         } else {
             // ... retrieving and trimming our body
-            input = getXpBody().invokeToString().trim();
+            input = getXpBody().invokeToString(out).trim();
         }
 
         if ((input == null) || input.equals("")) {

@@ -16,9 +16,9 @@ public abstract class XpFragment {
 
     public abstract XpContext getXpContext();
     public abstract void invoke(XpOutput out) throws XpException, ELException, SAXException;
-    public final String invokeToString() throws XpException, ELException, SAXException {
+    public final String invokeToString(XpOutput out) throws XpException, ELException, SAXException {
         TextContentHandler sbCh = new TextContentHandler();
-        XpOutput newOut = new XpOutput(sbCh, XpOutput.RAW_MODE);
+        XpOutput newOut = new XpOutput(sbCh, out.getXpContentHandler(), XpOutput.RAW_MODE);
         invoke(newOut);
         return sbCh.getText();
     }

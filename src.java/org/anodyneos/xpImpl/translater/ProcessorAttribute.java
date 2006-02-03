@@ -54,7 +54,7 @@ class ProcessorAttribute extends TranslaterProcessor {
             savedXPOutVariable = getTranslaterContext().getVariableForSavedXPOut();
             out.printIndent().println( "org.anodyneos.xp.XpOutput " + savedXPOutVariable + " = xpOut;");
             //out.printIndent().println( "savedXPCH = xpCH;");
-            out.printIndent().println( "xpOut = new org.anodyneos.xp.XpOutput(new org.anodyneos.xp.util.TextContentHandler());" );
+            out.printIndent().println( "xpOut = new org.anodyneos.xp.XpOutput(new org.anodyneos.xp.util.TextContentHandler(), xpCH);" );
             out.printIndent().println( "xpCH = xpOut.getXpContentHandler();");
 
             processorResultContent = new ProcessorResultContent(getTranslaterContext());

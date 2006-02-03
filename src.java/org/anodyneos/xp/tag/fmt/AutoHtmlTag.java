@@ -27,7 +27,7 @@ public class AutoHtmlTag extends XpTagSupport {
     public void doTag(XpOutput out) throws XpException, ELException,
             SAXException {
         if (null == text) {
-            text = getXpBody().invokeToString();
+            text = getXpBody().invokeToString(out);
         }
         AutoHtmlParserXp ahps = new AutoHtmlParserXp(new java.io.StringReader(text), out);
         try {

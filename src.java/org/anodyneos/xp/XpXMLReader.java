@@ -40,7 +40,8 @@ public class XpXMLReader implements XMLReader {
 
     public void parse(InputSource input) throws SAXException {
 
-        XpOutput out = new XpOutput(getContentHandler());
+        XpOutput out = new XpOutput(
+                XpContentHandlerFactory.getDefaultFactory().getXpContentHandler(getContentHandler()));
         out.getXpContentHandler().setNamespacePrefixes(namespacePrefixes);
 
         // process

@@ -107,7 +107,7 @@ public class UrlTag extends XpTagSupport implements ParamParent {
         params = new ParamTag.ParamManager();
 
         if (null != getXpBody()) {
-            getXpBody().invokeToString();
+            getXpBody().invokeToString(out);
         }
 
         String result; // the eventual result

@@ -75,7 +75,7 @@ public class SetTag extends XpTagSupport {
         if (null == value) {
             if (getXpBody() != null) {
                 // get value from body
-                value = getXpBody().invokeToString();
+                value = getXpBody().invokeToString(out);
             } else {
                 value = null;
             }

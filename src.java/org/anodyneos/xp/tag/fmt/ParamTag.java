@@ -78,7 +78,7 @@ public class ParamTag extends XpTagSupport {
         } else {
             // ... retrieving and trimming our body (TLV has ensured that it's
             // non-empty)
-            input = getXpBody().invokeToString().trim();
+            input = getXpBody().invokeToString(out).trim();
         }
         parent.addParam(input);
 

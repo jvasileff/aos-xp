@@ -129,12 +129,12 @@ public class MessageTag extends XpTagSupport {
             key = keyAttrValue;
             // this check is required as getXpBody returns null if the tag looks like: <fmt:message key="x" />
             if (getXpBody() != null) {
-                getXpBody().invokeToString(); // use this to avoid output - body should only be param tags.
+                getXpBody().invokeToString(out); // use this to avoid output - body should only be param tags.
             }
         } else {
             // ... retrieving and trimming our body
             if (getXpBody() != null) {
-                key = getXpBody().invokeToString().trim();
+                key = getXpBody().invokeToString(out).trim();
             }
         }
 

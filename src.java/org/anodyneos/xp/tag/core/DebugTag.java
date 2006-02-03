@@ -20,7 +20,7 @@ public class DebugTag extends XpTagSupport {
      * @see org.anodyneos.xp.tagext.XpTag#doTag(org.anodyneos.xp.XpContentHandler)
      */
     public void doTag(XpOutput out) throws XpException, ELException, SAXException {
-        XpOutput newOut = new XpOutput(new DebugCH(System.err, out.getXpContentHandler()));
+        XpOutput newOut = new XpOutput(new DebugCH(System.err, out.getXpContentHandler()), out.getXpContentHandler());
         getXpBody().invoke(newOut);
     }
 

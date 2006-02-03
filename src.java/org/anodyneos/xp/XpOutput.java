@@ -1,5 +1,9 @@
 package org.anodyneos.xp;
 
+import java.util.Enumeration;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -11,6 +15,8 @@ public final class XpOutput {
     private final XpContentHandler ch;
     private int mode = XML_MODE;
 
+    private static final Log logger = LogFactory.getLog(XpOutput.class);
+
     public XpOutput(XpContentHandler ch) {
         this.ch = ch;
     }
@@ -20,13 +26,32 @@ public final class XpOutput {
         setMode(mode);
     }
 
-    public XpOutput(ContentHandler ch) {
+    public XpOutput(ContentHandler ch, XpContentHandler lastXpCh) throws SAXException {
         this.ch = XpContentHandlerFactory.getDefaultFactory().getXpContentHandler(ch);
+        primePrefixes(lastXpCh, this.ch);
     }
 
-    public XpOutput(ContentHandler ch, int mode) {
-        this.ch = XpContentHandlerFactory.getDefaultFactory().getXpContentHandler(ch);
+    public XpOutput(ContentHandler ch, XpContentHandler lastXpCh, int mode) throws SAXException {
+        this(ch, lastXpCh);
         setMode(mode);
+    }
+
+    private void primePrefixes(XpContentHandler fromCh, XpContentHandler toCh) throws SAXException {
+        for (Enumeration en = fromCh.getPrefixes(); en.hasMoreElements() ; ) {
+            String prefix = (String) en.nextElement();
+            String uri = fromCh.getURI(prefix);
+            if(logger.isDebugEnabled()) {
+                logger.debug("Calling ch.pushPhantomPrefixMapping('"+prefix+"','"+uri+"')");
+            }
+            this.ch.pushPhantomPrefixMapping(prefix, uri);
+        }
+        String defaultURI = fromCh.getURI("");
+        if (null != defaultURI && ! "".equals(defaultURI)) {
+            if(logger.isDebugEnabled()) {
+                logger.debug("Calling ch.pushPhantomPrefixMapping('','"+defaultURI+"')");
+            }
+            this.ch.pushPhantomPrefixMapping("", defaultURI);
+        }
     }
 
     private void setMode(int mode) {

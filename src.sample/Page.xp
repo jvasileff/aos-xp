@@ -30,6 +30,21 @@
     <xp:content>
         <html>
 
+            <c:if test="${true}">
+                \${fn:startsWith('asdf', 'a')} = ${fn:startsWith('asdf', 'a')}
+            </c:if>
+            <h1>====== TEST ATTRIBUTE =====</h1>
+            <testElement>
+                <c:if test="${true}">
+                    <xp:attribute name="att1">
+                        <tag>
+                            \${fn:startsWith('asdf', 'a')} = ${fn:startsWith('asdf', 'a')}
+                        </tag>
+                    </xp:attribute>
+                </c:if>
+            </testElement>
+
+
             <h1>====== TEST FUNCTIONS =====</h1>
             <pre>
                 \${fn:startsWith('asdf', 'a')} = ${fn:startsWith('asdf', 'a')}

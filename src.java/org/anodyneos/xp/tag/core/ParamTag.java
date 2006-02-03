@@ -86,7 +86,7 @@ public class ParamTag extends XpTagSupport {
             if (getXpBody() == null) {
                 value = "";
             } else {
-                value = getXpBody().invokeToString().trim();
+                value = getXpBody().invokeToString(out).trim();
             }
         }
         if (encode) {
