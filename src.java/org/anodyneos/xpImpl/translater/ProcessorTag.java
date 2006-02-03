@@ -1,7 +1,9 @@
 package org.anodyneos.xpImpl.translater;
 
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +14,7 @@ import org.anodyneos.xpImpl.util.CodeWriter;
 import org.anodyneos.xpImpl.util.Util;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * ProcessorTag handles custom Tags
@@ -29,11 +32,12 @@ import org.xml.sax.SAXException;
  *
  * @author jvas
  */
-public class ProcessorTag extends TranslaterProcessor {
+public class ProcessorTag extends HelperProcessorNonResultContent {
 
     private StringBuffer sb;
 
     private ProcessorResultContent bodyFragmentProcessor;
+    private Map bodyFragmentPrefixMap;
 
     private boolean bodyFragmentStarted = false;
     int bodyFragmentId = -1;
@@ -47,6 +51,21 @@ public class ProcessorTag extends TranslaterProcessor {
     public ProcessorTag(TranslaterContext ctx) {
         super(ctx);
         bodyFragmentProcessor = new ProcessorResultContent(ctx);
+        // when we write the fragment, we will need to copy the source tree's prefix mappings into the output
+        // tree in case the fragment is used outside of the immediate parent in the source tree.
+        bodyFragmentPrefixMap = new HashMap();
+        NamespaceSupport ns = getTranslaterContext().getNamespaceSupport();
+        Enumeration e = ns.getPrefixes();
+        while (e.hasMoreElements()) {
+            String nsPrefix = (String) e.nextElement();
+            String nsURI = ns.getURI(nsPrefix);
+            bodyFragmentPrefixMap.put(nsPrefix, nsURI);
+        }
+        String uri = ns.getURI("");
+        if(null == uri) {
+            uri = "";
+        }
+        bodyFragmentPrefixMap.put("", uri);
     }
 
     public ElementProcessor getProcessorFor(String uri, String localName, String qName)
@@ -57,7 +76,7 @@ public class ProcessorTag extends TranslaterProcessor {
         // Return p (p may be the bodyFragmentProcessor itself if the content is result
         // content, but bodyFragmentProcessor made the decision.)
         if (! bodyFragmentStarted) {
-            bodyFragmentId = getTranslaterContext().startFragment();
+            startBodyFragment();
             bodyFragmentStarted = true;
         }
         if(null != sb) {
@@ -70,15 +89,16 @@ public class ProcessorTag extends TranslaterProcessor {
         return p;
     }
 
-    public void startElement(String uri, String localName, String qName, Attributes attributes)
+    public void startElementNonResultContent(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
 
         TranslaterContext ctx = getTranslaterContext();
+        CodeWriter out = ctx.getCodeWriter();
+
         this.tagInfo = ctx.getTagLibraryRegistry().getTagLibraryInfo(uri).getTagInfo(localName);
         this.attributeInfos = toMap(tagInfo.getTagAttributeInfos());
         String tagImplClass = tagInfo.getClassName();
         this.localVarName = ctx.getVariableForTag(tagImplClass);
-        CodeWriter out = ctx.getCodeWriter();
 
         // instantiate tag
         out.printIndent().println(tagImplClass + " " + localVarName + " = new " + tagImplClass + "();");
@@ -91,21 +111,24 @@ public class ProcessorTag extends TranslaterProcessor {
 
         // add attributes
         for (int i = 0; i < attributes.getLength(); i++) {
-            String name = attributes.getLocalName(i).trim();
-            String value = attributes.getValue(i);
-            TagAttributeInfo attrInfo = (TagAttributeInfo) attributeInfos.get(name);
-            if (null == attrInfo) {
-                throw new SAXException("attribute '" + name + "' not allowed in tag " + qName);
+            String prefix = parsePrefix(attributes.getQName(i));
+            String name = parseLocalName(attributes.getQName(i));
+            if (prefix.length() == 0 && ! name.equals("xmlns")) {
+                String value = attributes.getValue(i);
+                TagAttributeInfo attrInfo = (TagAttributeInfo) attributeInfos.get(name);
+                if (null == attrInfo) {
+                    throw new SAXException("attribute '" + name + "' not allowed in tag " + qName);
+                }
+                // add attribute
+                String codeValue;
+                if (Util.hasEL(value) && ! attrInfo.isRequestTimeOK()) {
+                    throw new SAXException("attribute '" + name + "' cannot have EL");
+                } else {
+                    codeValue = Util.elExpressionCode(value, attrInfo.getType());
+                }
+                out.printIndent().println(localVarName + "." + Util.toSetMethod(name) + "(" + codeValue + ");");
+                this.handledAttributes.add(name);
             }
-            // add attribute
-            String codeValue;
-            if (Util.hasEL(value) && ! attrInfo.isRequestTimeOK()) {
-                throw new SAXException("attribute '" + name + "' cannot have EL");
-            } else {
-                codeValue = Util.elExpressionCode(value, attrInfo.getType());
-            }
-            out.printIndent().println(localVarName + "." + Util.toSetMethod(name) + "(" + codeValue + ");");
-            this.handledAttributes.add(name);
         }
 
     }
@@ -117,11 +140,11 @@ public class ProcessorTag extends TranslaterProcessor {
         sb.append(ch, start, length);
     }
 
-    public void endElement(String uri, String localName, String qName) throws SAXException {
+    public void endElementNonResultContent(String uri, String localName, String qName) throws SAXException {
         // end element
         if (null != sb && ! sb.toString().trim().equals("")) {
             if (! bodyFragmentStarted) {
-                bodyFragmentId = getTranslaterContext().startFragment();
+                startBodyFragment();
                 bodyFragmentStarted = true;
             }
             char[] chars = sb.toString().toCharArray();
@@ -133,10 +156,24 @@ public class ProcessorTag extends TranslaterProcessor {
 
         if (bodyFragmentStarted) {
             bodyFragmentProcessor.flushCharacters();
-            getTranslaterContext().endFragment();
+
             CodeWriter out = getTranslaterContext().getCodeWriter();
+
+            out.println();
+            out.printIndent().println("if (! namespaceCompat) {");
+            out.indentPlus();
+            Iterator it = bodyFragmentPrefixMap.keySet().iterator();
+            for(int i = bodyFragmentPrefixMap.size(); i > 0; i--) {
+                String nsPrefix = (String) it.next();
+                String nsURI = (String) bodyFragmentPrefixMap.get(nsPrefix);
+                out.printIndent().println("xpCH.popPhantomPrefixMapping();");
+            }
+            out.endBlock();
+
+            getTranslaterContext().endFragment();
+            out = getTranslaterContext().getCodeWriter();
             out.printIndent().println(
-                    localVarName + ".setXpBody(new FragmentHelper(" + bodyFragmentId + ", xpContext, " + localVarName + "));");
+                    localVarName + ".setXpBody(new FragmentHelper(" + bodyFragmentId + ", xpContext, " + localVarName + ", xpCH));");
         }
 
         CodeWriter out = getTranslaterContext().getCodeWriter();
@@ -155,5 +192,51 @@ public class ProcessorTag extends TranslaterProcessor {
         return map;
     }
 
+    private void startBodyFragment() {
+        assert (! bodyFragmentStarted);
+        bodyFragmentId = getTranslaterContext().startFragment();
+        CodeWriter out = getTranslaterContext().getCodeWriter();
+        // check to see if we need to declare our prefixes
+        out.printIndent().println("boolean namespaceCompat = xpCH.isNamespaceContextCompatible(origXpCH, parentElClosed, origContextVersion, origAncestorsWithPrefixMasking, origPhantomPrefixCount);");
+        out.printIndent().println("if (! namespaceCompat) {");
+        out.indentPlus();
+        Iterator it = bodyFragmentPrefixMap.keySet().iterator();
+        while (it.hasNext()) {
+            String nsPrefix = (String) it.next();
+            String nsURI = (String) bodyFragmentPrefixMap.get(nsPrefix);
+            out.printIndent().println(
+                    "xpCH.pushPhantomPrefixMapping("
+                +        Util.escapeStringQuoted(nsPrefix)
+                + ", " + Util.escapeStringQuoted(nsURI)
+                + ");");
+        }
+        out.endBlock();
+        out.println();
+    }
 
+    private static final String parseLocalName(String qName) {
+        if (null == qName || qName.length() == 0) {
+            return "";
+        } else {
+            int colon = qName.indexOf(':');
+            if (-1 == colon) {
+                return qName;
+            } else {
+                return qName.substring(colon + 1);
+            }
+        }
+    }
+
+    private static final String parsePrefix(String qName) {
+        if (null == qName || qName.length() == 0) {
+            return "";
+        } else {
+            int colon = qName.indexOf(':');
+            if (-1 == colon) {
+                return "";
+            } else {
+                return qName.substring(0, colon);
+            }
+        }
+    }
 }

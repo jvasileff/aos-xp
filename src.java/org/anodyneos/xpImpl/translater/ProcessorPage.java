@@ -4,7 +4,10 @@ import java.util.Enumeration;
 import java.util.List;
 
 import org.anodyneos.commons.xml.sax.ElementProcessor;
+import org.anodyneos.xp.tagext.FunctionInfo;
+import org.anodyneos.xp.tagext.TagLibraryRegistry;
 import org.anodyneos.xpImpl.util.CodeWriter;
+import org.anodyneos.xpImpl.util.FunctionUtil;
 import org.anodyneos.xpImpl.util.JavaClass;
 import org.anodyneos.xpImpl.util.Util;
 import org.xml.sax.Attributes;
@@ -63,7 +66,7 @@ class ProcessorPage extends TranslaterProcessor {
         printJavaFooter();
     }
 
-    private void printJavaHeader() {
+    private void printJavaHeader() throws SAXException {
         // package, imports, class header
         JavaClass c = new JavaClass();
         c.setFullClassName(getTranslaterContext().getFullClassName());
@@ -96,6 +99,35 @@ class ProcessorPage extends TranslaterProcessor {
 
         out.println();
         out.printIndent().println("private java.util.Properties outputProperties = new java.util.Properties(defaultProperties);");
+        out.println();
+
+        // functionMapper
+        out.println();
+        TagLibraryRegistry tlr =  getTranslaterContext().getTagLibraryRegistry();
+        String[] uris = tlr.getURIs();
+        out.printIndent().println("private static org.anodyneos.xpImpl.runtime.XpFunctionResolver fResolver = "
+                + "new org.anodyneos.xpImpl.runtime.XpFunctionResolver();");
+        out.printIndent().println("static {");
+        out.indentPlus();
+        for (int i = 0; i < uris.length; i++) {
+            String uri = uris[i];
+            FunctionInfo[] finfos = tlr.getTagLibraryInfo(uri).getFunctionInfos();
+            if (null != finfos) {
+                for (int j = 0; j < finfos.length; j++) {
+                    // TODO: this work should be done when we read the TLD, not now.
+                    String args = FunctionUtil.getParameterCode(finfos[j].getFunctionSignature());
+                    String methodName = FunctionUtil.getMethod(finfos[j].getFunctionSignature());
+                    out.printIndent().println("fResolver.mapFunctionWithURI("
+                            +        Util.escapeStringQuoted(uri)
+                            + ", " + Util.escapeStringQuoted(finfos[j].getName())
+                            + ", " + finfos[j].getFunctionClass().trim() + ".class"
+                            + ", " + Util.escapeStringQuoted(methodName)
+                            + ", " + args
+                            + ");");
+                }
+            }
+        }
+        out.endBlock();
         out.println();
 
         // constructor()
@@ -173,17 +205,31 @@ class ProcessorPage extends TranslaterProcessor {
             out.printIndent().println("private int fragNum;");
             out.printIndent().println("private org.anodyneos.xp.XpContext xpContext;");
             out.printIndent().println("private org.anodyneos.xp.tagext.XpTag xpTagParent;");
+            out.printIndent().println("private boolean parentElClosed = false;");
+            out.printIndent().println("private org.anodyneos.xp.XpContentHandler origXpCH;");
+            out.printIndent().println("private int origContextVersion;");
+            out.printIndent().println("private int origAncestorsWithPrefixMasking;");
+            out.printIndent().println("private int origPhantomPrefixCount;");
             out.println();
-            out.printIndent().println("public FragmentHelper(int fragNum, org.anodyneos.xp.XpContext xpContext, org.anodyneos.xp.tagext.XpTag xpTagParent) {");
+            out.printIndent().println("public FragmentHelper(int fragNum, org.anodyneos.xp.XpContext xpContext, org.anodyneos.xp.tagext.XpTag xpTagParent, org.anodyneos.xp.XpContentHandler origXpCH) {");
             out.indentPlus();
             out.printIndent().println("this.fragNum = fragNum;");
             out.printIndent().println("this.xpContext = xpContext;");
             out.printIndent().println("this.xpTagParent = xpTagParent;");
+            out.printIndent().println("this.origXpCH = origXpCH;");
+            out.printIndent().println("this.origContextVersion = origXpCH.getContextVersion();");
+            out.printIndent().println("this.origAncestorsWithPrefixMasking = origXpCH.getAncestorsWithPrefixMasking();");
+            out.printIndent().println("this.origPhantomPrefixCount = origXpCH.getPhantomPrefixCount();");
             out.endBlock();
             out.println();
             out.printIndent().println("public org.anodyneos.xp.XpContext getXpContext() {");
             out.indentPlus();
             out.printIndent().println("return xpContext;");
+            out.endBlock();
+            out.println();
+            out.printIndent().println("public void setParentElClosed(boolean closed) {");
+            out.indentPlus();
+            out.printIndent().println("this.parentElClosed = closed;");
             out.endBlock();
             out.println();
             out.printIndent().println("public void invoke(org.anodyneos.xp.XpOutput out) throws org.anodyneos.xp.XpException, javax.servlet.jsp.el.ELException, org.xml.sax.SAXException {");

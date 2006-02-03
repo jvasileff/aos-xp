@@ -133,7 +133,9 @@ public class MessageTag extends XpTagSupport {
             }
         } else {
             // ... retrieving and trimming our body
-            key = getXpBody().invokeToString().trim();
+            if (getXpBody() != null) {
+                key = getXpBody().invokeToString().trim();
+            }
         }
 
         if ((key == null) || key.equals("")) {

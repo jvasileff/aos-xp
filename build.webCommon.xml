@@ -75,6 +75,7 @@
         <include name="**/*.jsp"/>
         <include name="**/*.properties"/>
         <include name="**/*.xptld"/>
+        <include name="META-INF/**"/>
     </patternset>
 
     <!-- paths -->
@@ -181,16 +182,20 @@
     <target name="compile.pre"/>
     <target name="compile.post"/>
 
-    <target name="compile" depends="compile.pre, compile.common, compile.post"/>
+    <target name="compile" depends="compile.pre, compile.common, compile.post" description="Compile"/>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  checkCatalogProps
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <target name="checkCatalogProps" depends="prepare">
-        <uptodate
-                property="u2d.CatalogManager.properties"
-                srcfile="build.properties"
-                targetfile="${dir.build.classes}/CatalogManager.properties"/>
+        <uptodate property="u2d.CatalogManager.properties" targetfile="${dir.build.classes}/CatalogManager.properties">
+            <srcfiles dir=".">
+                <include name="build.properties"/>
+                <include name="default.properties"/>
+                <include name="build.xml"/>
+                <include name="build.webCommon.xml"/>
+            </srcfiles>
+        </uptodate>
     </target>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -204,9 +209,34 @@
     </target>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  checkContext
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="checkContext" depends="prepare">
+        <uptodate property="u2d.context" targetfile="${file.build.context}">
+            <srcfiles dir=".">
+                <include name="build.properties"/>
+                <include name="default.properties"/>
+                <include name="build.xml"/>
+                <include name="build.webCommon.xml"/>
+            </srcfiles>
+        </uptodate>
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  cleanContext
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="cleanContext" depends="checkContext, prepare" unless="u2d.context">
+        <delete file="${file.build.context}"/>
+        <!--
+            note: style does not belong here; it should always run in order to
+            check the date on the xsl file.
+        -->
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  Refresh Webapp
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <target name="refreshWebapp.common" depends="prepare">
+    <target name="refreshWebapp.common" depends="prepare, cleanContext">
         <!-- build context.xml -->
         <style  in="${dir.src.misc}/dummy.xml"
                 out="${file.build.context}"
@@ -215,7 +245,6 @@
             <param name="webapp.context" expression="${webapp.context}"/>
             <param name="webapp.reloadable" expression="${webapp.reloadable}"/>
         </style>
-
         <!-- webapp -->
         <copy toDir="${dir.build.webapp}">
             <fileset dir="${dir.src.webapp}">
@@ -266,6 +295,9 @@
                 <include name="*.zip"/>
             </lib>
             <lib file="${file.jar}"/>
+            <classes dir="${dir.build.classes}">
+                <include name="META-INF/**"/>
+            </classes>
         </war>
         <zip zipfile="${file.src.zip}" compress="no">
             <fileset dir="${dir.src.java}">

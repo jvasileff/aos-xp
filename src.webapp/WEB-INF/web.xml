@@ -11,6 +11,7 @@
         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
         version="2.4">
 
+
     <!-- XP Servlet -->
     <servlet>
         <servlet-name>xp</servlet-name>

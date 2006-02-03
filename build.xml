@@ -44,8 +44,8 @@
     <property name="avalon-framework-cvs-20020806.jar" location="${dir.jars}/apache-fop-0.20.5/avalon-framework-cvs-20020806.jar"/>
 
     <!-- for jsp -->
-    <property name="jstl.jar" location="${dir.jars}/jstl/jstl.jar"/>
-    <property name="standard.jar" location="${dir.jars}/jstl/standard.jar"/>
+    <property name="jstl.jar" location="${dir.jars}/jakarta-taglibs-standard-1.1.2/jstl.jar"/>
+    <property name="standard.jar" location="${dir.jars}/jakarta-taglibs-standard-1.1.2/standard.jar"/>
 
     <property name="ant.jar" location="${dir.jars}/apache-ant-1.6.1/ant.jar"/>
     <property name="bsf.jar" location="${dir.jars}/ibm-bsf-2.2/bsf.jar"/>

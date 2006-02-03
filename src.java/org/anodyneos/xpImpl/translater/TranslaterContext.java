@@ -2,8 +2,10 @@ package org.anodyneos.xpImpl.translater;
 
 import java.io.StringWriter;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Stack;
 
@@ -24,6 +26,7 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
     private int tagVariableCounter = 0;
     private int savedXPOutVariableCounter = 0;
     private Properties outputProperties;
+    private Map bufferedStartPrefixMappings = new HashMap();
 
     // A list of files on which this current file depends
     private List dependents = new ArrayList();
@@ -142,5 +145,18 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
 
     public void setOutputProperties(Properties outputProperties) {
         this.outputProperties = outputProperties;
+    }
+
+
+    public Map getBufferedStartPrefixMappings() {
+        return Collections.unmodifiableMap(bufferedStartPrefixMappings);
+    }
+
+    public void clearBufferedStartPrefixMappings() {
+        bufferedStartPrefixMappings.clear();
+    }
+
+    public void bufferStartPrefixMapping(String prefix, String uri) {
+        bufferedStartPrefixMappings.put(prefix, uri);
     }
 }

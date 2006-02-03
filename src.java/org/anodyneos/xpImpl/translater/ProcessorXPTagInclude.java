@@ -9,7 +9,7 @@ import org.xml.sax.SAXParseException;
 /**
  * @author yao
  */
-public class ProcessorXPTagInclude extends TranslaterProcessor {
+public class ProcessorXPTagInclude extends HelperProcessorNonResultContent {
 
     ProcessorResultContent processorResultContent;
     public static final String E_PARAM = "param";
@@ -32,7 +32,7 @@ public class ProcessorXPTagInclude extends TranslaterProcessor {
         }
     }
 
-    public void startElement(String uri, String localName, String qName,
+    public void startElementNonResultContent(String uri, String localName, String qName,
             Attributes attributes) throws SAXException {
         CodeWriter out = getTranslaterContext().getCodeWriter();
 
@@ -58,7 +58,7 @@ public class ProcessorXPTagInclude extends TranslaterProcessor {
         processorResultContent.characters(ch, start, length);
     }
 
-    public void endElement(String uri, String localName, String qName) throws SAXException {
+    public void endElementNonResultContent(String uri, String localName, String qName) throws SAXException {
         processorResultContent.flushCharacters();
     }
 

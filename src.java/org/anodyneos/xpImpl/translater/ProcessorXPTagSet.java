@@ -24,7 +24,7 @@ import org.xml.sax.SAXParseException;
  *
  * @author jvas
  */
-public class ProcessorXPTagSet extends TranslaterProcessor {
+public class ProcessorXPTagSet extends HelperProcessorNonResultContent {
 
     public static final String A_VALUE = "value";
     public static final String A_TARGET = "target";
@@ -40,7 +40,7 @@ public class ProcessorXPTagSet extends TranslaterProcessor {
         return super.getProcessorFor(uri, localName, qName);
     }
 
-    public void startElement(String uri, String localName, String qName,
+    public void startElementNonResultContent(String uri, String localName, String qName,
             Attributes attributes) throws SAXException {
         CodeWriter out = getTranslaterContext().getCodeWriter();
 

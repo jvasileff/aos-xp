@@ -18,7 +18,7 @@ import org.xml.sax.SAXParseException;
  *
  * @author jvas
  */
-public class ProcessorXPTagChoose extends TranslaterProcessor {
+public class ProcessorXPTagChoose extends HelperProcessorNonResultContent {
 
     public static final String E_WHEN = "when";
     public static final String E_OTHERWISE = "otherwise";
@@ -52,7 +52,7 @@ public class ProcessorXPTagChoose extends TranslaterProcessor {
         }
     }
 
-    public void endElement(String uri, String localName, String qName) throws SAXException {
+    public void endElementNonResultContent(String uri, String localName, String qName) throws SAXException {
 
         if(nextIsFirst) {
             throw new SAXParseException("No <xp:when> found.", getContext().getLocator());
