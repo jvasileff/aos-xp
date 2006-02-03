@@ -19,15 +19,13 @@ import org.xml.sax.SAXParseException;
  *
  * 3. If body contains output elements and/or tags, processes the content using <code>ProcessorResultContent</code> to
  * allow for runtime branching, etc.  Sets attribute to runtime string result.
- *
- * TODO: provide proper context wrapping if necessary (review spec);  generate new variables instead of reusing savedXPCH
- * TODO: trim and crlf processing: support trim attribute, make sure result has &#10; instead of CRLF (attrs not supposed to be on two lines in XML.)
  */
 class ProcessorAttribute extends TranslaterProcessor {
 
     public static final String A_NAME = "name";
     public static final String A_NAMESPACE = "namespace";
     public static final String A_VALUE = "value";
+    public static final String A_TRIM = "trim";
 
     ProcessorResultContent processorResultContent;
     private boolean valueAttributeMode = true;
@@ -37,6 +35,7 @@ class ProcessorAttribute extends TranslaterProcessor {
 
     private String codeName;
     private String codeURI;
+    private boolean trim = true;
 
     public ProcessorAttribute(TranslaterContext ctx) {
         super(ctx);
@@ -53,7 +52,6 @@ class ProcessorAttribute extends TranslaterProcessor {
             CodeWriter out = getTranslaterContext().getCodeWriter();
             savedXPOutVariable = getTranslaterContext().getVariableForSavedXPOut();
             out.printIndent().println( "org.anodyneos.xp.XpOutput " + savedXPOutVariable + " = xpOut;");
-            //out.printIndent().println( "savedXPCH = xpCH;");
             out.printIndent().println( "xpOut = new org.anodyneos.xp.XpOutput(new org.anodyneos.xp.util.TextContentHandler(), xpCH);" );
             out.printIndent().println( "xpCH = xpOut.getXpContentHandler();");
 
@@ -72,10 +70,11 @@ class ProcessorAttribute extends TranslaterProcessor {
         String value = attributes.getValue(A_VALUE);
         String attName = attributes.getValue(A_NAME);
         String attURI = attributes.getValue(A_NAMESPACE);
+        String attTrim = attributes.getValue(A_TRIM);
 
-        /*if(null == attURI) {
-            attURI = "";
-        }*/
+        if(null != attTrim) {
+            trim = Boolean.parseBoolean(attTrim);
+        }
 
         if(Util.hasEL(attName)) {
             // EL expression may exist.  Process all unescaped expressions, concatinate, etc...
@@ -101,8 +100,15 @@ class ProcessorAttribute extends TranslaterProcessor {
             if(Util.hasEL(value)) {
                 // EL expression may exist.  Process all unescaped expressions, concatinate, etc...
                 codeValue = Util.elExpressionCode(value, "String");
+                if (trim) {
+                    codeValue = "(" + codeValue + ").trim()";
+                }
             } else {
-                codeValue = Util.escapeStringQuotedEL(value);
+                if (trim) {
+                    codeValue = Util.escapeStringQuotedEL(value.trim());
+                } else {
+                    codeValue = Util.escapeStringQuotedEL(value);
+                }
             }
             out.printIndent().println(
                   "xpCH.addAttribute("
@@ -139,13 +145,18 @@ class ProcessorAttribute extends TranslaterProcessor {
         if (optimizedMode) {
             if (sb != null) {
                 String value = sb.toString();
-                // TODO: what about strip-space? Is this what we want? Configurable?
-                value = value.trim();
                 if(Util.hasEL(value)) {
                     // EL expression may exist.  Process all unescaped expressions, concatinate, etc...
                     codeValue = Util.elExpressionCode(value, "String");
+                    if (trim) {
+                        codeValue = "(" + codeValue + ").trim()";
+                    }
                 } else {
-                    codeValue = Util.escapeStringQuotedEL(value);
+                    if (trim) {
+                        codeValue = Util.escapeStringQuotedEL(value.trim());
+                    } else {
+                        codeValue = Util.escapeStringQuotedEL(value);
+                    }
                 }
                 sb = null;
             } else {
@@ -160,11 +171,15 @@ class ProcessorAttribute extends TranslaterProcessor {
             );
         } else {
             processorResultContent.flushCharacters();
+            codeValue = "((org.anodyneos.xp.util.TextContentHandler) xpCH.getWrappedContentHandler()).getText()";
+            if (trim) {
+                codeValue = codeValue + ".trim()";
+            }
             out.printIndent().println(
                   savedXPOutVariable + ".addAttribute("
                 +       codeURI
                 + "," + codeName
-                + ", ((org.anodyneos.xp.util.TextContentHandler) xpCH.getWrappedContentHandler()).getText()"
+                + "," + codeValue
                 + ");"
             );
 
