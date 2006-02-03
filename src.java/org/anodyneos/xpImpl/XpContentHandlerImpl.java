@@ -43,8 +43,6 @@ import org.xml.sax.helpers.AttributesImpl;
  *
  * TODO: implement text-only output stack.
  *
- * TODO: fix documentation - much of it is out of date.
- *
  * TODO: handle clearing of default namespace when non-XP code uses the contentHandler.
  *
  * TODO: provide runtime support for excludeResultPrefixes - all mappings should be tracked and available to
@@ -101,7 +99,7 @@ public final class XpContentHandlerImpl implements XpContentHandler {
     private static final int EVENT_PUSH_PHANTOM_PREFIX_MAPPING = 10;
     private static final int EVENT_POP_PHANTOM_PREFIX_MAPPING = 11;
 
-    public XpContentHandlerImpl(ContentHandler contentHandler) {
+    XpContentHandlerImpl(ContentHandler contentHandler) {
         this.wrappedContentHandler = contentHandler;
     }
 
@@ -527,12 +525,12 @@ public final class XpContentHandlerImpl implements XpContentHandler {
 
     public void endDocument() throws SAXException {
         flush(EVENT_END_DOCUMENT);
-        // TODO should calls to this method be ignored?
+        // should calls to this method be ignored?
     }
 
     public void startDocument() throws SAXException {
         flush(EVENT_START_DOCUMENT);
-        // TODO should calls to this method be ignored?
+        // should calls to this method be ignored?
     }
 
     ////////////////////////////////////////////////////////////////////////////////

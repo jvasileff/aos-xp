@@ -4,6 +4,7 @@
     xmlns:xp="http://www.anodyneos.org/xmlns/xp"
     xmlns:fmt="http://www.anodyneos.org/xmlns/xp/fmt"
     xmlns:c="http://www.anodyneos.org/xmlns/xp/core"
+    xmlns:fn="http://www.anodyneos.org/xmlns/xp/function"
     xmlns="http://xhtml.com"
 >
     <xp:output
@@ -28,6 +29,14 @@
 
     <xp:content>
         <html>
+
+            <h1>====== TEST FUNCTIONS =====</h1>
+            <pre>
+                \${fn:startsWith('asdf', 'a')} = ${fn:startsWith('asdf', 'a')}
+                \${fn:endsWith('asdf', 'b')} = ${fn:endsWith('asdf', 'b')}
+                \${fn:join(fn:split('a,b,c', ','), ';')} = ${fn:join(fn:split('a,b,c', ','), ';')}
+            </pre>
+
             <h1>====== NAMESPACE TEST -1 ======</h1>
             <test0 xmlns:ns1="http://origns1.example.com">
                 <c:if test="${true}" xmlns:ns1="http://ns1.example.com">
