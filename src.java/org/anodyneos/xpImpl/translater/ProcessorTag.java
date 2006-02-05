@@ -70,7 +70,7 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
         bodyFragmentProcessor = new ProcessorFragment(ctx);
     }
 
-    public ElementProcessor getProcessorFor(String uri, String localName, String qName)
+    public ElementProcessor getProcessorFor(String uri, String localName, String qName, Attributes attrs)
             throws SAXException {
 
         final ElementProcessor p;
@@ -84,7 +84,20 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
             bodyType = BODY_TYPE_TAGS;
             //p = new ProcessorFragment(getTranslaterContext());
             //paramFragmentProcessors.add(p);
-            p = new ProcessorXPParam(getTranslaterContext(), "java.lang.String", attributeInfos, localVarName);
+
+            String paramName = attrs.getValue(A_NAME);
+            if (null == paramName || "".equals(paramName)) {
+                throw new SAXException("xp:param requires attribute @name.");
+            }
+
+            TagAttributeInfo attrInfo = (TagAttributeInfo) attributeInfos.get(paramName);
+            if (null == attrInfo) {
+                throw new SAXException("attribute '" + paramName + "' not allowed in tag " + qName);
+            }
+            String type = attrInfo.getType();
+            type = CoerceUtil.simplifyType(type);
+
+            p = new ProcessorXPParam(getTranslaterContext(), type, paramName, localVarName);
         // xp:body
         } else if (uri.equals(URI_XP) && (E_BODY.equals(localName))) {
             if (BODY_TYPE_EMPTY != bodyType && BODY_TYPE_TAGS != bodyType) {
