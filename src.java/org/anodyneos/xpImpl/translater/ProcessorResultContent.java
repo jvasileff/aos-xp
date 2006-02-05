@@ -1,8 +1,5 @@
 package org.anodyneos.xpImpl.translater;
 
-import java.util.Iterator;
-import java.util.Map;
-
 import org.anodyneos.commons.xml.sax.ElementProcessor;
 import org.anodyneos.xpImpl.util.CodeWriter;
 import org.anodyneos.xpImpl.util.Util;
@@ -66,21 +63,6 @@ public class ProcessorResultContent extends TranslaterProcessor {
             throws SAXException {
         CodeWriter out = getTranslaterContext().getCodeWriter();
 
-        // buffered startPrefixMappings may exist, lets output them
-        Map prefixBuffer = getTranslaterContext().getBufferedStartPrefixMappings();
-        Iterator it = prefixBuffer.keySet().iterator();
-        while (it.hasNext()) {
-            String prefix = (String) it.next();
-            String tmpUri = (String) prefixBuffer.get(prefix);
-            out.printIndent().println(
-                    "xpCH.startPrefixMapping("
-                  + "\""   + prefix + "\""
-                  + ",\""  + tmpUri + "\""
-                  + ");"
-            );
-        }
-        getTranslaterContext().clearBufferedStartPrefixMappings();
-
         // start element
         out.printIndent().println(
               "xpCH.startElement("
@@ -142,5 +124,19 @@ public class ProcessorResultContent extends TranslaterProcessor {
               + ");"
         );
     }
+
+    public void startPrefixMapping(String prefix, String uri) throws SAXException {
+        flushCharacters();
+        CodeWriter out = getTranslaterContext().getCodeWriter();
+
+        out.printIndent().println(
+                "xpCH.startPrefixMapping("
+                +       Util.escapeStringQuoted(prefix)
+                + "," + Util.escapeStringQuoted(uri)
+                + ");"
+        );
+    }
+
+    // public void endPrefixMapping(String prefix) not needed; xpCH takes care of this
 
 }

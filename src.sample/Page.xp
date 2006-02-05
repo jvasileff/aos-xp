@@ -29,17 +29,39 @@
 
     <xp:content>
         <html>
+            <c:if test="${true}">
+                <xp:body xmlns:testns="http://www.test.ns.com">
+                    Text #1
+                    <tag/>
+                    Text #2
+                    <tag/>
+                    Text #3
+                </xp:body>
+            </c:if>
+            <c:if test="${true}">
+                Some text
+            </c:if>
 
             <c:if test="${true}">
                 \${fn:startsWith('asdf', 'a')} = ${fn:startsWith('asdf', 'a')}
             </c:if>
+            <trimTest>
+                <xp:attribute name="notrim" trim="false">  &#10;abcd  </xp:attribute>
+                <xp:attribute name="notrim2" trim="false">  &#10;${fn:toUpperCase('  abcd  ')}  </xp:attribute>
+                <xp:attribute name="notrim3" trim="false">  <a> abcd </a>  </xp:attribute>
+                <xp:attribute name="notrim4" trim="false" value="  &#10;abcd  "/>
+                <xp:attribute name="trim" trim="true">  &#10;abcd  </xp:attribute>
+                <xp:attribute name="trim2" trim="true">  &#10;${fn:toUpperCase('  abcd  ')}  </xp:attribute>
+                <xp:attribute name="trim3" trim="true">  <a> abcd </a>  </xp:attribute>
+                <xp:attribute name="trim4" trim="true" value="  &#10;abcd  "/>
+            </trimTest>
             <h1>====== TEST ATTRIBUTE =====</h1>
             <testElement>
                 <c:if test="${true}">
                     <xp:attribute name="att1">
-                        <tag>
+                        <pre>
                             \${fn:startsWith('asdf', 'a')} = ${fn:startsWith('asdf', 'a')}
-                        </tag>
+                        </pre>
                     </xp:attribute>
                 </c:if>
             </testElement>

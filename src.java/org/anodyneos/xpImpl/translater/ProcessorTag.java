@@ -1,9 +1,7 @@
 package org.anodyneos.xpImpl.translater;
 
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,10 +12,20 @@ import org.anodyneos.xpImpl.util.CodeWriter;
 import org.anodyneos.xpImpl.util.Util;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.NamespaceSupport;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * ProcessorTag handles custom Tags
+ *
+ * Contents may include one of the following:
+ *
+ * 1. Nothing
+ * 2. Text content or a fragment
+ * 3. Combination of 0 or more <xp:parameter> elements and 0 or 1 <xp:body> elements
+ *
+ * In case #3, xp:parameter content is either a fragment that is passed to the tag or content
+ * whose result is processed to the tag.
  *
  * <li>startElement: instantiate tag. Validate names and types of attributes
  * vs TLD, call setters.
@@ -32,64 +40,75 @@ import org.xml.sax.helpers.NamespaceSupport;
  *
  * @author jvas
  */
-public class ProcessorTag extends HelperProcessorNonResultContent {
+public class ProcessorTag extends TranslaterProcessorNonResultContent {
 
     private StringBuffer sb;
 
-    private ProcessorResultContent bodyFragmentProcessor;
-    private Map bodyFragmentPrefixMap;
+    private ProcessorFragment bodyFragmentProcessor;
 
-    private boolean bodyFragmentStarted = false;
-    int bodyFragmentId = -1;
-    Set handledAttributes = new HashSet();
-    TagInfo tagInfo = null;
-    Map attributeInfos = null;
-    String localVarName = null;
+    private Set handledAttributes = new HashSet();
+    private TagInfo tagInfo = null;
+    private Map attributeInfos = null;
+    private String localVarName = null;
 
-    public static final String E_ATTRIBUTE = "attribute";
+    private static final int BODY_TYPE_EMPTY = 0;
+    private static final int BODY_TYPE_FRAGMENT = 1;
+    private static final int BODY_TYPE_TAGS = 2;
+
+    private int bodyType = 0;
+
+    public static final String E_PARAMETER = "parameter";
+    public static final String E_BODY = "body";
 
     public ProcessorTag(TranslaterContext ctx) {
         super(ctx);
-        bodyFragmentProcessor = new ProcessorResultContent(ctx);
-        // when we write the fragment, we will need to copy the source tree's prefix mappings into the output
-        // tree in case the fragment is used outside of the immediate parent in the source tree.
-        bodyFragmentPrefixMap = new HashMap();
-        NamespaceSupport ns = getTranslaterContext().getNamespaceSupport();
-        Enumeration e = ns.getPrefixes();
-        while (e.hasMoreElements()) {
-            String nsPrefix = (String) e.nextElement();
-            String nsURI = ns.getURI(nsPrefix);
-            bodyFragmentPrefixMap.put(nsPrefix, nsURI);
-        }
-        String uri = ns.getURI("");
-        if(null == uri) {
-            uri = "";
-        }
-        bodyFragmentPrefixMap.put("", uri);
+        bodyFragmentProcessor = new ProcessorFragment(ctx);
     }
 
     public ElementProcessor getProcessorFor(String uri, String localName, String qName)
             throws SAXException {
-        // TODO: consider xp:tagAttribute to allow subelements to provide values for tag attributes.
-        ElementProcessor p = bodyFragmentProcessor.getProcessorFor(uri, localName, qName);
-        // since no exception, start fragment if not already started. Dump characters.
-        // Return p (p may be the bodyFragmentProcessor itself if the content is result
-        // content, but bodyFragmentProcessor made the decision.)
-        if (! bodyFragmentStarted) {
-            startBodyFragment();
-            bodyFragmentStarted = true;
-        }
-        if(null != sb) {
-            char[] chars = sb.toString().toCharArray();
-            bodyFragmentProcessor.characters(chars, 0, chars.length);
-            sb = null;
-            // make sure to flush characters in processor
-            bodyFragmentProcessor.flushCharacters();
+
+        final ElementProcessor p;
+
+        // xp:parameter
+        if (uri.equals(URI_XP) && (E_PARAMETER.equals(localName))) {
+            if (BODY_TYPE_EMPTY != bodyType && BODY_TYPE_TAGS != bodyType) {
+                throw new SAXException("Element '" + qName + "' not allowed here.");
+            }
+            bodyType = BODY_TYPE_TAGS;
+            throw new NotImplementedException();
+        // xp:body
+        } else if (uri.equals(URI_XP) && (E_BODY.equals(localName))) {
+            if (BODY_TYPE_EMPTY != bodyType && BODY_TYPE_TAGS != bodyType) {
+                throw new SAXException("Element '" + qName + "' not allowed here.");
+            }
+            bodyType = BODY_TYPE_TAGS;
+            bodyFragmentProcessor.startFragment();
+            p = bodyFragmentProcessor;
+        // body content
+        } else {
+            if (BODY_TYPE_EMPTY != bodyType && BODY_TYPE_FRAGMENT != bodyType) {
+                throw new SAXException("Element '" + qName + "' not allowed when xp:body or xp:parameter exist in tag.");
+            }
+            bodyType = BODY_TYPE_FRAGMENT;
+
+            // start fragment if not already started. Dump characters.
+            // Return p (p may be the bodyFragmentProcessor itself if the content is result
+            // content, but bodyFragmentProcessor made the decision.)
+            if (! bodyFragmentProcessor.isFragmentStarted()) {
+                bodyFragmentProcessor.startFragment();
+            }
+            if(null != sb) {
+                char[] chars = sb.toString().toCharArray();
+                bodyFragmentProcessor.characters(chars, 0, chars.length);
+                sb = null;
+            }
+            p = bodyFragmentProcessor.getProcessorFor(uri, localName, qName);
         }
         return p;
     }
 
-    public void startElementNonResultContent(String uri, String localName, String qName, Attributes attributes)
+    public void startElement(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
 
         TranslaterContext ctx = getTranslaterContext();
@@ -134,46 +153,33 @@ public class ProcessorTag extends HelperProcessorNonResultContent {
     }
 
     public void characters(char[] ch, int start, int length) {
+        // TODO: non-whitespace characters only allowed when BODY_TYPE = fragment
+        // For non-ws, set BODY_TYPE = fragment if possible, otherwise throw exception.
         if (null == sb) {
             sb = new StringBuffer();
         }
         sb.append(ch, start, length);
     }
 
-    public void endElementNonResultContent(String uri, String localName, String qName) throws SAXException {
-        // end element
-        if (null != sb && ! sb.toString().trim().equals("")) {
-            if (! bodyFragmentStarted) {
-                startBodyFragment();
-                bodyFragmentStarted = true;
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+        if (BODY_TYPE_FRAGMENT == bodyType || BODY_TYPE_EMPTY == bodyType) {
+            // end element
+            if (null != sb && ! sb.toString().trim().equals("")) {
+                if (! bodyFragmentProcessor.isFragmentStarted()) {
+                    bodyFragmentProcessor.startFragment();
+                }
+                char[] chars = sb.toString().toCharArray();
+                bodyFragmentProcessor.characters(chars, 0, chars.length);
+                sb = null;
             }
-            char[] chars = sb.toString().toCharArray();
-            bodyFragmentProcessor.characters(chars, 0, chars.length);
-            sb = null;
-            // make sure to flush characters in processor
-            bodyFragmentProcessor.flushCharacters();
         }
 
-        if (bodyFragmentStarted) {
-            bodyFragmentProcessor.flushCharacters();
-
+        if (bodyFragmentProcessor.isFragmentStarted()) {
+            bodyFragmentProcessor.endFragment();
             CodeWriter out = getTranslaterContext().getCodeWriter();
-
-            out.println();
-            out.printIndent().println("if (! namespaceCompat) {");
-            out.indentPlus();
-            Iterator it = bodyFragmentPrefixMap.keySet().iterator();
-            for(int i = bodyFragmentPrefixMap.size(); i > 0; i--) {
-                String nsPrefix = (String) it.next();
-                String nsURI = (String) bodyFragmentPrefixMap.get(nsPrefix);
-                out.printIndent().println("xpCH.popPhantomPrefixMapping();");
-            }
-            out.endBlock();
-
-            getTranslaterContext().endFragment();
-            out = getTranslaterContext().getCodeWriter();
             out.printIndent().println(
-                    localVarName + ".setXpBody(new FragmentHelper(" + bodyFragmentId + ", xpContext, " + localVarName + ", xpCH));");
+                    localVarName + ".setXpBody(new FragmentHelper("
+                    + bodyFragmentProcessor.getFragmentId() + ", xpContext, " + localVarName + ", xpCH));");
         }
 
         CodeWriter out = getTranslaterContext().getCodeWriter();
@@ -190,28 +196,6 @@ public class ProcessorTag extends HelperProcessorNonResultContent {
             }
         }
         return map;
-    }
-
-    private void startBodyFragment() {
-        assert (! bodyFragmentStarted);
-        bodyFragmentId = getTranslaterContext().startFragment();
-        CodeWriter out = getTranslaterContext().getCodeWriter();
-        // check to see if we need to declare our prefixes
-        out.printIndent().println("boolean namespaceCompat = xpCH.isNamespaceContextCompatible(origXpCH, parentElClosed, origContextVersion, origAncestorsWithPrefixMasking, origPhantomPrefixCount);");
-        out.printIndent().println("if (! namespaceCompat) {");
-        out.indentPlus();
-        Iterator it = bodyFragmentPrefixMap.keySet().iterator();
-        while (it.hasNext()) {
-            String nsPrefix = (String) it.next();
-            String nsURI = (String) bodyFragmentPrefixMap.get(nsPrefix);
-            out.printIndent().println(
-                    "xpCH.pushPhantomPrefixMapping("
-                +        Util.escapeStringQuoted(nsPrefix)
-                + ", " + Util.escapeStringQuoted(nsURI)
-                + ");");
-        }
-        out.endBlock();
-        out.println();
     }
 
     private static final String parseLocalName(String qName) {

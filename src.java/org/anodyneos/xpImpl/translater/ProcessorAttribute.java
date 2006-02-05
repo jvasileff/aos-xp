@@ -20,7 +20,7 @@ import org.xml.sax.SAXParseException;
  * 3. If body contains output elements and/or tags, processes the content using <code>ProcessorResultContent</code> to
  * allow for runtime branching, etc.  Sets attribute to runtime string result.
  */
-class ProcessorAttribute extends TranslaterProcessor {
+class ProcessorAttribute extends TranslaterProcessorNonResultContent {
 
     public static final String A_NAME = "name";
     public static final String A_NAMESPACE = "namespace";

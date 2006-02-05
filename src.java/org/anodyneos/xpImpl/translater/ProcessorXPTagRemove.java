@@ -17,7 +17,7 @@ import org.xml.sax.SAXParseException;
  *
  * @author jvas
  */
-public class ProcessorXPTagRemove extends HelperProcessorNonResultContent {
+public class ProcessorXPTagRemove extends TranslaterProcessorNonResultContent {
 
     public static final String A_VAR = "var";
     public static final String A_SCOPE = "scope";
@@ -30,7 +30,7 @@ public class ProcessorXPTagRemove extends HelperProcessorNonResultContent {
         return super.getProcessorFor(uri, localName, qName);
     }
 
-    public void startElementNonResultContent(String uri, String localName, String qName,
+    public void startElement(String uri, String localName, String qName,
             Attributes attributes) throws SAXException {
         CodeWriter out = getTranslaterContext().getCodeWriter();
 
