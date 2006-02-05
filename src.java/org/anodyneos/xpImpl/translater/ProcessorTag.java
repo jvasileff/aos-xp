@@ -1,7 +1,10 @@
 package org.anodyneos.xpImpl.translater;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,11 +12,10 @@ import org.anodyneos.commons.xml.sax.ElementProcessor;
 import org.anodyneos.xp.tagext.TagAttributeInfo;
 import org.anodyneos.xp.tagext.TagInfo;
 import org.anodyneos.xpImpl.util.CodeWriter;
+import org.anodyneos.xpImpl.util.CoerceUtil;
 import org.anodyneos.xpImpl.util.Util;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * ProcessorTag handles custom Tags
@@ -22,9 +24,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  *
  * 1. Nothing
  * 2. Text content or a fragment
- * 3. Combination of 0 or more <xp:parameter> elements and 0 or 1 <xp:body> elements
+ * 3. Combination of 0 or more <xp:param> elements and 0 or 1 <xp:body> elements
  *
- * In case #3, xp:parameter content is either a fragment that is passed to the tag or content
+ * In case #3, xp:param content is either a fragment that is passed to the tag or content
  * whose result is processed to the tag.
  *
  * <li>startElement: instantiate tag. Validate names and types of attributes
@@ -45,6 +47,7 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
     private StringBuffer sb;
 
     private ProcessorFragment bodyFragmentProcessor;
+    private List paramFragmentProcessors = new ArrayList();
 
     private Set handledAttributes = new HashSet();
     private TagInfo tagInfo = null;
@@ -57,8 +60,10 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
 
     private int bodyType = 0;
 
-    public static final String E_PARAMETER = "parameter";
+    public static final String E_PARAM = "param";
     public static final String E_BODY = "body";
+
+    public static final String A_NAME = "name";
 
     public ProcessorTag(TranslaterContext ctx) {
         super(ctx);
@@ -71,13 +76,15 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
         final ElementProcessor p;
 
         // xp:parameter
-        if (uri.equals(URI_XP) && (E_PARAMETER.equals(localName))) {
+        if (uri.equals(URI_XP) && (E_PARAM.equals(localName))) {
             if (BODY_TYPE_EMPTY != bodyType && BODY_TYPE_TAGS != bodyType) {
                 // not allowed
                 return super.getProcessorFor(uri, localName, qName);
             }
             bodyType = BODY_TYPE_TAGS;
-            throw new NotImplementedException();
+            //p = new ProcessorFragment(getTranslaterContext());
+            //paramFragmentProcessors.add(p);
+            p = new ProcessorXPParam(getTranslaterContext(), "java.lang.String", attributeInfos, localVarName);
         // xp:body
         } else if (uri.equals(URI_XP) && (E_BODY.equals(localName))) {
             if (BODY_TYPE_EMPTY != bodyType && BODY_TYPE_TAGS != bodyType) {
@@ -188,6 +195,61 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
             out.printIndent().println(bodyFragmentVar + " = null;");
         }
 
+        // xp:param
+        for (Iterator it = paramFragmentProcessors.iterator(); it.hasNext();) {
+            ProcessorFragment paramProcessor = (ProcessorFragment) it.next();
+            CodeWriter out = getTranslaterContext().getCodeWriter();
+            //String savedXPOutVariable = getTranslaterContext().getVariableForSavedXPOut();
+            //out.printIndent().println( "org.anodyneos.xp.XpOutput " + savedXPOutVariable + " = xpOut;");
+            //out.printIndent().println( "xpOut = new org.anodyneos.xp.XpOutput(new org.anodyneos.xp.util.TextContentHandler(), xpCH);" );
+            //out.printIndent().println( "xpCH = xpOut.getXpContentHandler();");
+
+            StringBuffer expr = new StringBuffer();
+
+            String fragmentVar = paramProcessor.getFragmentVar();
+            expr.append(fragmentVar + ".invokeToString(xpOut)");
+            // FIXME: whitespace?
+            expr.append(".trim()");
+
+            String name = paramProcessor.getAttributes().getValue(A_NAME);
+            if (null == name || "".equals(name)) {
+                throw new SAXException("xp:param requires attribute @name.");
+            }
+
+            TagAttributeInfo attrInfo = (TagAttributeInfo) attributeInfos.get(name);
+            if (null == attrInfo) {
+                throw new SAXException("attribute '" + name + "' not allowed in tag " + qName);
+            }
+            String type = attrInfo.getType();
+            type = CoerceUtil.simplifyType(type);
+
+            if (CoerceUtil.isNativeType(type)) {
+                String type2 = type.substring(0,1).toUpperCase() + type.substring(1);
+                expr.insert(0, "org.anodyneos.xp.util.XpCoerce.coerceTo" + type2 + "Type(");
+                expr.append(")");
+            } else if (CoerceUtil.isBoxClass(type)) {
+                expr.insert(0, "org.anodyneos.xp.util.XpCoerce.coerceTo" + type + "(");
+                expr.append(")");
+            } else {
+                throw new SAXException("Invalid type: " + type);
+            }
+
+            // add attribute
+            String codeValue;
+            if (! attrInfo.isRequestTimeOK()) {
+                throw new SAXException("param '" + name + "' cannot be defined using xp:param, ! isRequestTimeOK");
+            }
+            out.printIndent().println(localVarName + "." + Util.toSetMethod(name) + "(" + expr.toString() + ");");
+            out.printIndent().println(fragmentVar + " = null;");
+
+            this.handledAttributes.add(name);
+
+            //out.printIndent().println( "xpOut = " + savedXPOutVariable + ";");
+            //out.printIndent().println( "xpCH = xpOut.getXpContentHandler();");
+            //out.printIndent().println( savedXPOutVariable + " = null;");
+        }
+
+        // execute tag
         CodeWriter out = getTranslaterContext().getCodeWriter();
         out.printIndent().println(localVarName + ".doTag(xpOut);");
         out.printIndent().println(localVarName + " = null;");

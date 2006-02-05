@@ -225,69 +225,6 @@ public class Util {
         }
     }
 
-
-    /**
-     * Returns a String containing Java code that can be used to represent the
-     * result of processing the given expression.
-     *
-     * @param parts
-     * @param xpContextVar
-     *            The name of a variable that contains the XpContext
-     * @param targetClass
-     *            The Java class name for the result. If not java.lang.String,
-     *            inExpr must contain only an EL expression.
-     * @return Java expression
-     */
-    public static String elExpressionCodeOld(Util.TextPart[] parts, String targetClass)
-            throws SAXException {
-
-        // @TODO: what about FunctionMapper() - probably needs to be passed in since
-        // the page defines mappings using namespaces.
-
-        if("java.lang.String".equals(targetClass)) {
-            targetClass = "String";
-        }
-
-        // not returning a String
-        if (! "String".equals(targetClass)) {
-            if (parts.length != 1 || ! parts[0].isEL) {
-                // if not a String, entire inExpr must be an EL expression
-                throw new SAXException("expression is not a java.lang.String, must only have EL");
-            } else {
-                return "(" + targetClass + ") "
-                        + "elEvaluator.evaluate("
-                        + escapeStringQuoted(parts[0].part)
-                        + ", " + targetClass + ".class"
-                        + ", varResolver"
-                        + ", null)";
-            }
-        } else {
-            if(parts.length == 1 && ! parts[0].isEL) {
-                // dispose of simple cases
-                return escapeStringQuoted(parts[0].part);
-            }
-
-            StringBuffer code = new StringBuffer();
-            code.append ("(String) ");
-            for (int i = 0; i < parts.length; i++) {
-                if(i > 0) {
-                    code.append(" + ");
-                }
-                if (! parts[i].isEL) {
-                    code.append(escapeStringQuoted(parts[i].part));
-                } else { // this part is an EL
-                    code.append(
-                        "elEvaluator.evaluate("
-                        + escapeStringQuoted(parts[i].part)
-                        + ", String.class"
-                        + ", varResolver"
-                        + ", null)");
-                }
-            }
-            return code.toString();
-        }
-    }
-
     public static void outputCharactersCode(String raw, CodeWriter out) throws SAXException {
         // this will output on multiple lines to make generated code easier to read.
         // TODO split up the regular text lines at line breaks

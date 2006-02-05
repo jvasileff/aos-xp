@@ -23,6 +23,7 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
     private ArrayList fragments = new ArrayList();
     private int tagVariableCounter = 0;
     private int savedXPOutVariableCounter = 0;
+    private int dataVariableCounter = 0;
     private Properties outputProperties;
 
     // A list of files on which this current file depends
@@ -123,6 +124,10 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
 
     public String getVariableForSavedXPOut() {
         return "savedXPOut" + savedXPOutVariableCounter++;
+    }
+
+    public String getVariableForData() {
+        return "data" + dataVariableCounter++;
     }
 
     public boolean inFragment() {

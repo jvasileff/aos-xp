@@ -35,7 +35,9 @@ public class ProcessorResultContent extends TranslaterProcessor {
         if (URI_XP.equals(uri)) {
             if (E_ATTRIBUTE.equals(localName)) {
                 // for output content, not attributes for action tags
-                return new ProcessorAttribute(getTranslaterContext());
+
+                //return new ProcessorAttribute(getTranslaterContext());
+                return new ProcessorXPAttribute(getTranslaterContext());
             } else if (E_IF.equals(localName)) {
                 return new ProcessorXPTagIf(getTranslaterContext());
             } else if (E_CHOOSE.equals(localName)) {

@@ -29,7 +29,9 @@
 
     <xp:content>
         <html>
-            <c:if test="${true}">
+            <h1>====== ********************** =====</h1>
+            <c:if>
+                <xp:param name="test"> <h1>true</h1> </xp:param>
                 <xp:body xmlns:testns="http://www.test.ns.com">
                     Text #1
                     <tag/>

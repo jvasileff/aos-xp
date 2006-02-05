@@ -20,52 +20,34 @@ import org.xml.sax.SAXParseException;
  * 3. If body contains output elements and/or tags, processes the content using <code>ProcessorResultContent</code> to
  * allow for runtime branching, etc.  Sets attribute to runtime string result.
  */
-class ProcessorAttribute extends TranslaterProcessorNonResultContent {
+class ProcessorXPAttribute extends ProcessorForType {
 
     public static final String A_NAME = "name";
     public static final String A_NAMESPACE = "namespace";
     public static final String A_VALUE = "value";
     public static final String A_TRIM = "trim";
 
-    ProcessorResultContent processorResultContent;
     private boolean valueAttributeMode = true;
-    private boolean optimizedMode = true;
-    private String savedXPOutVariable;
-    private StringBuffer sb;
 
     private String codeName;
     private String codeURI;
     private boolean trim = true;
 
-    public ProcessorAttribute(TranslaterContext ctx) {
-        super(ctx);
+    public ProcessorXPAttribute(TranslaterContext ctx) throws SAXException {
+        super(ctx, "String");
     }
 
     public ElementProcessor getProcessorFor(String uri, String localName, String qName) throws SAXException {
         if (valueAttributeMode) {
             throw new SAXParseException("Element not allowed here: <" + qName + "> when @value is present on <xp:attribute>;", getContext().getLocator());
         }
-        // new element is coming, so we cannot run in optimized mode.
-        if (optimizedMode) {
-            // switch to non-optimized mode
-            optimizedMode = false;
-            CodeWriter out = getTranslaterContext().getCodeWriter();
-            savedXPOutVariable = getTranslaterContext().getVariableForSavedXPOut();
-            out.printIndent().println( "org.anodyneos.xp.XpOutput " + savedXPOutVariable + " = xpOut;");
-            out.printIndent().println( "xpOut = new org.anodyneos.xp.XpOutput(new org.anodyneos.xp.util.TextContentHandler(), xpCH);" );
-            out.printIndent().println( "xpCH = xpOut.getXpContentHandler();");
-
-            processorResultContent = new ProcessorResultContent(getTranslaterContext());
-            if (null != sb) {
-                processorResultContent.characters(sb.toString().toCharArray(), 0, sb.length());
-                sb = null;
-            }
-        }
-        return processorResultContent.getProcessorFor(uri, localName, qName);
+        return super.getProcessorFor(uri, localName, qName);
     }
 
     public void startElement(String uri, String localName, String qName,
             Attributes attributes) throws SAXException {
+        super.startElement(uri, localName, qName, attributes);
+
         CodeWriter out = getTranslaterContext().getCodeWriter();
         String value = attributes.getValue(A_VALUE);
         String attName = attributes.getValue(A_NAME);
@@ -120,72 +102,28 @@ class ProcessorAttribute extends TranslaterProcessorNonResultContent {
         }
     }
 
-    public void characters(char[] ch, int start, int length) throws SAXException {
-        if (valueAttributeMode) {
-            throw new SAXParseException("Text content not allowed here when @value is present on <xp:attribute>;", getContext().getLocator());
-        } else {
-            if (optimizedMode) {
-                if (null == sb) {
-                    sb = new StringBuffer();
-                }
-                sb.append(ch, start, length);
-            } else {
-                processorResultContent.characters(ch, start, length);
-            }
-        }
-    }
-
     public void endElement(String uri, String localName, String qName) throws SAXException {
         if (valueAttributeMode) {
             return;
         }
+        super.endElement(uri, localName, qName);
+    }
+
+
+    public void process(String xpOutVar, String expr) {
+
         CodeWriter out = getTranslaterContext().getCodeWriter();
-        String codeValue;
 
-        if (optimizedMode) {
-            if (sb != null) {
-                String value = sb.toString();
-                if(Util.hasEL(value)) {
-                    // EL expression may exist.  Process all unescaped expressions, concatinate, etc...
-                    codeValue = Util.elExpressionCode(value, "String");
-                    if (trim) {
-                        codeValue = "(" + codeValue + ").trim()";
-                    }
-                } else {
-                    if (trim) {
-                        codeValue = Util.escapeStringQuotedEL(value.trim());
-                    } else {
-                        codeValue = Util.escapeStringQuotedEL(value);
-                    }
-                }
-                sb = null;
-            } else {
-                codeValue = Util.escapeStringQuoted("");
-            }
-            out.printIndent().println(
-                  "xpCH.addAttribute("
-                +       codeURI
-                + "," + codeName
-                + "," + codeValue
-                + ");"
-            );
-        } else {
-            processorResultContent.flushCharacters();
-            codeValue = "((org.anodyneos.xp.util.TextContentHandler) xpCH.getWrappedContentHandler()).getText()";
-            if (trim) {
-                codeValue = codeValue + ".trim()";
-            }
-            out.printIndent().println(
-                  savedXPOutVariable + ".addAttribute("
-                +       codeURI
-                + "," + codeName
-                + "," + codeValue
-                + ");"
-            );
-
-            out.printIndent().println( "xpOut = " + savedXPOutVariable + ";");
-            out.printIndent().println( "xpCH = xpOut.getXpContentHandler();");
-            out.printIndent().println( savedXPOutVariable + " = null;");
+        if (trim) {
+            expr = "(" + expr + ").trim()";
         }
+
+        out.printIndent().println(
+              xpOutVar + ".addAttribute("
+            +       codeURI
+            + "," + codeName
+            + "," + expr
+            + ");"
+        );
     }
 }

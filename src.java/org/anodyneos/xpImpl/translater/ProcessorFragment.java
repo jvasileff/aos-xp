@@ -10,6 +10,7 @@ import org.anodyneos.xpImpl.util.CodeWriter;
 import org.anodyneos.xpImpl.util.Util;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
 
 /**
@@ -31,10 +32,10 @@ public class ProcessorFragment extends TranslaterProcessorNonResultContent {
     private int fragmentId = -1;
     private String fragmentVar;
 
+    private Attributes attributes;
+
     public ProcessorFragment(TranslaterContext ctx) {
         super(ctx);
-
-        // most of our reall setup is done in startFragment();
     }
 
     public ElementProcessor getProcessorFor(String uri, String localName, String qName)
@@ -66,6 +67,7 @@ public class ProcessorFragment extends TranslaterProcessorNonResultContent {
         if (inFragment) {
             throw new IllegalStateException("startElement() called after startFragment()");
         }
+        this.attributes = new AttributesImpl(attributes);
         startFragment();
     }
 
@@ -208,6 +210,10 @@ public class ProcessorFragment extends TranslaterProcessorNonResultContent {
     }
     public boolean isFragmentExists() {
         return fragmentExists;
+    }
+
+    public Attributes getAttributes() {
+        return attributes;
     }
 
 }
