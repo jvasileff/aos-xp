@@ -40,7 +40,13 @@ class ProcessorPage extends TranslaterProcessor {
     public ProcessorPage(TranslaterContext ctx) {
         super(ctx);
         outputProcessor = new ProcessorOutput(ctx);
-        contentFragmentProcessor = new ProcessorFragment(ctx);
+        contentFragmentProcessor = new ProcessorFragment(ctx) {
+            public void process(String expr) throws SAXException {
+                // this code will be placed as the last line in service()
+                CodeWriter out = getTranslaterContext().getCodeWriter();
+                out.printIndent().println(expr + ".invoke(xpOut);");
+            }
+        };
     }
 
     public ElementProcessor getProcessorFor(String uri, String localName, String qName) throws SAXException {
@@ -164,13 +170,10 @@ class ProcessorPage extends TranslaterProcessor {
     private void printJavaFooter() throws SAXException {
         CodeWriter out = getTranslaterContext().getCodeWriter();
 
-        // finish main method
+        // make sure we had a body fragment
         if (! contentFragmentProcessor.isFragmentExists()) {
             throw new SAXException("xp:content does not exist.");
         }
-        String fragmentVar = contentFragmentProcessor.getFragmentVar();
-        out.printIndent().println(fragmentVar + ".invoke(xpOut);");
-        out.printIndent().println(fragmentVar + " = null;");
 
         out.endBlock();
         out.println();

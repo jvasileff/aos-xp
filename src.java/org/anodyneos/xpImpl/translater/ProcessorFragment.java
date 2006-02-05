@@ -20,7 +20,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  *
  * @author jvas
  */
-public class ProcessorFragment extends TranslaterProcessorNonResultContent {
+public abstract class ProcessorFragment extends TranslaterProcessorNonResultContent {
 
     private StringBuffer sb;
 
@@ -30,7 +30,6 @@ public class ProcessorFragment extends TranslaterProcessorNonResultContent {
     private boolean inFragment = false;
     private boolean fragmentExists = false;
     private int fragmentId = -1;
-    private String fragmentVar;
 
     private Attributes attributes;
 
@@ -126,6 +125,7 @@ public class ProcessorFragment extends TranslaterProcessorNonResultContent {
         out.endBlock();
 
         getTranslaterContext().endFragment();
+        out = null; // fragment closed, out no longer valid.
 
         inFragment = false;
         fragmentExists = true;
@@ -133,8 +133,6 @@ public class ProcessorFragment extends TranslaterProcessorNonResultContent {
         // we need to create the FragmentHelper here to make sure it appears between
         // push and pop phantom prefix mappings in the code.  This is because endPrefixMapping
         // is called after endElement.
-        out = getTranslaterContext().getCodeWriter();
-        fragmentVar = "frag" + fragmentId;
         String parentTagVar = "xpTagParent";
         String origXpChVar = "xpCH";
         if (! getTranslaterContext().inFragment()) {
@@ -143,11 +141,12 @@ public class ProcessorFragment extends TranslaterProcessorNonResultContent {
             parentTagVar = "null";
             origXpChVar = "null";
         }
-        out.printIndent().println("org.anodyneos.xp.tagext.XpFragment " + fragmentVar
-                + " = "
-                + "new FragmentHelper("
-                + fragmentId + ", xpContext, " + parentTagVar + ", " + origXpChVar + ");");
+
+        process("new FragmentHelper("
+                + fragmentId + ", xpContext, " + parentTagVar + ", " + origXpChVar + ")");
     }
+
+    public abstract void process(String expr) throws SAXException;
 
     public void startFragment() {
         if (inFragment || fragmentExists) {
@@ -193,16 +192,6 @@ public class ProcessorFragment extends TranslaterProcessorNonResultContent {
         out.println();
 
         inFragment = true;
-    }
-
-    /**
-     * @return the fragment variable if fragment exists
-     */
-    public String getFragmentVar() {
-        if (! fragmentExists) {
-            throw new IllegalStateException("Fragment does not exist.");
-        }
-        return fragmentVar;
     }
 
     public boolean isFragmentStarted() {
