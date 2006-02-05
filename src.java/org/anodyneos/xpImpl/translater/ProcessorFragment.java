@@ -13,6 +13,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.NamespaceSupport;
 
 /**
+ * ProcessorFragment creates fragments for elements that declare a fragment (ie xp:body, xp:content)
+ * or mixed content.  For mixed content, the fragments boundaries must be set using
+ * startFragment() and endFragment().
+ *
  * @author jvas
  */
 public class ProcessorFragment extends TranslaterProcessorNonResultContent {
@@ -22,8 +26,10 @@ public class ProcessorFragment extends TranslaterProcessorNonResultContent {
     private ProcessorResultContent resultContentProcessor;
     private Map savedPrefixMappings;
 
-    private boolean fragmentStarted = false;
+    private boolean inFragment = false;
+    private boolean fragmentExists = false;
     private int fragmentId = -1;
+    private String fragmentVar;
 
     public ProcessorFragment(TranslaterContext ctx) {
         super(ctx);
@@ -34,16 +40,13 @@ public class ProcessorFragment extends TranslaterProcessorNonResultContent {
     public ElementProcessor getProcessorFor(String uri, String localName, String qName)
             throws SAXException {
 
-        if (!fragmentStarted) {
+        if (!inFragment) {
             throw new IllegalStateException("getProcessorFor() called prior to startFragment()");
         }
 
         final ElementProcessor p;
 
         p = resultContentProcessor.getProcessorFor(uri, localName, qName);
-        // since no exception, start fragment if not already started. Dump characters.
-        // Return p (p may be the bodyFragmentProcessor itself if the content is result
-        // content, but bodyFragmentProcessor made the decision.)
         if(null != sb) {
             char[] chars = sb.toString().toCharArray();
             resultContentProcessor.characters(chars, 0, chars.length);
@@ -60,16 +63,15 @@ public class ProcessorFragment extends TranslaterProcessorNonResultContent {
         // this processor may be used with or without an element.  startElement is called in cases
         // such as <xp:body>.  The only thing the outer element provides is possible namespace mappings.
 
-        if (!fragmentStarted) {
-            throw new IllegalStateException("startElement() called prior to startFragment()");
+        if (inFragment) {
+            throw new IllegalStateException("startElement() called after startFragment()");
         }
-
-        // the super-class adds phantom prefix mappings, so we don't have to do anything.
+        startFragment();
     }
 
     public void characters(char[] ch, int start, int length) {
-        if (!fragmentStarted) {
-            throw new IllegalStateException("startElement() called prior to startFragment()");
+        if (!inFragment) {
+            throw new IllegalStateException("characters() called prior to startFragment()");
         }
 
         if (null == sb) {
@@ -79,8 +81,8 @@ public class ProcessorFragment extends TranslaterProcessorNonResultContent {
     }
 
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        if (!fragmentStarted) {
-            throw new IllegalStateException("startElement() called prior to startFragment()");
+        if (!inFragment) {
+            throw new IllegalStateException("endElement() called prior to startElement()");
         }
         if (null != sb && ! sb.toString().trim().equals("")) {
             char[] chars = sb.toString().toCharArray();
@@ -92,13 +94,12 @@ public class ProcessorFragment extends TranslaterProcessorNonResultContent {
 
         resultContentProcessor.flushCharacters();
 
-        // the super-class pops phantom prefix mappings, so we don't have to do anything.
-
+        endFragment();
     }
 
     public void endFragment() throws SAXException {
-        if (!fragmentStarted) {
-            throw new IllegalStateException("startElement() called prior to startFragment()");
+        if (!inFragment) {
+            throw new IllegalStateException("endFragment() called prior to startFragment()");
         }
 
         if (null != sb && ! sb.toString().trim().equals("")) {
@@ -123,10 +124,31 @@ public class ProcessorFragment extends TranslaterProcessorNonResultContent {
         out.endBlock();
 
         getTranslaterContext().endFragment();
+
+        inFragment = false;
+        fragmentExists = true;
+
+        // we need to create the FragmentHelper here to make sure it appears between
+        // push and pop phantom prefix mappings in the code.  This is because endPrefixMapping
+        // is called after endElement.
+        out = getTranslaterContext().getCodeWriter();
+        fragmentVar = "frag" + fragmentId;
+        String parentTagVar = "xpTagParent";
+        String origXpChVar = "xpCH";
+        if (! getTranslaterContext().inFragment()) {
+            // for the root fragment there is no parentTag and the contentHandler has no initial
+            // namespace mappings.
+            parentTagVar = "null";
+            origXpChVar = "null";
+        }
+        out.printIndent().println("org.anodyneos.xp.tagext.XpFragment " + fragmentVar
+                + " = "
+                + "new FragmentHelper("
+                + fragmentId + ", xpContext, " + parentTagVar + ", " + origXpChVar + ");");
     }
 
     public void startFragment() {
-        if (fragmentStarted) {
+        if (inFragment || fragmentExists) {
             throw new IllegalStateException("startFragment() called when already started.");
         }
 
@@ -168,18 +190,24 @@ public class ProcessorFragment extends TranslaterProcessorNonResultContent {
         out.endBlock();
         out.println();
 
-        fragmentStarted = true;
+        inFragment = true;
     }
 
-    public int getFragmentId() {
-        if (!fragmentStarted) {
-            throw new IllegalStateException("getFragmentId() called prior to startFragment()");
+    /**
+     * @return the fragment variable if fragment exists
+     */
+    public String getFragmentVar() {
+        if (! fragmentExists) {
+            throw new IllegalStateException("Fragment does not exist.");
         }
-        return fragmentId;
+        return fragmentVar;
     }
 
     public boolean isFragmentStarted() {
-        return fragmentStarted;
+        return inFragment;
+    }
+    public boolean isFragmentExists() {
+        return fragmentExists;
     }
 
 }

@@ -73,22 +73,24 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
         // xp:parameter
         if (uri.equals(URI_XP) && (E_PARAMETER.equals(localName))) {
             if (BODY_TYPE_EMPTY != bodyType && BODY_TYPE_TAGS != bodyType) {
-                throw new SAXException("Element '" + qName + "' not allowed here.");
+                // not allowed
+                return super.getProcessorFor(uri, localName, qName);
             }
             bodyType = BODY_TYPE_TAGS;
             throw new NotImplementedException();
         // xp:body
         } else if (uri.equals(URI_XP) && (E_BODY.equals(localName))) {
             if (BODY_TYPE_EMPTY != bodyType && BODY_TYPE_TAGS != bodyType) {
-                throw new SAXException("Element '" + qName + "' not allowed here.");
+                // not allowed
+                return super.getProcessorFor(uri, localName, qName);
             }
             bodyType = BODY_TYPE_TAGS;
-            bodyFragmentProcessor.startFragment();
             p = bodyFragmentProcessor;
         // body content
         } else {
             if (BODY_TYPE_EMPTY != bodyType && BODY_TYPE_FRAGMENT != bodyType) {
-                throw new SAXException("Element '" + qName + "' not allowed when xp:body or xp:parameter exist in tag.");
+                // not allowed
+                return super.getProcessorFor(uri, localName, qName);
             }
             bodyType = BODY_TYPE_FRAGMENT;
 
@@ -167,6 +169,7 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
             if (null != sb && ! sb.toString().trim().equals("")) {
                 if (! bodyFragmentProcessor.isFragmentStarted()) {
                     bodyFragmentProcessor.startFragment();
+                    bodyType = BODY_TYPE_FRAGMENT;
                 }
                 char[] chars = sb.toString().toCharArray();
                 bodyFragmentProcessor.characters(chars, 0, chars.length);
@@ -174,12 +177,15 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
             }
         }
 
-        if (bodyFragmentProcessor.isFragmentStarted()) {
+        if (BODY_TYPE_FRAGMENT == bodyType && bodyFragmentProcessor.isFragmentStarted()) {
             bodyFragmentProcessor.endFragment();
+        }
+
+        if (bodyFragmentProcessor.isFragmentExists()) {
+            String bodyFragmentVar = bodyFragmentProcessor.getFragmentVar();
             CodeWriter out = getTranslaterContext().getCodeWriter();
-            out.printIndent().println(
-                    localVarName + ".setXpBody(new FragmentHelper("
-                    + bodyFragmentProcessor.getFragmentId() + ", xpContext, " + localVarName + ", xpCH));");
+            out.printIndent().println(localVarName + ".setXpBody(" + bodyFragmentVar + ");");
+            out.printIndent().println(bodyFragmentVar + " = null;");
         }
 
         CodeWriter out = getTranslaterContext().getCodeWriter();

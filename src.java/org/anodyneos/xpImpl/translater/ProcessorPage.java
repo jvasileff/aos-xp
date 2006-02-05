@@ -31,7 +31,7 @@ class ProcessorPage extends TranslaterProcessor {
 
     //private ArrayList xmlPiplineProcessors = new ArrayList();
     private ProcessorOutput outputProcessor;
-    private ProcessorContent contentProcessor;
+    private ProcessorFragment contentFragmentProcessor;
 
     //static final String E_XML_PIPELINE = "xml-pipeline";
     public static final String E_OUTPUT = "output";
@@ -40,13 +40,14 @@ class ProcessorPage extends TranslaterProcessor {
     public ProcessorPage(TranslaterContext ctx) {
         super(ctx);
         outputProcessor = new ProcessorOutput(ctx);
-        contentProcessor = new ProcessorContent(ctx);
+        contentFragmentProcessor = new ProcessorFragment(ctx);
     }
 
     public ElementProcessor getProcessorFor(String uri, String localName, String qName) throws SAXException {
         if (URI_XP.equals(uri)) {
             if (E_CONTENT.equals(localName)) {
-                return contentProcessor;
+                //return contentProcessor;
+                return contentFragmentProcessor;
             } else if (E_OUTPUT.equals(localName)) {
                 return outputProcessor;
             } else {
@@ -148,10 +149,31 @@ class ProcessorPage extends TranslaterProcessor {
         out.printIndent().println("System.out.println(\"Completed in \" + (System.currentTimeMillis() - start) + \" milliseconds\");");
         out.endBlock();
         out.println();
+
+        // service()
+        out.printIndent().println("public final void service(org.anodyneos.xp.XpContext xpContext, org.anodyneos.xp.XpOutput xpOut) throws org.anodyneos.xp.XpException, javax.servlet.jsp.el.ELException, org.xml.sax.SAXException {");
+        out.indentPlus();
+        out.printIndent().println("javax.servlet.jsp.el.ExpressionEvaluator elEvaluator = xpContext.getExpressionEvaluator();");
+        out.printIndent().println("javax.servlet.jsp.el.VariableResolver varResolver = xpContext.getVariableResolver();");
+        out.printIndent().println("org.anodyneos.xp.XpContentHandler xpCH = xpOut.getXpContentHandler();");
+        out.println();
+
+        // printJavaFooter will call the "main" fragment.
     }
 
-    private void printJavaFooter() {
+    private void printJavaFooter() throws SAXException {
         CodeWriter out = getTranslaterContext().getCodeWriter();
+
+        // finish main method
+        if (! contentFragmentProcessor.isFragmentExists()) {
+            throw new SAXException("xp:content does not exist.");
+        }
+        String fragmentVar = contentFragmentProcessor.getFragmentVar();
+        out.printIndent().println(fragmentVar + ".invoke(xpOut);");
+        out.printIndent().println(fragmentVar + " = null;");
+
+        out.endBlock();
+        out.println();
 
         // output properties
         out.printIndent().println("private void initOutputProperties() {");
@@ -179,7 +201,7 @@ class ProcessorPage extends TranslaterProcessor {
         out.endBlock();
         out.println();
 
-        out.printIndent().println("public static java.util.List getDependents(){");
+        out.printIndent().println("public static java.util.List getDependents() {");
         out.indentPlus();
         out.printIndent().println("java.util.List dependents = new java.util.ArrayList();");
         List dependents = getTranslaterContext().getDependents();
@@ -191,10 +213,12 @@ class ProcessorPage extends TranslaterProcessor {
 
         out.println();
         out.printIndent().println("private final long loadTime = System.currentTimeMillis();");
-        out.printIndent().println("public long getLoadTime(){");
+        out.println();
+        out.printIndent().println("public long getLoadTime() {");
         out.indentPlus();
         out.printIndent().println("return loadTime;");
         out.endBlock();
+        out.println();
 
         if(getTranslaterContext().getFragmentCount() > 0) {
             // Output Fragments
@@ -215,11 +239,13 @@ class ProcessorPage extends TranslaterProcessor {
             out.indentPlus();
             out.printIndent().println("this.fragNum = fragNum;");
             out.printIndent().println("this.xpContext = xpContext;");
-            out.printIndent().println("this.xpTagParent = xpTagParent;");
             out.printIndent().println("this.origXpCH = origXpCH;");
+            out.printIndent().println("if (null != origXpCH) {");
+            out.indentPlus();
             out.printIndent().println("this.origContextVersion = origXpCH.getContextVersion();");
             out.printIndent().println("this.origAncestorsWithPrefixMasking = origXpCH.getAncestorsWithPrefixMasking();");
             out.printIndent().println("this.origPhantomPrefixCount = origXpCH.getPhantomPrefixCount();");
+            out.endBlock();
             out.endBlock();
             out.println();
             out.printIndent().println("public org.anodyneos.xp.XpContext getXpContext() {");
