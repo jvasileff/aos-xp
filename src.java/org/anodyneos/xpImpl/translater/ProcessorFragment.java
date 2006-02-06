@@ -27,9 +27,15 @@ public abstract class ProcessorFragment extends TranslaterProcessorNonResultCont
     private ProcessorResultContent resultContentProcessor;
     private Map<String, String> savedPrefixMappings;
 
-    private boolean inFragment = false;
-    private boolean fragmentExists = false;
     private int fragmentId = -1;
+
+    public enum State {
+        NOT_STARTED,
+        IN_FRAGMENT,
+        FINISHED;
+    }
+
+    private State state = State.NOT_STARTED;
 
     private Attributes attributes;
 
@@ -40,7 +46,7 @@ public abstract class ProcessorFragment extends TranslaterProcessorNonResultCont
     public ElementProcessor getProcessorFor(String uri, String localName, String qName)
             throws SAXException {
 
-        if (!inFragment) {
+        if (! (State.IN_FRAGMENT == state)) {
             throw new IllegalStateException("getProcessorFor() called prior to startFragment()");
         }
 
@@ -63,15 +69,15 @@ public abstract class ProcessorFragment extends TranslaterProcessorNonResultCont
         // this processor may be used with or without an element.  startElement is called in cases
         // such as <xp:body>.  The only thing the outer element provides is possible namespace mappings.
 
-        if (inFragment) {
-            throw new IllegalStateException("startElement() called after startFragment()");
+        if (State.IN_FRAGMENT == state || State.FINISHED == state) {
+            throw new IllegalStateException("startElement() called after startFragment() or after endFragment()");
         }
         this.attributes = new AttributesImpl(attributes);
         startFragment();
     }
 
     public void characters(char[] ch, int start, int length) {
-        if (!inFragment) {
+        if (! (State.IN_FRAGMENT == state)) {
             throw new IllegalStateException("characters() called prior to startFragment()");
         }
 
@@ -82,7 +88,7 @@ public abstract class ProcessorFragment extends TranslaterProcessorNonResultCont
     }
 
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        if (!inFragment) {
+        if (! (State.IN_FRAGMENT == state)) {
             throw new IllegalStateException("endElement() called prior to startElement()");
         }
         if (null != sb && ! sb.toString().trim().equals("")) {
@@ -99,7 +105,7 @@ public abstract class ProcessorFragment extends TranslaterProcessorNonResultCont
     }
 
     public void endFragment() throws SAXException {
-        if (!inFragment) {
+        if (! (State.IN_FRAGMENT == state)) {
             throw new IllegalStateException("endFragment() called prior to startFragment()");
         }
 
@@ -126,9 +132,6 @@ public abstract class ProcessorFragment extends TranslaterProcessorNonResultCont
         getTranslaterContext().endFragment();
         out = null; // fragment closed, out no longer valid.
 
-        inFragment = false;
-        fragmentExists = true;
-
         // we need to create the FragmentHelper here to make sure it appears between
         // push and pop phantom prefix mappings in the code.  This is because endPrefixMapping
         // is called after endElement.
@@ -143,12 +146,14 @@ public abstract class ProcessorFragment extends TranslaterProcessorNonResultCont
 
         process("new FragmentHelper("
                 + fragmentId + ", xpContext, " + parentTagVar + ", " + origXpChVar + ")");
+
+        state = State.FINISHED;
     }
 
     public abstract void process(String expr) throws SAXException;
 
     public void startFragment() {
-        if (inFragment || fragmentExists) {
+        if (State.NOT_STARTED != state) {
             throw new IllegalStateException("startFragment() called when already started.");
         }
 
@@ -190,14 +195,11 @@ public abstract class ProcessorFragment extends TranslaterProcessorNonResultCont
         out.endBlock();
         out.println();
 
-        inFragment = true;
+        state = State.IN_FRAGMENT;
     }
 
-    public boolean isFragmentStarted() {
-        return inFragment;
-    }
-    public boolean isFragmentExists() {
-        return fragmentExists;
+    public State getState() {
+        return state;
     }
 
     public Attributes getAttributes() {

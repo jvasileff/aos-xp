@@ -5,6 +5,7 @@
     xmlns:fmt="http://www.anodyneos.org/xmlns/xp/fmt"
     xmlns:c="http://www.anodyneos.org/xmlns/xp/core"
     xmlns:fn="http://www.anodyneos.org/xmlns/xp/function"
+    xmlns:test="http://www.anodyneos.org/xmlns/xpImpl/testTag"
     xmlns="http://xhtml.com"
 >
     <xp:output
@@ -29,6 +30,15 @@
 
     <xp:content>
         <html>
+            <test:testFragments>
+                <xp:param name="frag1">
+                    <h1>frag1</h1>
+                </xp:param>
+                <xp:param name="frag2">
+                    <h1>frag2</h1>
+                </xp:param>
+            </test:testFragments>
+
             <h1>====== ********************** =====</h1>
             <c:if>
                 <xp:param name="test"> <h1>true</h1> </xp:param>

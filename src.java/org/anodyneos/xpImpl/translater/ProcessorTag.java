@@ -85,7 +85,7 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
             }
             bodyType = BODY_TYPE_TAGS;
 
-            String paramName = attrs.getValue(A_NAME);
+            final String paramName = attrs.getValue(A_NAME);
             if (null == paramName || "".equals(paramName)) {
                 throw new SAXException("xp:param requires attribute @name.");
             }
@@ -97,11 +97,22 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
             String type = attrInfo.getType();
 
             if (XpFragment.class.getName().equals(type)) {
-                //p = new ProcessorFragment(getTranslaterContext());
-                p = null;
+                p = new ProcessorFragment(getTranslaterContext()) {
+                    public void process(String expr) throws SAXException {
+                        CodeWriter out = getTranslaterContext().getCodeWriter();
+                        out.printIndent().println(
+                                localVarName + "." + Util.toSetMethod(paramName) + "(" + expr + ");");
+                    }
+                };
             } else {
                 type = CoerceUtil.simplifyType(type);
-                p = new ProcessorXPParam(getTranslaterContext(), type, paramName, localVarName);
+                p = new ProcessorForType(getTranslaterContext(), type) {
+                    public void process(String savedXPOutVariable, String expr) throws SAXException {
+                        CodeWriter out = getTranslaterContext().getCodeWriter();
+                        out.printIndent().println(
+                                localVarName + "." + Util.toSetMethod(paramName) + "(" + expr + ");");
+                    }
+                };
             }
         // xp:body
         } else if (uri.equals(URI_XP) && (E_BODY.equals(localName))) {
@@ -122,7 +133,7 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
             // start fragment if not already started. Dump characters.
             // Return p (p may be the bodyFragmentProcessor itself if the content is result
             // content, but bodyFragmentProcessor made the decision.)
-            if (! bodyFragmentProcessor.isFragmentStarted()) {
+            if (bodyFragmentProcessor.getState() == ProcessorFragment.State.NOT_STARTED) {
                 bodyFragmentProcessor.startFragment();
             }
             if(null != sb) {
@@ -192,7 +203,7 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
         if (BODY_TYPE_FRAGMENT == bodyType || BODY_TYPE_EMPTY == bodyType) {
             // end element
             if (null != sb && ! sb.toString().trim().equals("")) {
-                if (! bodyFragmentProcessor.isFragmentStarted()) {
+                if (bodyFragmentProcessor.getState() == ProcessorFragment.State.NOT_STARTED) {
                     bodyFragmentProcessor.startFragment();
                     bodyType = BODY_TYPE_FRAGMENT;
                 }
@@ -202,7 +213,8 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
             }
         }
 
-        if (BODY_TYPE_FRAGMENT == bodyType && bodyFragmentProcessor.isFragmentStarted()) {
+        if (BODY_TYPE_FRAGMENT == bodyType &&
+                bodyFragmentProcessor.getState() == ProcessorFragment.State.IN_FRAGMENT) {
             bodyFragmentProcessor.endFragment();
         }
 

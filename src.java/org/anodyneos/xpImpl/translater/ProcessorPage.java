@@ -169,7 +169,7 @@ class ProcessorPage extends TranslaterProcessor {
         CodeWriter out = getTranslaterContext().getCodeWriter();
 
         // make sure we had a body fragment
-        if (! contentFragmentProcessor.isFragmentExists()) {
+        if (! (contentFragmentProcessor.getState() == ProcessorFragment.State.FINISHED)) {
             throw new SAXException("xp:content does not exist.");
         }
 

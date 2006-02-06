@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<taglib>
+    <description>
+        Test Tags
+    </description>
+    <tag>
+        <description>Invoke two fragments</description>
+        <name>testFragments</name>
+        <tag-class>org.anodyneos.xpImpl.testTag.TestFragments</tag-class>
+        <attribute>
+            <description>
+                Fragment #1
+            </description>
+            <name>frag1</name>
+            <required>true</required>
+            <request-time-ok>true</request-time-ok>
+            <type>org.anodyneos.xp.tagext.XpFragment</type>
+        </attribute>
+        <attribute>
+            <description>
+                Fragment #2
+            </description>
+            <name>frag2</name>
+            <required>true</required>
+            <request-time-ok>true</request-time-ok>
+            <type>org.anodyneos.xp.tagext.XpFragment</type>
+        </attribute>
+	</tag>
+
+</taglib>
