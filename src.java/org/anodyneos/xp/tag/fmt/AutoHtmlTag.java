@@ -33,7 +33,7 @@ public class AutoHtmlTag extends XpTagSupport {
         try {
             ahps.process();
         } catch (Exception e) {
-            // TODO:
+            // TODO: don't throw away exception
         }
     }
 
