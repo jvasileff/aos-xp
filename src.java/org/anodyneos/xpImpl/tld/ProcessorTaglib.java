@@ -15,8 +15,8 @@ class ProcessorTaglib extends TLDProcessor {
 
     private CDATAProcessor descriptionProcessor;
 
-    private ArrayList tags = new ArrayList();
-    private ArrayList functions = new ArrayList();
+    private ArrayList<ProcessorTag> tags = new ArrayList<ProcessorTag>();
+    private ArrayList<ProcessorFunction> functions = new ArrayList<ProcessorFunction>();
 
     public static final String E_DESCRIPTION = "description";
 
@@ -33,11 +33,11 @@ class ProcessorTaglib extends TLDProcessor {
         if (E_DESCRIPTION.equals(localName)) {
             return descriptionProcessor;
         } else if (E_TAG.equals(localName)) {
-            ElementProcessor p = new ProcessorTag(getTLDContext());
+            ProcessorTag p = new ProcessorTag(getTLDContext());
             tags.add(p);
             return p;
         } else if (E_FUNCTION.equals(localName)) {
-            ElementProcessor p = new ProcessorFunction(getTLDContext());
+            ProcessorFunction p = new ProcessorFunction(getTLDContext());
             functions.add(p);
             return p;
         } else {
@@ -48,12 +48,12 @@ class ProcessorTaglib extends TLDProcessor {
     public void endElement(String uri, String localName, String qName) throws SAXException {
         TagInfo[] tarray = new TagInfo[tags.size()];
         for (int i = 0; i < tags.size(); i++) {
-            tarray[i] = (TagInfo) ((ProcessorTag) tags.get(i)).getTagInfo();
+            tarray[i] = tags.get(i).getTagInfo();
         }
 
         FunctionInfo[] farray = new FunctionInfo[functions.size()];
         for (int i = 0; i < functions.size(); i++) {
-            farray[i] = (FunctionInfo) ((ProcessorFunction) functions.get(i)).getFunctionInfo();
+            farray[i] = functions.get(i).getFunctionInfo();
         }
 
         tagLibraryInfo = new TagLibraryInfo(descriptionProcessor.getCDATA(), tarray, farray);

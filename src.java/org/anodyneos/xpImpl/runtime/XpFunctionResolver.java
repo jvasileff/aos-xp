@@ -13,7 +13,7 @@ import org.anodyneos.xp.XpNamespaceMapper;
  */
 public class XpFunctionResolver {
 
-    private Map uris = new HashMap();
+    private Map<String, Map<String, Method>> uris = new HashMap<String, Map<String, Method>>();
 
     public void mapFunctionWithURI(String uri, String localName, Class clazz, String methodName, Class[] args) {
 
@@ -24,20 +24,20 @@ public class XpFunctionResolver {
             throw new RuntimeException("No such method: " + e.getMessage());
         }
 
-        Map m = (Map) uris.get(uri);
+        Map<String, Method> m = uris.get(uri);
         if (null == m) {
-            m = new HashMap();
+            m = new HashMap<String, Method>();
             uris.put(uri, m);
         }
         m.put(localName, method);
     }
 
     public Method resolveFunctionWithURI(String uri, String localName) {
-        Map m = (Map) uris.get(uri);
+        Map<String, Method> m = uris.get(uri);
         if (null == m) {
             return null;
         } else {
-            return (Method) m.get(localName);
+            return m.get(localName);
         }
     }
 

@@ -8,8 +8,8 @@ public class JavaClass {
     private String className;
     private String packageName;
     private String classExtends;
-    private ArrayList imports = new ArrayList();
-    private ArrayList interfaces = new ArrayList();
+    private ArrayList<String> imports = new ArrayList<String>();
+    private ArrayList<String> interfaces = new ArrayList<String>();
 
     // constructors
     public JavaClass() {

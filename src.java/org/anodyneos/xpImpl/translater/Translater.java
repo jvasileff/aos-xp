@@ -35,8 +35,6 @@ public class Translater extends BaseParser {
 
     public static void main(String[] args) throws Exception {
         try {
-            OutputStream os;
-            Translater obj = new Translater();
             long start = System.currentTimeMillis();
             UnifiedResolver resolver = new UnifiedResolver();
             resolver.addProtocolHandler("classpath",

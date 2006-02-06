@@ -11,8 +11,8 @@ public class FileLister {
         if(! root.isDirectory()) {
             return new File[0];
         } else {
-            ArrayList results = new ArrayList();
-            Stack dirs = new Stack();
+            ArrayList<File> results = new ArrayList<File>();
+            Stack<File> dirs = new Stack<File>();
             dirs.push(root);
             while (! dirs.empty()) {
                 File[] files;
@@ -26,7 +26,7 @@ public class FileLister {
                     }
                 }
             }
-            return (File[]) results.toArray(new File[results.size()]);
+            return results.toArray(new File[results.size()]);
         }
     }
 

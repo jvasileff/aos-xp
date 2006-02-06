@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Properties;
@@ -20,7 +19,6 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
@@ -61,7 +59,7 @@ public class XpServlet extends HttpServlet{
 
     private static final String XP_REGISTRY="xpRegistry";
     private static final String XP_CACHE_AUTOLOAD="xpCacheAutoload";
-    private TransformerFactory tf = TransformerFactory.newInstance();
+    //private TransformerFactory tf = TransformerFactory.newInstance();
     private XpCachingLoader cache = XpCachingLoader.getLoader();
 
     private TemplatesCache templatesCache;
@@ -355,7 +353,7 @@ public class XpServlet extends HttpServlet{
             res.setContentType(contentType);
         }
         PrintWriter out = res.getWriter();
-        String output = transformer.getOutputProperty(OutputKeys.METHOD);
+        //String output = transformer.getOutputProperty(OutputKeys.METHOD);
 
         transformer.transform(source, new StreamResult(out));
         out.close();
@@ -428,6 +426,7 @@ public class XpServlet extends HttpServlet{
         }
     }
 
+    /*
     private static String getStackTrace(Throwable thrown){
         if (thrown != null){
             StringWriter sw = new StringWriter();
@@ -439,4 +438,5 @@ public class XpServlet extends HttpServlet{
         }
 
     }
+    */
 }

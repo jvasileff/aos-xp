@@ -11,13 +11,13 @@ import org.apache.commons.el.ExpressionEvaluatorImpl;
 public class TestEL {
 
     public static void main(String[] args) throws Exception {
-        HashMap vars = new HashMap();
+        HashMap<String, Object> vars = new HashMap<String, Object>();
         VariableResolver variableResolver = new SimpleVariableResolver(vars);
         ExpressionEvaluator sEvaluator = new ExpressionEvaluatorImpl();
 
         vars.put("str", "${8 + 2}");
         vars.put("num", new Integer(8));
-        HashMap pc = new HashMap();
+        HashMap<String, Object> pc = new HashMap<String, Object>();
         pc.put("str", "in_pc");
         vars.put("pageContext", pc);
 
@@ -26,10 +26,8 @@ public class TestEL {
         pAttributeValue = "${'${8 + 2}'} = ${num / 3}";
         pAttributeValue = "${str} = ${num + 2}";
         pAttributeValue = "${pageContext.str} = something";
-        Object pPageContext = null;
         Class pExpectedType = String.class;
         FunctionMapper functionMapper = null;
-        String defaultPrefix = null;
 
         System.out.println(
                 sEvaluator.evaluate

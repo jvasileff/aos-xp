@@ -64,13 +64,13 @@ public class MessageTag extends XpTagSupport {
 
     private int scope; // 'scope' attribute
 
-    private List params;
+    private List<Object> params;
 
     // *********************************************************************
     // Constructor and initialization
 
     public MessageTag() {
-        params = new ArrayList();
+        params = new ArrayList<Object>();
         var = null;
         scope = XpContext.PAGE_SCOPE;
         keyAttrValue = null;

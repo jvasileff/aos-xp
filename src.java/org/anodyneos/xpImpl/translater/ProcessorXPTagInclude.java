@@ -44,7 +44,6 @@ public class ProcessorXPTagInclude extends TranslaterProcessorNonResultContent {
 
         try{
             URI uriFile = getTranslaterContext().uriFromRelative(file);
-            String absPath = uriFile.getPath();
 
             getTranslaterContext().addDependent(uriFile.toString());
             out.printIndent().println("new " + Translater.getClassName(uriFile) + "().service(xpContext, xpOut);");

@@ -24,7 +24,7 @@ public class XpClassLoader extends ClassLoader {
         this.root = root;
     }
 
-    protected synchronized Class loadClass(String name, boolean resolve)
+    protected synchronized Class<?> loadClass(String name, boolean resolve)
             throws ClassNotFoundException {
 
         Class clazz = null;
@@ -50,7 +50,7 @@ public class XpClassLoader extends ClassLoader {
         }
     }
 
-    public Class findClass(String name) throws ClassNotFoundException{
+    public Class<?> findClass(String name) throws ClassNotFoundException{
         byte[] b = loadClassData(name);
         if (b == null){
             throw new ClassNotFoundException(getFileNameFromClassName(getRoot(),name));

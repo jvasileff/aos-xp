@@ -13,9 +13,6 @@ import org.xml.sax.SAXException;
 
 /**
  * @author jvas
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class ProcessorOutput extends TranslaterProcessor {
 
@@ -31,7 +28,7 @@ public class ProcessorOutput extends TranslaterProcessor {
             String attURI = attributes.getURI(i);
             String attValue = attributes.getValue(i);
             String attLocalName = attributes.getLocalName(i);
-            String attQName = attributes.getQName(i);
+            //String attQName = attributes.getQName(i);
 
             if (attURI == null || "".equals(attURI)) {
                 props.setProperty(attLocalName, attValue);

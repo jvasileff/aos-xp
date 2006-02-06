@@ -283,7 +283,7 @@ public class Util {
             return new TextPart[] { new TextPart(str, false) };
         }
         StringBuffer sb = new StringBuffer();
-        List list = new ArrayList();
+        List<TextPart> list = new ArrayList<TextPart>();
         StringCharacterIterator it = new StringCharacterIterator(str);
         char buf = ' ';  // may be '\\', '$', or ' '
         for(char cur = it.first(); cur != CharacterIterator.DONE; cur = it.next()) {
@@ -373,12 +373,12 @@ public class Util {
         if(sb.length() != 0) {
             list.add(new TextPart(sb.toString(), false));
         }
-        return (TextPart[]) list.toArray(new TextPart[list.size()]);
+        return list.toArray(new TextPart[list.size()]);
     }
 
     public static void main(String[] args) throws Exception {
         // test splitEl
-        String[] stringArray;
+        // String[] stringArray;
 
         // test only text
         System.out.println(

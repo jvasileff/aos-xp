@@ -72,7 +72,7 @@ public final class NamespaceMappings {
     private int nextVersionNum = 0;
 
     /** Used to hold return value for popContext2() */
-    private ArrayList tmpPrefixes = new ArrayList();
+    private ArrayList<String> tmpPrefixes = new ArrayList<String>();
 
     // this only holds items when it is being used. It holds null values
     // whenever possible.
@@ -202,7 +202,7 @@ public final class NamespaceMappings {
             // if a prefix is declared multiple times in phantom or in both
             // phantom and namespaceSupport, that
             // is ok, but just return it once.
-            Set prefixes = new HashSet();
+            Set<String> prefixes = new HashSet<String>();
             ArrayStack prefixStack = (ArrayStack) phantomPrefixes.peek();
             for (int i = 0; i < prefixStack.size(); i++) {
                 prefixes.add(((String[]) prefixStack.get(i))[0]);
@@ -239,7 +239,7 @@ public final class NamespaceMappings {
             // if a prefix is declared multiple times in phantom or in both
             // phantom and namespaceSupport, that
             // is ok, but just return it once.
-            Set prefixes = new HashSet();
+            Set<String> prefixes = new HashSet<String>();
             ArrayStack prefixStack = (ArrayStack) phantomPrefixes.peek();
             for (int i = 0; i < prefixStack.size(); i++) {
                 // IMPORTANT: Make sure not to return the "" prefix
@@ -263,11 +263,10 @@ public final class NamespaceMappings {
             // if a prefix is declared multiple times in phantom or in both
             // phantom and namespaceSupport, that
             // is ok, but just return it once.
-            Set prefixes = new HashSet();
+            Set<String> prefixes = new HashSet<String>();
             ArrayStack prefixStack = (ArrayStack) phantomPrefixes.peek();
             for (int i = 0; i < prefixStack.size(); i++) {
                 // IMPORTANT: Make sure not to return the "" prefix
-                String prefix = ((String[]) prefixStack.get(i))[0];
                 String[] entry = ((String[]) prefixStack.get(i));
                 if (entry[0].length() > 0 && uri.equals(entry[1])) {
                     prefixes.add(entry[0]);

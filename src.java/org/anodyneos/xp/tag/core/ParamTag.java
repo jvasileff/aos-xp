@@ -127,9 +127,9 @@ public class ParamTag extends XpTagSupport {
         // *********************************
         // Private state
 
-        private List names = new LinkedList();
+        private List<String> names = new LinkedList<String>();
 
-        private List values = new LinkedList();
+        private List<String> values = new LinkedList<String>();
 
         private boolean done = false;
 

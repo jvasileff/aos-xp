@@ -19,15 +19,14 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
     private TagLibraryRegistry taglibRegistry;
     private String className;
     private String packageName;
-    private Stack fragmentCodeWriters = new Stack();
-    private ArrayList fragments = new ArrayList();
+    private Stack<CodeWriter> fragmentCodeWriters = new Stack<CodeWriter>();
+    private ArrayList<StringWriter> fragments = new ArrayList<StringWriter>();
     private int tagVariableCounter = 0;
     private int savedXPOutVariableCounter = 0;
-    private int dataVariableCounter = 0;
     private Properties outputProperties;
 
     // A list of files on which this current file depends
-    private List dependents = new ArrayList();
+    private List<String> dependents = new ArrayList<String>();
 
     public TranslaterContext(InputSource is, CodeWriter codeWriter, TagLibraryRegistry taglibRegistry) {
         super(is);
@@ -115,7 +114,7 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
     }
 
     public String getFragment(int index) {
-        return ((StringWriter) fragments.get(index)).toString();
+        return fragments.get(index).toString();
     }
 
     public String getVariableForTag(String newClassName) {
@@ -126,10 +125,6 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
         return "savedXPOut" + savedXPOutVariableCounter++;
     }
 
-    public String getVariableForData() {
-        return "data" + dataVariableCounter++;
-    }
-
     public boolean inFragment() {
         return fragmentCodeWriters.size() > 0;
     }
@@ -137,7 +132,7 @@ public class TranslaterContext extends BaseContext implements TranslaterResult {
     public void addDependent(String dependent){
         dependents.add(dependent);
     }
-    public List getDependents(){
+    public List<String> getDependents(){
         return Collections.unmodifiableList(dependents);
     }
 

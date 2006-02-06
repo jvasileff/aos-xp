@@ -17,7 +17,7 @@ public class FunctionUtil {
      * @return An array of parameter class names
      */
     public static String[] getParameters(String signature) throws SAXException {
-        ArrayList params = new ArrayList();
+        ArrayList<String> params = new ArrayList<String>();
         // Signature is of the form
         // <return-type> S <method-name S? '('
         // < <arg-type> ( ',' <arg-type> )* )? ')'

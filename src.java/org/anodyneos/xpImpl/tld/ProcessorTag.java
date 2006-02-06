@@ -15,8 +15,8 @@ class ProcessorTag extends TLDProcessor {
     private CDATAProcessor nameProcessor;
     private CDATAProcessor descriptionProcessor;
     private CDATAProcessor tagClassProcessor;
-    private ArrayList variables = new ArrayList();
-    private ArrayList attributes = new ArrayList();
+    private ArrayList<ProcessorVariable> variables = new ArrayList<ProcessorVariable>();
+    private ArrayList<ProcessorAttribute> attributes = new ArrayList<ProcessorAttribute>();
 
     public static final String E_NAME = "name";
     public static final String E_DESCRIPTION = "description";
@@ -40,11 +40,11 @@ class ProcessorTag extends TLDProcessor {
         } else if (E_TAG_CLASS.equals(localName)) {
             return tagClassProcessor;
         } else if (E_VARIABLE.equals(localName)) {
-            ElementProcessor p = new ProcessorVariable(getTLDContext());
+            ProcessorVariable p = new ProcessorVariable(getTLDContext());
             variables.add(p);
             return p;
         } else if (E_ATTRIBUTE.equals(localName)) {
-            ElementProcessor p = new ProcessorAttribute(getTLDContext());
+            ProcessorAttribute p = new ProcessorAttribute(getTLDContext());
             attributes.add(p);
             return p;
         } else {
@@ -57,14 +57,13 @@ class ProcessorTag extends TLDProcessor {
         // variables
         TagVariableInfo[] vars = new TagVariableInfo[variables.size()];
         for (int i = 0; i < variables.size(); i++) {
-            vars[i] = (TagVariableInfo) ((ProcessorVariable) variables.get(i)).getTagVariableInfo();
+            vars[i] = variables.get(i).getTagVariableInfo();
         }
 
         // attributes
         TagAttributeInfo[] attrs = new TagAttributeInfo[attributes.size()];
         for (int i = 0; i < attributes.size(); i++) {
-            attrs[i] = (TagAttributeInfo) ((ProcessorAttribute) attributes.get(i))
-                    .getTagAttributeInfo();
+            attrs[i] = attributes.get(i).getTagAttributeInfo();
         }
 
         tagInfo = new TagInfo(nameProcessor.getCDATA(), descriptionProcessor.getCDATA(),

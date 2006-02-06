@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 public class TagLibraryRegistry {
-    protected HashMap tagLibraryInfos = new HashMap();
+    protected HashMap<String, TagLibraryInfo> tagLibraryInfos = new HashMap<String, TagLibraryInfo>();
 
     public TagLibraryRegistry() {
         // super();
@@ -15,8 +15,8 @@ public class TagLibraryRegistry {
     }
 
     public String[] getURIs() {
-        Set keys =  tagLibraryInfos.keySet();
-        return (String[]) keys.toArray(new String[keys.size()]);
+        Set<String> keys =  tagLibraryInfos.keySet();
+        return keys.toArray(new String[keys.size()]);
     }
 
     public TagLibraryInfo[] getTagLibraryInfos() {

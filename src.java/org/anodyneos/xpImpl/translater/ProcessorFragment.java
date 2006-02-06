@@ -25,7 +25,7 @@ public abstract class ProcessorFragment extends TranslaterProcessorNonResultCont
     private StringBuffer sb;
 
     private ProcessorResultContent resultContentProcessor;
-    private Map savedPrefixMappings;
+    private Map<String, String> savedPrefixMappings;
 
     private boolean inFragment = false;
     private boolean fragmentExists = false;
@@ -118,7 +118,6 @@ public abstract class ProcessorFragment extends TranslaterProcessorNonResultCont
         out.println();
         out.printIndent().println("if (! namespaceCompat) {");
         out.indentPlus();
-        Iterator it = savedPrefixMappings.keySet().iterator();
         for(int i = savedPrefixMappings.size(); i > 0; i--) {
             out.printIndent().println("xpCH.popPhantomPrefixMapping();");
         }
@@ -158,7 +157,7 @@ public abstract class ProcessorFragment extends TranslaterProcessorNonResultCont
         resultContentProcessor = new ProcessorResultContent(ctx);
         // when we write the fragment, we will need to copy the source tree's prefix mappings into the output
         // tree in case the fragment is used outside of the immediate parent in the source tree.
-        savedPrefixMappings = new HashMap();
+        savedPrefixMappings = new HashMap<String, String>();
         NamespaceSupport ns = getTranslaterContext().getNamespaceSupport();
         Enumeration e = ns.getPrefixes();
         while (e.hasMoreElements()) {
@@ -178,10 +177,10 @@ public abstract class ProcessorFragment extends TranslaterProcessorNonResultCont
         out.printIndent().println("boolean namespaceCompat = xpCH.isNamespaceContextCompatible(origXpCH, parentElClosed, origContextVersion, origAncestorsWithPrefixMasking, origPhantomPrefixCount);");
         out.printIndent().println("if (! namespaceCompat) {");
         out.indentPlus();
-        Iterator it = savedPrefixMappings.keySet().iterator();
+        Iterator<String> it = savedPrefixMappings.keySet().iterator();
         while (it.hasNext()) {
-            String nsPrefix = (String) it.next();
-            String nsURI = (String) savedPrefixMappings.get(nsPrefix);
+            String nsPrefix = it.next();
+            String nsURI = savedPrefixMappings.get(nsPrefix);
             out.printIndent().println(
                     "xpCH.pushPhantomPrefixMapping("
                 +        Util.escapeStringQuoted(nsPrefix)

@@ -16,7 +16,7 @@ public class XpCompiler {
 
     public void compile(XpCompilerContext xpcCtx, XpFile[] xpFiles, EntityResolver er) throws Exception {
         Translater translater = new Translater();
-        ArrayList javaFiles = new ArrayList();
+        ArrayList<String> javaFiles = new ArrayList<String>();
 
         // translate
         for(int i = 0; i < xpFiles.length; i++) {
@@ -43,7 +43,7 @@ public class XpCompiler {
         }
 
         // java compile
-        xpcCtx.getJavaCompiler().compile((String[]) javaFiles.toArray(new String[javaFiles.size()]), xpcCtx.getOut());
+        xpcCtx.getJavaCompiler().compile(javaFiles.toArray(new String[javaFiles.size()]), xpcCtx.getOut());
     }
 
 }

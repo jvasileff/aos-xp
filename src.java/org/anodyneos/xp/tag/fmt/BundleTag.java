@@ -54,7 +54,7 @@ public class BundleTag extends XpTagSupport {
     // *********************************************************************
     // Private state
 
-    private Locale fallbackLocale;
+    //private Locale fallbackLocale;
 
     private LocalizationContext locCtxt;
 

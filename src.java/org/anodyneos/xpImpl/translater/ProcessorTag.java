@@ -46,9 +46,9 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
 
     private ProcessorFragment bodyFragmentProcessor;
 
-    private Set handledAttributes = new HashSet();
+    private Set<String> handledAttributes = new HashSet<String>();
     private TagInfo tagInfo = null;
-    private Map attributeInfos = null;
+    private Map<String, TagAttributeInfo> attributeInfos = null;
     private String localVarName = null;
 
     private static final int BODY_TYPE_EMPTY = 0;
@@ -90,7 +90,7 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
                 throw new SAXException("xp:param requires attribute @name.");
             }
 
-            TagAttributeInfo attrInfo = (TagAttributeInfo) attributeInfos.get(paramName);
+            TagAttributeInfo attrInfo = attributeInfos.get(paramName);
             if (null == attrInfo) {
                 throw new SAXException("attribute '" + paramName + "' not allowed in tag " + qName);
             }
@@ -213,8 +213,8 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
 
     }
 
-    private Map toMap(TagAttributeInfo[] infos) {
-        Map map = new HashMap();
+    private Map<String, TagAttributeInfo> toMap(TagAttributeInfo[] infos) {
+        Map<String, TagAttributeInfo> map = new HashMap<String, TagAttributeInfo>();
         if (null != infos) {
             for(int i = 0; i < infos.length; i++) {
                 map.put(infos[i].getName(), infos[i]);

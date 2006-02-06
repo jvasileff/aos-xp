@@ -25,7 +25,7 @@ public class HttpXpContextImpl implements HttpXpContext {
     private VariableResolver variableResolver;
     private ExpressionEvaluator expVal = new ExpressionEvaluatorImpl(false);
 
-    private Hashtable pageScopeMap = new Hashtable();
+    private Hashtable<String, Object> pageScopeMap = new Hashtable<String, Object>();
 
     public HttpXpContextImpl(Servlet servlet, ServletRequest servletRequest,
             ServletResponse servletResponse) {

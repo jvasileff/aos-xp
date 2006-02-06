@@ -27,8 +27,6 @@ import org.xml.sax.SAXException;
  */
 class ProcessorPage extends TranslaterProcessor {
 
-    private JavaClass jc = new JavaClass();
-
     //private ArrayList xmlPiplineProcessors = new ArrayList();
     private ProcessorOutput outputProcessor;
     private ProcessorFragment contentFragmentProcessor;

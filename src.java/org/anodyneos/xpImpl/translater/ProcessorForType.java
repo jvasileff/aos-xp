@@ -4,9 +4,7 @@ import org.anodyneos.commons.xml.sax.ElementProcessor;
 import org.anodyneos.xpImpl.util.CodeWriter;
 import org.anodyneos.xpImpl.util.CoerceUtil;
 import org.anodyneos.xpImpl.util.Util;
-import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 /**
  * This translater supports two modes:
@@ -25,10 +23,8 @@ public abstract class ProcessorForType extends TranslaterProcessorNonResultConte
 
     private String type;
 
-    private Attributes attributes;
-
     //TODO: whitespace handling for type = String
-    private boolean trim = true;
+    //private boolean trim = true;
 
     public ProcessorForType(TranslaterContext ctx, String type) throws SAXException {
         super(ctx);
@@ -63,11 +59,12 @@ public abstract class ProcessorForType extends TranslaterProcessorNonResultConte
         return processorResultContent.getProcessorFor(uri, localName, qName);
     }
 
+    /*
     public void startElement(String uri, String localName, String qName,
             Attributes attributes) throws SAXException {
-
-        this.attributes = new AttributesImpl(attributes);
+        // nothing to do.
     }
+    */
 
     public void characters(char[] ch, int start, int length) throws SAXException {
         if (optimizedMode) {
@@ -107,7 +104,6 @@ public abstract class ProcessorForType extends TranslaterProcessorNonResultConte
                 expr.insert(0, "org.anodyneos.xp.util.XpCoerce.coerceTo" + type + "(");
                 expr.append(")");
             }
-            String dataVariable = getTranslaterContext().getVariableForData();
 
             process(savedXPOutVariable, expr.toString());
 

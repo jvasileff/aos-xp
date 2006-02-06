@@ -4,8 +4,8 @@ import java.util.HashMap;
 
 public class TagLibraryInfo {
     protected String description;
-    protected HashMap tagInfos = new HashMap();
-    protected HashMap functionInfos = new HashMap();
+    protected HashMap<String, TagInfo> tagInfos = new HashMap<String, TagInfo>();
+    protected HashMap<String, FunctionInfo> functionInfos = new HashMap<String, FunctionInfo>();
 
     public TagLibraryInfo(String description, TagInfo[] tagInfos, FunctionInfo[] functionInfos) {
         this.description = description;

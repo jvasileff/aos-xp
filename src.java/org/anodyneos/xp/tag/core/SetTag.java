@@ -90,10 +90,12 @@ public class SetTag extends XpTagSupport {
         } else {
             // must have target and property
             if (target instanceof Map) {
+                @SuppressWarnings({"unchecked"})
+                Map<String, Object> targetMap = (Map<String, Object>) target;
                 if(value == null) {
-                    ((Map) target).remove(property);
+                    targetMap.remove(property);
                 } else {
-                    ((Map) target).put(property, value);
+                    targetMap.put(property, value);
                 }
             } else if (target != null) {
                 // must be a javaBean

@@ -17,10 +17,8 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
     /**
      * Page Context
      */
-    private Map[] scopeMaps = new Map[] { new HashMap(), new HashMap() };
-
-    private Map pageScopeMap = new HashMap();
-    private Map applicationScopeMap = new HashMap();
+    private Map<String, Object> pageScopeMap = new HashMap<String, Object>();
+    private Map<String, Object> applicationScopeMap = new HashMap<String, Object>();
     private VariableResolver variableResolver;
     private ExpressionEvaluator expEval = new ExpressionEvaluatorImpl(false);
 
@@ -91,7 +89,7 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
     }
 
     public Enumeration getAttributeNamesInScope(int scope){
-        Set keys;
+        Set<String> keys;
         switch (scope) {
             case PAGE_SCOPE:
                 keys = pageScopeMap.keySet();
@@ -102,7 +100,7 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
             default:
                 throw new IllegalArgumentException("invalid scope: " + scope);
         }
-        final String[] array = (String[]) keys.toArray(new String[keys.size()]);
+        final String[] array = keys.toArray(new String[keys.size()]);
         return new Enumeration() {
             private int next = 0;
 

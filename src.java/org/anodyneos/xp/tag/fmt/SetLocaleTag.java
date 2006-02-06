@@ -257,7 +257,7 @@ public class SetLocaleTag extends XpTagSupport {
     static {
         Locale[] dateLocales = DateFormat.getAvailableLocales();
         Locale[] numberLocales = NumberFormat.getAvailableLocales();
-        Vector vec = new Vector(dateLocales.length);
+        Vector<Locale> vec = new Vector<Locale>(dateLocales.length);
         for (int i = 0; i < dateLocales.length; i++) {
             for (int j = 0; j < numberLocales.length; j++) {
                 if (dateLocales[i].equals(numberLocales[j])) {
@@ -267,7 +267,7 @@ public class SetLocaleTag extends XpTagSupport {
             }
         }
         availableFormattingLocales = new Locale[vec.size()];
-        availableFormattingLocales = (Locale[]) vec.toArray(availableFormattingLocales);
+        availableFormattingLocales = vec.toArray(availableFormattingLocales);
         /*
          * for (int i=0; i <availableFormattingLocales.length; i++) {
          * System.out.println("AvailableLocale[" + i + "] " +

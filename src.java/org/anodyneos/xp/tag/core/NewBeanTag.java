@@ -15,7 +15,7 @@ public class NewBeanTag extends XpTagSupport {
 
     private String className;
 
-    private String scope;
+    //private String scope;
 
     public void doTag(XpOutput out) throws XpException, ELException {
         try {
@@ -43,7 +43,7 @@ public class NewBeanTag extends XpTagSupport {
      *            The scope to set.
      */
     public void setScope(String scope) {
-        this.scope = scope;
+        //this.scope = scope;
     }
 
     /**

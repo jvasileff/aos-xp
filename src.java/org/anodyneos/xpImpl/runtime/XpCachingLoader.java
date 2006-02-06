@@ -15,7 +15,6 @@ import org.anodyneos.xp.XpTranslationException;
 import org.anodyneos.xpImpl.compiler.JavaCompiler;
 import org.anodyneos.xpImpl.compiler.SunJavaCompiler;
 import org.anodyneos.xpImpl.translater.Translater;
-import org.anodyneos.xpImpl.translater.TranslaterResult;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,8 +31,8 @@ public class XpCachingLoader{
     private UnifiedResolver resolver;
     private boolean autoLoad = true;
 
-    private final Map xpCache =
-        Collections.synchronizedMap(new HashMap());
+    private final Map<String, XpPage> xpCache =
+        Collections.synchronizedMap(new HashMap<String, XpPage>());
     private static XpCachingLoader me = new XpCachingLoader();
 
     private XpCachingLoader(){}
@@ -161,7 +160,7 @@ public class XpCachingLoader{
         if (getResolver() == null){
             throw new IllegalStateException("XpCachingLoader requires resolver to be set.");
         }
-        TranslaterResult result = Translater.translate(getJavaRoot(), xpURI, getXpRegistry(),resolver);
+        Translater.translate(getJavaRoot(), xpURI, getXpRegistry(),resolver);
     }
     public String getClassRoot() {
         return classRoot;

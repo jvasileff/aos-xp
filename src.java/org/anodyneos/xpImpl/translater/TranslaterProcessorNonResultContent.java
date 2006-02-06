@@ -10,8 +10,6 @@ import org.xml.sax.SAXException;
  */
 public class TranslaterProcessorNonResultContent extends TranslaterProcessor {
 
-    private int phantomPrefixCount = 0;
-
     public TranslaterProcessorNonResultContent(TranslaterContext ctx) {
         super(ctx);
     }

@@ -3,8 +3,7 @@ package org.anodyneos.xpImpl.compiler;
 import java.io.OutputStream;
 import java.util.ArrayList;
 
-import sun.tools.javac.Main;
-
+@SuppressWarnings({"deprecation"})
 public class SunJavaCompiler extends JavaCompiler {
 
     public SunJavaCompiler() {
@@ -16,14 +15,14 @@ public class SunJavaCompiler extends JavaCompiler {
 
 
     public boolean compile(String[] files, OutputStream out) {
-        Main compiler = new Main(out, "");
+        sun.tools.javac.Main compiler = new sun.tools.javac.Main(out, "");
         String[] args = getArgs(files);
 
         return compiler.compile(args);
     }
 
     public String[] getArgs(String[] files) {
-        ArrayList args = new ArrayList();
+        ArrayList<String> args = new ArrayList<String>();
 
         // debug
         if(debugSource || debugLines || debugLocalVariables) {
@@ -105,7 +104,7 @@ public class SunJavaCompiler extends JavaCompiler {
             args.add(files[i]);
         }
 
-        return (String[]) args.toArray(new String[args.size()]);
+        return args.toArray(new String[args.size()]);
     }
 
 }

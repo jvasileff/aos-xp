@@ -17,11 +17,11 @@ import java.util.Map;
  */
 public final class CoerceUtil {
 
-    private static final Map typesMap;
-    private static final Map nativeTypesMap;
+    private static final Map<String, String> typesMap;
+    private static final Map<String, String> nativeTypesMap;
 
     static {
-        typesMap = new HashMap();
+        typesMap = new HashMap<String, String>();
         typesMap.put("java.lang.String", "String");
         typesMap.put("java.lang.Boolean", "Boolean");
         typesMap.put("java.lang.Byte", "Byte");
@@ -33,7 +33,7 @@ public final class CoerceUtil {
         typesMap.put("java.lang.Short", "Short");
         typesMap.put("java.lang.Object", "Object");
 
-        nativeTypesMap = new HashMap();
+        nativeTypesMap = new HashMap<String, String>();
         nativeTypesMap.put("boolean", "Boolean");
         nativeTypesMap.put("byte", "Byte");
         nativeTypesMap.put("char", "Character");
@@ -57,12 +57,12 @@ public final class CoerceUtil {
     }
 
     public static String boxClass(String type) {
-        return (String) nativeTypesMap.get(type);
+        return nativeTypesMap.get(type);
     }
 
     public static String simplifyType(String type) {
         if (typesMap.containsKey(type)) {
-            type = (String) typesMap.get(type);
+            type = typesMap.get(type);
         }
         return type;
     }
@@ -70,7 +70,7 @@ public final class CoerceUtil {
     public static String javaExpression(String raw, String type) {
         // normalize type
         if (typesMap.containsKey(type)) {
-            type = (String) typesMap.get(type);
+            type = typesMap.get(type);
         }
 
         raw = raw == null ? "" : raw;
