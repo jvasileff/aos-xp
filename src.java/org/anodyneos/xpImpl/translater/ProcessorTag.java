@@ -69,6 +69,10 @@ public class ProcessorTag extends TranslaterProcessorNonResultContent {
                 CodeWriter out = getTranslaterContext().getCodeWriter();
                 out.printIndent().println(localVarName + ".setXpBody(" + expr + ");");
             }
+            // this won't be called until process() is about to be called.
+            public String getParentTagVarName() {
+                return localVarName;
+            }
         };
     }
 

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<taglib>
+    <description>
+        My Tag Files
+    </description>
+    <tag>
+        <description>Test tag</description>
+        <name>test</name>
+        <tag-file>test.xptag</tag-file>
+        <attribute>
+            <description>String to output</description>
+            <name>val</name>
+            <required>true</required>
+            <request-time-ok>true</request-time-ok>
+        </attribute>
+        <variable>
+            <description>Test return var</description>
+            <name-from-attribute>var</name-from-attribute>
+            <alias>var</alias>
+            <scope>AT_END</scope>
+        </variable>
+    </tag>
+</taglib>

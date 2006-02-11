@@ -38,6 +38,5 @@ public abstract class HttpXpFactory {
     }
 
     public abstract HttpXpContext getHttpXpContext(org.xml.sax.ContentHandler ch);
-    public abstract void releaseHttpXpContext(HttpXpContext xpContext);
 
 }

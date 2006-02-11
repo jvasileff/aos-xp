@@ -17,4 +17,8 @@
         <taglib-uri>http://www.anodyneos.org/xmlns/xpImpl/testTag</taglib-uri>
         <taglib-location>classpath:org/anodyneos/xpImpl/testTag/testTag.xptld</taglib-location>
     </taglib>
+    <taglib>
+        <taglib-uri>http://www.anodyneos.org/xmlns/testTagFile</taglib-uri>
+        <taglib-location>myTagFiles.xptld</taglib-location>
+    </taglib>
 </registry>

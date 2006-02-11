@@ -1,24 +1,19 @@
-package org.anodyneos.xpImpl.standalone;
+package org.anodyneos.xpImpl.runtime;
 
 import org.anodyneos.xp.standalone.StandaloneXpContext;
 import org.anodyneos.xp.standalone.StandaloneXpFactory;
 
-public class StandaloneXpFactoryImpl extends StandaloneXpFactory {
+public class StandaloneXpContextFactoryImpl extends StandaloneXpFactory {
 
     // TODO: pool?
 
-    public StandaloneXpFactoryImpl() {
+    public StandaloneXpContextFactoryImpl() {
         // super();
     }
 
     public StandaloneXpContext getStandaloneXpContext() {
         StandaloneXpContext xpCtx = new StandaloneXpContextImpl();
-        xpCtx.initialize();
         return xpCtx;
-    }
-
-    public void releaseStandaloneXpContext(StandaloneXpContext xpContext) {
-        xpContext.release();
     }
 
 }

@@ -21,7 +21,7 @@
                 />
     <xp:content>
         <xp:newBean var="browser" class="org.anodyneos.servlet.util.BrowserDetector"/>
-        <c:set target="${browser}" property="request" value="${pageContext.request}"/>
+        <c:set target="${browser}" property="request" value="${xpContext.request}"/>
         <html>
             <head/>
             <body>

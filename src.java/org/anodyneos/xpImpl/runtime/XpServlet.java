@@ -40,7 +40,7 @@ import org.anodyneos.xp.XpPage;
 import org.anodyneos.xp.XpTranslationException;
 import org.anodyneos.xp.XpXMLReader;
 import org.anodyneos.xp.http.HttpXpContext;
-import org.anodyneos.xpImpl.http.HttpXpContextImpl;
+import org.anodyneos.xpImpl.runtime.HttpXpContextImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.fop.apps.Driver;
@@ -116,7 +116,7 @@ public class XpServlet extends HttpServlet{
     public void service(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpXpContext xpContext = new HttpXpContextImpl(this,request,response);
+        HttpXpContext xpContext = new HttpXpContextImpl();
         try{
 
             // TODO kinda redundant to construct and initialize with same parms
@@ -224,15 +224,12 @@ public class XpServlet extends HttpServlet{
 
             e.printStackTrace();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             if (logger.isInfoEnabled()) {
                 logger.info("XpServlet.service - " + e.getMessage(),e);
             }
             throw new ServletException(e);
-        }finally{
-            xpContext.release();
         }
-
 
     }
 

@@ -1,7 +1,7 @@
 package org.anodyneos.xp.standalone;
 
 public abstract class StandaloneXpFactory {
-    private static final String DEFAULT_FACTORY = "org.anodyneos.xpImpl.standalone.StandaloneXpFactoryImpl";
+    private static final String DEFAULT_FACTORY = "org.anodyneos.xpImpl.runtime.StandaloneXpContextFactoryImpl";
 
     public static StandaloneXpFactory getDefaultFactory() {
         ClassLoader cl1 = Thread.currentThread().getContextClassLoader();
@@ -38,6 +38,5 @@ public abstract class StandaloneXpFactory {
     }
 
     public abstract StandaloneXpContext getStandaloneXpContext();
-    public abstract void releaseStandaloneXpContext(StandaloneXpContext xpContext);
 
 }

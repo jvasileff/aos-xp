@@ -1,6 +1,7 @@
 package org.anodyneos.xp;
 
 import java.util.Enumeration;
+import java.util.Map;
 
 import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.el.VariableResolver;
@@ -12,9 +13,6 @@ public interface XpContext {
 
     public static final String PAGE_SCOPE_STRING = "page";
     public static final String APPLICATION_SCOPE_STRING = "application";
-
-    //void initialize();
-    void release();
 
     Object getAttribute(String name);
     Object getAttribute(String name, int scope);
@@ -37,4 +35,7 @@ public interface XpContext {
     String resolveScope(int scope);
 
     int[] getScopes();
+
+    Map<String, Object> getScopeAsMap(int scope);
+
 }

@@ -135,19 +135,33 @@ public abstract class ProcessorFragment extends TranslaterProcessorNonResultCont
         // we need to create the FragmentHelper here to make sure it appears between
         // push and pop phantom prefix mappings in the code.  This is because endPrefixMapping
         // is called after endElement.
-        String parentTagVar = "xpTagParent";
         String origXpChVar = "xpCH";
         if (! getTranslaterContext().inFragment()) {
             // for the root fragment there is no parentTag and the contentHandler has no initial
             // namespace mappings.
-            parentTagVar = "null";
             origXpChVar = "null";
         }
 
         process("new FragmentHelper("
-                + fragmentId + ", xpContext, " + parentTagVar + ", " + origXpChVar + ")");
+                + fragmentId + ", xpContext, " + getParentTagVarName() + ", " + origXpChVar + ")");
 
         state = State.FINISHED;
+    }
+
+    /**
+     * ProcessorTag will want to override this method to make sure the
+     * parent is set to the new tag being processed.  This method will not
+     * be called until just before process()
+     *
+     * @return the parent tag variable name to use for the new FragmentHelper
+     */
+    protected String getParentTagVarName() {
+        if (! getTranslaterContext().inFragment()) {
+            // for the root fragment there is no parentTag
+            return "null";
+        } else {
+            return "xpTagParent";
+        }
     }
 
     public abstract void process(String expr) throws SAXException;

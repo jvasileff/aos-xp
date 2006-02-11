@@ -239,6 +239,7 @@ class ProcessorPage extends TranslaterProcessor {
             out.indentPlus();
             out.printIndent().println("this.fragNum = fragNum;");
             out.printIndent().println("this.xpContext = xpContext;");
+            out.printIndent().println("this.xpTagParent = xpTagParent;");
             out.printIndent().println("this.origXpCH = origXpCH;");
             out.printIndent().println("if (null != origXpCH) {");
             out.indentPlus();
