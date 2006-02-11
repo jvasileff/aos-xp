@@ -2,7 +2,6 @@ package org.anodyneos.xpImpl.runtime;
 
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.jsp.el.ExpressionEvaluator;
@@ -17,9 +16,6 @@ public abstract class XpContextA implements XpContext {
     public abstract int[] getScopes();
     public abstract int resolveScope(String scope);
     public abstract String resolveScope(int scope);
-
-    public abstract XpContext wrap(List<String> nestedVars, List<String> atBeginVars,
-            List<String> atEndVar, Map<String, String> aliases);
 
     public final Object findAttribute(String name) {
         int[] scopes = getScopes();

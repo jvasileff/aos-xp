@@ -10,7 +10,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.http.HttpXpContext;
 
 public class HttpXpContextWrapper extends XpContextWrapperA implements HttpXpContext {
@@ -22,12 +21,6 @@ public class HttpXpContextWrapper extends XpContextWrapperA implements HttpXpCon
             Map<String, String> aliases) {
         super(wrappedContext, nestedVars, atBeginVars, atEndVar, aliases);
         this.wrappedContext = wrappedContext;
-    }
-
-    @Override
-    public XpContext wrap(List<String> nestedVars, List<String> atBeginVars, List<String> atEndVars,
-            Map<String, String> aliases) {
-        return new HttpXpContextWrapper(this, nestedVars, atBeginVars, atEndVars, aliases);
     }
 
     public ServletRequest getRequest() {

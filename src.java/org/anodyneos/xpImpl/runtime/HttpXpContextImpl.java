@@ -19,18 +19,10 @@ import javax.servlet.jsp.el.ELException;
 import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.el.VariableResolver;
 
-import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.http.HttpXpContext;
 import org.apache.commons.el.ExpressionEvaluatorImpl;
 
 public class HttpXpContextImpl extends XpContextA implements HttpXpContext, VariableResolver {
-
-    public HttpXpContextImpl(Servlet iServlet, ServletRequest iServletRequest,
-            ServletResponse iServletResponse) {
-        this.servlet = iServlet;
-        this.servletRequest = iServletRequest;
-        this.servletResponse = iServletResponse;
-    }
 
     private ExpressionEvaluator expressionEvaluator = new ExpressionEvaluatorImpl(false);
 
@@ -49,6 +41,14 @@ public class HttpXpContextImpl extends XpContextA implements HttpXpContext, Vari
     private Map<String, String[]> headerValuesMap;
     private Map<String, String> initParamMap;
     private Map<String, Cookie> cookieMap;
+
+    HttpXpContextImpl(Servlet iServlet, ServletRequest iServletRequest,
+            ServletResponse iServletResponse) {
+        this.servlet = iServlet;
+        this.servletRequest = iServletRequest;
+        this.servletResponse = iServletResponse;
+    }
+
 
     @Override
     public Map<String, Object> getScopeAsMap(int scope) {
@@ -105,13 +105,6 @@ public class HttpXpContextImpl extends XpContextA implements HttpXpContext, Vari
         default:
             throw new IllegalArgumentException("Illegal Scope: " + scope);
         }
-    }
-
-    @Override
-    public XpContext wrap(List<String> nestedVars, List<String> atBeginVars, List<String> atEndVar,
-            Map<String, String> aliases) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

@@ -1,14 +1,12 @@
 package org.anodyneos.xpImpl.runtime;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.jsp.el.ELException;
 import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.el.VariableResolver;
 
-import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.standalone.StandaloneXpContext;
 import org.apache.commons.el.ExpressionEvaluatorImpl;
 
@@ -19,9 +17,7 @@ public class StandaloneXpContextImpl extends XpContextA implements StandaloneXpC
     private Map<String, Object> pageScopeMap = new HashMap<String, Object>();
     private Map<String, Object> applicationScopeMap = new HashMap<String, Object>();
 
-    public XpContext wrap(List<String> nestedVars, List<String> atBeginVars,
-            List<String> atEndVar, Map<String, String> aliases) {
-        return new StandaloneXpContextWrapper(this, nestedVars, atBeginVars, atEndVar, aliases);
+    StandaloneXpContextImpl() {
     }
 
     @Override

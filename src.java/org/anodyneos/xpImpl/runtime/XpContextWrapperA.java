@@ -11,6 +11,8 @@ import javax.servlet.jsp.el.VariableResolver;
 import javax.servlet.jsp.tagext.VariableInfo;
 
 import org.anodyneos.xp.XpContext;
+import org.anodyneos.xp.http.HttpXpContext;
+import org.anodyneos.xp.standalone.StandaloneXpContext;
 
 /**
  * Portions adapted from Apache Jakarta Commons EL "JspContextWrapper.java"
@@ -174,10 +176,6 @@ public abstract class XpContextWrapperA extends XpContextA implements XpContext,
     }
 
     @Override
-    public abstract XpContext wrap(List<String> nestedVars, List<String> atBeginVars,
-            List<String> atEndVar, Map<String, String> aliases);
-
-    @Override
     public final int[] getScopes() {
         return wrappedContext.getScopes();
     }
@@ -208,6 +206,17 @@ public abstract class XpContextWrapperA extends XpContextA implements XpContext,
 
     public final VariableResolver getVariableResolver() {
         return this;
+    }
+
+    public static final XpContext wrap(XpContext ctx,  List<String> nestedVars,
+            List<String> atBeginVars, List<String> atEndVars, Map<String, String> aliases) {
+        if (ctx instanceof HttpXpContext) {
+            return new HttpXpContextWrapper((HttpXpContext) ctx, nestedVars, atBeginVars, atEndVars, aliases);
+        } else if (ctx instanceof StandaloneXpContext) {
+            return new StandaloneXpContextWrapper((StandaloneXpContext) ctx, nestedVars, atBeginVars, atEndVars, aliases);
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
 }
