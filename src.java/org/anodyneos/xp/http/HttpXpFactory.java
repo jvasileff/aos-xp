@@ -1,7 +1,15 @@
 package org.anodyneos.xp.http;
 
+import javax.servlet.Servlet;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
 public abstract class HttpXpFactory {
-    private static final String DEFAULT_FACTORY = "org.anodyneos.xpImpl.http.HttpXpFactoryImpl";
+    private static final String DEFAULT_FACTORY = "org.anodyneos.xpImpl.runtime.HttpXpFactoryImpl";
+
+    protected HttpXpFactory() {
+        // super();
+    }
 
     public static HttpXpFactory getDefaultFactory() {
         ClassLoader cl1 = Thread.currentThread().getContextClassLoader();
@@ -37,6 +45,7 @@ public abstract class HttpXpFactory {
         }
     }
 
-    public abstract HttpXpContext getHttpXpContext(org.xml.sax.ContentHandler ch);
+    public abstract HttpXpContext getHttpXpContext(Servlet iServlet, ServletRequest iServletRequest,
+            ServletResponse iServletResponse);
 
 }

@@ -25,6 +25,13 @@ import org.apache.commons.el.ExpressionEvaluatorImpl;
 
 public class HttpXpContextImpl extends XpContextA implements HttpXpContext, VariableResolver {
 
+    public HttpXpContextImpl(Servlet iServlet, ServletRequest iServletRequest,
+            ServletResponse iServletResponse) {
+        this.servlet = iServlet;
+        this.servletRequest = iServletRequest;
+        this.servletResponse = iServletResponse;
+    }
+
     private ExpressionEvaluator expressionEvaluator = new ExpressionEvaluatorImpl(false);
 
     private Servlet servlet;
@@ -130,13 +137,6 @@ public class HttpXpContextImpl extends XpContextA implements HttpXpContext, Vari
 
     public HttpSession getSession() {
         return ((HttpServletRequest)servletRequest).getSession();
-    }
-
-    public void initialize(Servlet iServlet, ServletRequest iServletRequest,
-            ServletResponse iServletResponse) {
-        this.servlet = iServlet;
-        this.servletRequest = iServletRequest;
-        this.servletResponse = iServletResponse;
     }
 
     private Map<String, Object> getRequestScopeMap() {

@@ -40,7 +40,7 @@ import org.anodyneos.xp.XpPage;
 import org.anodyneos.xp.XpTranslationException;
 import org.anodyneos.xp.XpXMLReader;
 import org.anodyneos.xp.http.HttpXpContext;
-import org.anodyneos.xpImpl.runtime.HttpXpContextImpl;
+import org.anodyneos.xp.http.HttpXpFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.fop.apps.Driver;
@@ -116,14 +116,9 @@ public class XpServlet extends HttpServlet{
     public void service(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpXpContext xpContext = new HttpXpContextImpl();
         try{
 
-            // TODO kinda redundant to construct and initialize with same parms
-            // when the only difference is the "inititialize" method has just one extra instantiation in it
-            // ** (jv) Actually, constructor should not be called, use factory instead.  When done, return to
-            // factory for cleanup.
-            xpContext.initialize(this,request,response);
+            HttpXpContext xpContext = HttpXpFactory.getDefaultFactory().getHttpXpContext(this, request, response);
 
             XpPage xpPage = getXpPage(getXpURIFromRequest(request.getServletPath()));
             if (xpPage == null){
