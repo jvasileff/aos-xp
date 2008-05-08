@@ -43,6 +43,7 @@
         <include name="**/*.gif"/>
         <include name="**/*.htm"/>
         <include name="**/*.html"/>
+        <include name="**/*.xhtml"/>
         <include name="**/*.jpg"/>
         <include name="**/*.js"/>
         <include name="**/*.jsp"/>
@@ -240,13 +241,14 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <target name="refreshWebapp.common" depends="prepare, cleanContext">
         <!-- build context.xml -->
-        <style  in="${dir.src.misc}/dummy.xml"
+        <xslt   in="${dir.src.misc}/dummy.xml"
                 out="${file.build.context}"
                 style="${dir.src.misc}/context.xsl">
             <param name="dir.build.webapp" expression="${dir.build.webapp}"/>
             <param name="webapp.context" expression="${webapp.context}"/>
             <param name="webapp.reloadable" expression="${webapp.reloadable}"/>
-        </style>
+        </xslt>
+
         <!-- webapp -->
         <copy toDir="${dir.build.webapp}">
             <fileset dir="${dir.src.webapp}">
