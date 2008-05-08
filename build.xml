@@ -16,6 +16,9 @@
 
     <property file="build.properties"/>
 
+    <property name="compile.source" value="1.4"/>
+    <property name="compile.target" value="1.4"/>
+
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  common
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -48,20 +51,30 @@
     <property name="standard.jar" location="${dir.jars}/jakarta-taglibs-standard-1.1.2/standard.jar"/>
 
     <property name="ant.jar" location="${dir.jars}/apache-ant-1.6.1/ant.jar"/>
-    <property name="bsf.jar" location="${dir.jars}/ibm-bsf-2.2/bsf.jar"/>
+
+    <property name="bsf.jar" location="${dir.jars}/bsf-2.4.0/bsf.jar"/>
+
     <property name="commons-el.jar" location="${dir.jars}/commons-el-1.0/commons-el.jar"/>
     <property name="jsp-api.jar" location="${dir.jars}/jsp-api-2.0/jsp-api.jar"/>
-    <property name="junit.jar" location="${dir.jars}/junit-3.8.1/junit.jar"/>
-    <property name="tools.jar" location="${env.JAVA_HOME}/lib/tools.jar"/>
+    <property name="junit-4.4.jar" location="${dir.jars}/junit-4.4/junit-4.4.jar"/>
 
-    <property name="servlet.jar" location="${dir.jars}/servlet-api-2.2/servlet.jar"/>
-    <property name="xml-apis.jar" location="${dir.jars}/xerces-2.6.0/xml-apis.jar"/>
-    <property name="xalan.jar" location="${dir.jars}/xalan-2.6.2/xalan.jar"/>
-    <property name="xercesImpl.jar" location="${dir.jars}/xerces-2.6.0/xercesImpl.jar"/>
+    <property name="servlet-api.jar" location="${dir.jars}/servlet-api-2.4/servlet-api.jar"/>
 
-    <property name="commons-logging.jar" location="${dir.jars}/commons-logging-1.0.3/commons-logging.jar"/>
-    <property name="log4j-1.2.8.jar" location="${dir.jars}/jakarta-log4j-1.2.8/log4j-1.2.8.jar"/>
+    <property name="xml-apis.jar" location="${dir.jars}/xalan-2.7.1/xml-apis.jar"/>
+    <property name="xalan.jar" location="${dir.jars}/xalan-2.7.1/xalan.jar"/>
+    <property name="xercesImpl.jar" location="${dir.jars}/xalan-2.7.1/xercesImpl.jar"/>
+    <property name="serializer.jar" location="${dir.jars}/xalan-2.7.1/serializer.jar"/>
+    <property name="xsltc.jar" location="${dir.jars}/xalan-2.7.1/xsltc.jar"/>
+
+    <property name="commons-logging-1.1.1.jar" location="${dir.jars}/commons-logging-1.1.1/commons-logging-1.1.1.jar"/>
+    <property name="log4j-1.2.15.jar" location="${dir.jars}/apache-log4j-1.2.15/log4j-1.2.15.jar"/>
+
     <property name="commons-collections-2.1.1.jar" location="${dir.jars}/commons-collections-2.1.1/commons-collections-2.1.1.jar"/>
+
+    <available property="tools.jar" value="${env.JAVA_HOME}/lib/tools.jar" file="${env.JAVA_HOME}/lib/tools.jar"/>
+    <path id="path.tools.jar">
+        <fileset id="fs.tools.jar" file="${tools.jar}"/>
+    </path>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  prepare.post
@@ -87,17 +100,20 @@
         <copy toDir="${dir.build.ide.lib}" file="${bsf.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${commons-el.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${jsp-api.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${junit.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${servlet.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${tools.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${junit-4.4.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${servlet-api.jar}"/>
 
         <copy toDir="${dir.build.ide.lib}" file="${xml-apis.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${xalan.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${xercesImpl.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${serializer.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${xsltc.jar}"/>
 
-        <copy toDir="${dir.build.ide.lib}" file="${commons-logging.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${log4j-1.2.8.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${commons-logging-1.1.1.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${log4j-1.2.15.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${commons-collections-2.1.1.jar}"/>
+
+        <copy toDir="${dir.build.ide.lib}"><fileset refid="fs.tools.jar"/></copy>
 
         <!-- paths -->
         <path id="path.compile">
@@ -108,7 +124,8 @@
 
         <fileset id="fs.jars" dir="${dir.build.ide.lib}">
             <include name="*.jar"/>
-            <exclude name="servlet.jar"/>
+            <exclude name="tools.jar"/>
+            <exclude name="servlet-api.jar"/>
             <exclude name="jsp-api.jar"/>
         </fileset>
     </target>

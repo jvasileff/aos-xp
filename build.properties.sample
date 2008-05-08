@@ -1,6 +1,5 @@
 # TOMCAT
-#catalina.home:/opt/zeus/repository/build/jakarta-tomcat-5.0.19
-catalina.home:/opt/zeus/repository/build/jakarta-tomcat-5.5.7
+catalina.home:/opt/repository-aos/build/apache-tomcat-5.5.25
 catalina.username: admin
 catalina.password: admin
 catalina.url.manager: http://localhost:8080/manager
@@ -16,16 +15,15 @@ webapp.reloadable: false
 transformerFactory: xalan
 #transformerFactory: xsltc
 
-
 ################################################################################
 ##
-## EXTERNAL JAR FILES; ONE OF THE FOLLOWING SECTIONS IS NECESSARY:
+## EXTERNAL JAR FILES
 ##
 ################################################################################
 
 ## ALL JARS FROM REPOSITORY:
-dir.jars:/opt/zeus/repository/jars
-dir.jars.notfree:/opt/zeus/repository/jars.notfree
+dir.jars:/opt/repository-aos/jars
+dir.jars.notfree:/opt/repository-aos/jars.notfree
 
 ## JARS SPECIFIED INDIVIDUALLY:
 anodyneos-commons.jar=../anodyneos-commons/build/jar/anodyneos-commons.jar
