@@ -35,11 +35,10 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  required jars
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <!--
-        ALSO NEED:
-            anodyneos-servlet.jar
-            anodyneos-commons.jar
-    -->
+
+    <!-- aos deps -->
+    <property name="anodyneos-commons.jar" location="${dir.jars}/anodyneos-commons-rel-00.03/anodyneos-commons.jar"/>
+    <property name="anodyneos-servlet.jar" location="${dir.jars}/anodyneos-servlet-rel-00.05/anodyneos-servlet.jar"/>
 
     <!-- for fop -->
     <property name="fop.jar" location="${dir.jars}/apache-fop-0.20.5/fop.jar"/>
