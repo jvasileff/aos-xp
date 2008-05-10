@@ -127,7 +127,8 @@ public class XpServlet extends HttpServlet{
             // factory for cleanup.
             xpContext.initialize(this,request,response);
 
-            XpPage xpPage = getXpPage(getXpURIFromRequest(request.getServletPath()));
+            org.anodyneos.commons.net.URI xpURI = getXpURIFromRequest(request.getServletPath());
+            XpPage xpPage = getXpPage(xpURI);
             if (xpPage == null){
 //                  TODO replace with smarter error page
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -148,7 +149,10 @@ public class XpServlet extends HttpServlet{
                     transformer = templatesCache.getTransformer();
                 } else {
                     org.anodyneos.commons.net.URI xslURI;
-                    xslURI = new org.anodyneos.commons.net.URI(xsltPath);
+                    xslURI = new org.anodyneos.commons.net.URI(xpURI, xsltPath);
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("Using xslURI: " + xslURI);
+                    }
                     transformer = templatesCache.getTransformer(xslURI);
                 }
                 response.setContentType("application/pdf");
@@ -184,7 +188,10 @@ public class XpServlet extends HttpServlet{
             } else {
                 try {
                     org.anodyneos.commons.net.URI xslURI;
-                    xslURI = new org.anodyneos.commons.net.URI(xsltPath);
+                    xslURI = new org.anodyneos.commons.net.URI(xpURI, xsltPath);
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("Using xslURI: " + xslURI);
+                    }
 
                     transformer = templatesCache.getTransformer(xslURI);
                     setTransformerProp( transformer, OutputKeys.ENCODING
