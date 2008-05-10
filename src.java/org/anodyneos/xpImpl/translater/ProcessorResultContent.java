@@ -26,6 +26,7 @@ public class ProcessorResultContent extends TranslaterProcessor {
     public static final String E_REMOVE = "remove";
     public static final String E_NEW_BEAN = "newBean";
     public static final String E_INCLUDE = "include";
+    public static final String E_TEXT = "text";
 
     public ProcessorResultContent(TranslaterContext ctx) {
         super(ctx);
@@ -51,6 +52,8 @@ public class ProcessorResultContent extends TranslaterProcessor {
                 return new ProcessorXPTagNewBean(getTranslaterContext());
             } else if (E_INCLUDE.equals(localName)) {
                 return new ProcessorXPTagInclude(getTranslaterContext());
+            } else if (E_TEXT.equals(localName)) {
+                return new ProcessorXPTagText(getTranslaterContext());
             } else {
                 return super.getProcessorFor(uri, localName, qName);
             }
@@ -121,9 +124,10 @@ public class ProcessorResultContent extends TranslaterProcessor {
         CodeWriter out = getTranslaterContext().getCodeWriter();
         if (sb != null) {
             String s = sb.toString();
-            // TODO: what about strip-space? Is this what we want? Configurable?
-            s = s.trim();
-            if (!"".equals(s)) { // don't output if only whitespace
+            // Handle whitespace similar to XSLT stylesheets:
+            //  - discard text nodes that have only whitespace
+            //  - keep text nodes that have whitespace and non-whitespace
+            if (s.trim().length() > 0) { // don't output if only whitespace
                 Util.outputCharactersCode(s, out);
             }
             sb = null;

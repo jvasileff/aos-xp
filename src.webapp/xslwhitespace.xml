@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="xslwhitespace.xsl"?>
+
+<html   xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:aostest="http://www.anodyneos.org/aostest">
+    <h1>Testing 6..</h1>
+    <p>
+        This is an example paragraph with <b>bold</b> text.
+    </p>
+    <aostest:somecontent/>
+
+
+    <p>
+        This is a test with a <b>bold</b> word.
+    </p>
+    <p>
+        This is a test with <b>bold</b> <i>italic</i> words.
+    </p>
+    <p>
+        <b>This is all bold.</b>
+    </p>
+    <p>
+        <b>
+            <i>Bold and italic.</i>
+        </b>
+    </p>
+    <p>Indent test <a href="."><b>test bold</b></a></p>
+
+    <p>
+        Test whitespace in attributes: <a href="." title="  whitespace  ">some link</a>
+    </p>
+    <p>
+        Test whitespace in attributes: <a href="." title="nowhitespace">some link</a>
+    </p>
+</html>

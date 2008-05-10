@@ -23,4 +23,67 @@
         <url-pattern>*.xp</url-pattern>
     </servlet-mapping>
 
+    <!-- XSLT Servlet (ServletContext) -->
+    <servlet>
+        <servlet-name>XSLTServletServletContext</servlet-name>
+        <servlet-class>org.anodyneos.servlet.xsl.XSLTServlet</servlet-class>
+        <init-param>
+            <param-name>xhtml.magic</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>resolver.externalLookups</param-name>
+            <param-value>false</param-value>
+            <description>
+                Specifies whether or not the resolver should try to locate XML
+                entities that exist outside of the webapp and classloader.
+                This affects xsl:import and xsl:include within XSL files.  It
+                also applies to document() calls made during stylesheet
+                processing.
+            </description>
+        </init-param>
+        <init-param>
+            <param-name>resolver.useCatalog</param-name>
+            <param-value>false</param-value>
+            <description>
+                If true, the resolver will try to find XML entities using an
+                XML catalog PRIOR to searching the webapp and classloader.  If
+                set, the catalog will be initialized with the
+                CatalogManager.properties found on the classpath.  This feature
+                uses
+                http://xml.apache.org/commons/components/resolver/index.html.
+            </description>
+        </init-param>
+        <init-param>
+            <param-name>template.cache</param-name>
+            <param-value>false</param-value>
+            <description>
+                Specifies wether or not to cache templates.
+            </description>
+        </init-param>
+        <init-param>
+            <param-name>input.validation</param-name>
+            <param-value>false</param-value>
+            <description>
+                Specifies wether or not to enable validation on the xml parser
+                (boolean) for source XML documents.
+            </description>
+        </init-param>
+        <init-param>
+            <param-name>output.validation</param-name>
+            <param-value>false</param-value>
+            <description>
+                Specifies wether or not to perform validation on the result
+                before serving to the user.  NOTE: SETTING TO TRUE CAUSES
+                SIGNIFICANT PERFORMANCE DEGREDATION AS THE OUTPUT MUST BE
+                STORED IN MEMORY AND PARSED.
+            </description>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>XSLTServletServletContext</servlet-name>
+        <url-pattern>*.xml</url-pattern>
+    </servlet-mapping>
+
 </web-app>

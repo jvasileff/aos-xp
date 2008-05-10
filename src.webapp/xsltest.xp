@@ -21,7 +21,12 @@
                 excludeResultPrefixes="xp xpext fmt c"
                 />
     <xp:content>
-        <h1>Testing 6..</h1>
+        <html>
+            <h1>Testing 6..</h1>
+            <p>
+                This is an example paragraph with <b>bold</b> text.
+            </p>
+        </html>
     </xp:content>
 
 </xp:page>

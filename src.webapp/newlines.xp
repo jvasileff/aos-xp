@@ -11,7 +11,7 @@
     xmlns:c="http://www.anodyneos.org/xmlns/xp/core"
     xmlns="http://www.w3.org/1999/xhtml"
 >
-    <xp:output  indent="yes"
+    <xp:output  indent="no"
                 indentAmount="2"
                 mediaType="application/xhtml+xml"
                 encoding="us-ascii"
@@ -68,6 +68,42 @@
                     was provided as output content it was normalized.  myvar on
                     the other hand was set using the <code>value</code>
                     attribute thereby skipping the normalize step.
+                </p>
+                <p>
+                    Test whitespace <b>bold</b> <i>italics</i>
+                </p>
+                <p>
+                    Test whitespace <b>bold</b>&nbsp;<i>italics</i>
+                </p>
+                <p>
+                    Test whitespace <b>bold</b>&#x20;<i>italics</i>
+                </p>
+                <p>
+                    Test whitespace <b>bold</b><xp:text> </xp:text><i>italics</i>
+                </p>
+                <p>
+                    Test whitespace <b>bold</b><xp:text>  some text with 2spaces  </xp:text><i>italics</i>
+                </p>
+                <p>
+                    Test whitespace in attributes: <a href="." title="  whitespace  ">some link</a>
+                </p>
+                <p>
+                    Test whitespace in attributes: <a href="." title="nowhitespace">some link</a>
+                </p>
+                <p>
+                    Test whitespace in xp attributes: <a href="."><xp:attribute name="title" value="  whitespace  "/>some link</a>
+                </p>
+                <p>
+                    Test whitespace in xp attributes: <a href="."><xp:attribute name="title" value="nowhitespace"/>some link</a>
+                </p>
+                <p>
+                    Test whitespace in xp attributes2: <a href="."><xp:attribute name="title">  whitespace  </xp:attribute>some link</a>
+                </p>
+                <p>
+                    Test whitespace in xp attributes2: <a href="."><xp:attribute name="title">nowhitespace</xp:attribute>some link</a>
+                </p>
+                <p>
+                    Test whitespace in xp attributes3tag: <a href="."><xp:attribute name="title"><xp:text>  spaces  </xp:text></xp:attribute>some link</a>
                 </p>
             </body>
         </html>

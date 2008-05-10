@@ -139,8 +139,10 @@ class ProcessorAttribute extends TranslaterProcessor {
         if (optimizedMode) {
             if (sb != null) {
                 String value = sb.toString();
-                // TODO: what about strip-space? Is this what we want? Configurable?
-                value = value.trim();
+                // Based on xsl tests, whitespace should be preserved (unless there is only whitespace)
+                if (value.trim().length() == 0) {
+                    value = "";
+                }
                 if(Util.hasEL(value)) {
                     // EL expression may exist.  Process all unescaped expressions, concatinate, etc...
                     codeValue = Util.elExpressionCode(value, "String");
@@ -152,13 +154,14 @@ class ProcessorAttribute extends TranslaterProcessor {
                 codeValue = Util.escapeStringQuoted("");
             }
             out.printIndent().println(
-                  "xpCH.addAttribute("
-                +       codeURI
-                + "," + codeName
-                + "," + codeValue
-                + ");"
+                    "xpCH.addAttribute("
+                    +       codeURI
+                    + "," + codeName
+                    + "," + codeValue
+                    + ");"
             );
         } else {
+            // per xsl:attribute whitespace tests, don't trim
             processorResultContent.flushCharacters();
             out.printIndent().println(
                   savedXPOutVariable + ".addAttribute("
