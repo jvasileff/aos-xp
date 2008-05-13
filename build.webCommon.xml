@@ -10,7 +10,6 @@
 
     <!-- setup -->
     <property name="build.sysclasspath"         value="ignore"/>
-    <property name="file.depCache"              location="build/ant_depcache"/>
 
     <!-- properties -->
     <property name="dir.src.java"               location="src.java"/>
@@ -24,6 +23,7 @@
     <property name="dir.build.ide.src"          location="${dir.build}/ide.src"/>
     <property name="file.jar"                   location="${dir.build.jar}/${ant.project.name}.jar"/>
     <property name="file.src.zip"               location="${dir.build.jar}/${ant.project.name}-src.zip"/>
+    <property name="file.depCache"              location="${dir.build}/ant_depcache"/>
 
     <!-- webapp properties -->
     <property name="dir.src.misc"               location="src.misc"/>
@@ -135,7 +135,9 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
     <target name="clean" description="Clean from previous builds">
-        <delete dir="${dir.build}"/>
+        <delete includeEmptyDirs="true">
+            <fileset dir="${dir.build}" includes="**/*" defaultexcludes="false"/>
+        </delete>
     </target>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
