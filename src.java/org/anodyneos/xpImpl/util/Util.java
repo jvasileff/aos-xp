@@ -181,7 +181,7 @@ public class Util {
                         + escapeStringQuoted(parts[0].part)
                         + ", " + boxClass + ".class"
                         + ", varResolver"
-                        + ", null))");
+                        + ", fResolver.getFunctionMapper(xpCH)))");
                 // for boolean, byte, char, double, int, float, long, short
                 expr.append("." + type + "Value()");
                 return expr.toString();
@@ -201,7 +201,7 @@ public class Util {
                         + escapeStringQuoted(parts[i].part)
                         + ", String.class"
                         + ", varResolver"
-                        + ", null)");
+                        + ", fResolver.getFunctionMapper(xpCH))");
                 }
             }
             if("String".equals(type) || "Object".equals(type)) { // multiple parts, String
