@@ -57,6 +57,14 @@ public class XpServlet extends HttpServlet{
 
     private static final long serialVersionUID = 3258132440416794419L;
 
+    private static final String IP_XHTML_TO_HTML = "xhtmlToHtml";
+    private static final String IP_XP_XSLT_CACHE = "xsltCache";
+    private static final String IP_TRUE = "true";
+    private static final String IP_FALSE = "false";
+    private static final String IP_ALWAYS = "always";
+    private static final String IP_NEVER = "never";
+    private static final String IP_AUTO = "auto";
+
     public static final String TMP_DIR = "javax.servlet.context.tempdir";
 
     private static final String XP_REGISTRY="xpRegistry";
@@ -65,6 +73,8 @@ public class XpServlet extends HttpServlet{
     private XpCachingLoader cache = XpCachingLoader.getLoader();
 
     private TemplatesCache templatesCache;
+
+    private String xhtmlToHtml = IP_AUTO;
 
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
@@ -105,14 +115,28 @@ public class XpServlet extends HttpServlet{
         cache.setResolver(resolver);
 
         //////////////////////////////////////////
-        // XSLT Cache setup
+        // INIT PARAM SETUP
         //////////////////////////////////////////
-        // Setup Stylesheet Factory
-        // TODO: help garbage collector (servlet reloading)???
-        String xslCacheSetting = (String) servletConfig.getInitParameter("XP_XSLT_CACHE");
-        boolean enableCache = ! "FALSE".equalsIgnoreCase(xslCacheSetting); // default true
+        boolean xsltCache = true; // default
+        if (IP_FALSE.equalsIgnoreCase(servletConfig.getInitParameter(IP_XP_XSLT_CACHE))) {
+            xsltCache = false;
+        }
         templatesCache = new TemplatesCache(resolver);
-        templatesCache.setCacheEnabled(enableCache);
+        templatesCache.setCacheEnabled(xsltCache);
+
+
+        if (IP_ALWAYS.equalsIgnoreCase(servletConfig.getInitParameter(IP_XHTML_TO_HTML))) {
+            xhtmlToHtml = IP_ALWAYS;
+        } else if (IP_NEVER.equalsIgnoreCase(servletConfig.getInitParameter(IP_XHTML_TO_HTML))) {
+            xhtmlToHtml = IP_NEVER;
+        } else if (IP_AUTO.equalsIgnoreCase(servletConfig.getInitParameter(IP_XHTML_TO_HTML))) {
+            xhtmlToHtml = IP_AUTO;
+        }
+
+        if (logger.isInfoEnabled()) {
+            logger.info("xhtmlToHtml=" + xhtmlToHtml);
+            logger.info("xsltCache=" + xsltCache);
+        }
     }
 
     public void service(HttpServletRequest request, HttpServletResponse response)
@@ -177,7 +201,7 @@ public class XpServlet extends HttpServlet{
                         ,xpOutputProperties.getProperty(XpOutputKeys.ENCODING));
                 setTransformerProp( transformer, OutputKeys.INDENT
                         ,xpOutputProperties.getProperty(XpOutputKeys.INDENT));
-                setTransformerProp( transformer, "{http://xml.apache.org/xslt}indent-amount"
+                setTransformerProp( transformer, "{http://xml.apache.org/xalan}indent-amount"
                         ,xpOutputProperties.getProperty(XpOutputKeys.INDENT_AMOUNT));
                 setTransformerProp( transformer, OutputKeys.MEDIA_TYPE
                         ,xpOutputProperties.getProperty(XpOutputKeys.MEDIA_TYPE));
@@ -198,7 +222,7 @@ public class XpServlet extends HttpServlet{
                             ,xpOutputProperties.getProperty(XpOutputKeys.ENCODING));
                     setTransformerProp( transformer, OutputKeys.INDENT
                             ,xpOutputProperties.getProperty(XpOutputKeys.INDENT));
-                    setTransformerProp( transformer, "{http://xml.apache.org/xslt}indent-amount"
+                    setTransformerProp( transformer, "{http://xml.apache.org/xalan}indent-amount"
                             ,xpOutputProperties.getProperty(XpOutputKeys.INDENT_AMOUNT));
                     setTransformerProp( transformer, OutputKeys.OMIT_XML_DECLARATION
                             ,xpOutputProperties.getProperty(XpOutputKeys.OMIT_XML_DECLARATION));
@@ -312,33 +336,37 @@ public class XpServlet extends HttpServlet{
                 transformer);
     }
 
-    public void output(HttpServletRequest req, HttpServletResponse res,
-            Source source, Transformer transformer) throws IOException {
+    public void output(HttpServletRequest req, HttpServletResponse res, Source source, Transformer transformer)
+    throws IOException {
         try {
             String method = transformer.getOutputProperty(OutputKeys.METHOD);
-            String mediaType = transformer
-                    .getOutputProperty(OutputKeys.MEDIA_TYPE);
+            String mediaType = transformer.getOutputProperty(OutputKeys.MEDIA_TYPE);
 
-            boolean doXHTMLMagic = false;
+            boolean doXhtmlToHtml = false;
 
-            if ("xml".equalsIgnoreCase(method)
-                    && "application/xhtml+xml".equalsIgnoreCase(mediaType)) {
-                doXHTMLMagic = true;
-                // Don't do xhtmlMagic on Mozilla
-                BrowserDetector bd = getBrowserDetector(req);
-                if (BrowserDetector.MOZILLA.equals(bd.getBrowserName())
-                        || BrowserDetector.SAFARI.equals(bd.getBrowserName())) {
-                    doXHTMLMagic = false;
-                }
-                if (logger.isDebugEnabled()) {
-                    logger.debug("User-Agent: " + req.getHeader("User-Agent"));
-                    logger.debug("Browser name: " + bd.getBrowserName() + "; version: " + bd.getBrowserVersion());
-                    logger.debug("doXHTMLMagic = " + doXHTMLMagic);
+            if ("xml".equalsIgnoreCase(method) && "application/xhtml+xml".equalsIgnoreCase(mediaType)) {
+                if (IP_ALWAYS.equalsIgnoreCase(xhtmlToHtml)) {
+                    doXhtmlToHtml = true;
+                } else if (IP_NEVER.equalsIgnoreCase(xhtmlToHtml)) {
+                    doXhtmlToHtml = false;
+                } else { // auto
+                    doXhtmlToHtml = true;
+                    // Mozilla and Safari can handle XHTML
+                    BrowserDetector bd = getBrowserDetector(req);
+                    if (    (BrowserDetector.MOZILLA.equals(bd.getBrowserName()) && bd.getBrowserVersion() >= 5)
+                            || BrowserDetector.SAFARI.equals(bd.getBrowserName())) {
+                        doXhtmlToHtml = false;
+                    }
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("User-Agent: " + req.getHeader("User-Agent"));
+                        logger.debug("Browser name: " + bd.getBrowserName() + "; version: " + bd.getBrowserVersion());
+                        logger.debug("doXhtmlToHtml = " + doXhtmlToHtml);
+                    }
                 }
             }
 
-            if (doXHTMLMagic) {
-                outputMagic(req, res, source, transformer);
+            if (doXhtmlToHtml) {
+                outputXhtmlToHtml(req, res, source, transformer);
             } else {
                 outputNormal(req, res, source, transformer);
             }
@@ -368,7 +396,7 @@ public class XpServlet extends HttpServlet{
         out.close();
     }
 
-    private void outputMagic(HttpServletRequest req, HttpServletResponse res,
+    private void outputXhtmlToHtml(HttpServletRequest req, HttpServletResponse res,
             Source source, Transformer transformer) throws IOException,
             TransformerException {
         // first is the XSL transformer (transformer)
@@ -378,11 +406,13 @@ public class XpServlet extends HttpServlet{
         TransformerHandler th = templatesCache.getTransformerHandler();
 
         // setup identity th
-        th.getTransformer().setOutputProperties(
-                transformer.getOutputProperties());
+        // xsltc doesn't like it's own indent_amount property, so get rid of it
+        Properties props = transformer.getOutputProperties();
+        props.remove("indent_amount");
+        th.getTransformer().setOutputProperties(props);
         th.getTransformer().setOutputProperty(OutputKeys.METHOD, "html");
-        th.getTransformer().setOutputProperty(OutputKeys.MEDIA_TYPE,
-                "text/html");
+        th.getTransformer().setOutputProperty(OutputKeys.MEDIA_TYPE, "text/html");
+
         // th.getTransformer().setOutputProperty(OutputKeys.ENCODING, "UTF-8");
         String contentType = null;
         if ((contentType = getContentType(th.getTransformer())) != null) {
