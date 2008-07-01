@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Properties;
@@ -28,7 +29,6 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
 import org.anodyneos.commons.net.ClassLoaderURIHandler;
-import org.anodyneos.commons.net.URI;
 import org.anodyneos.commons.xml.StripNamespaceFilter;
 import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.commons.xml.xsl.TemplatesCache;
@@ -151,7 +151,7 @@ public class XpServlet extends HttpServlet{
             // factory for cleanup.
             xpContext.initialize(this,request,response);
 
-            org.anodyneos.commons.net.URI xpURI = getXpURIFromRequest(request.getServletPath());
+            URI xpURI = getXpURIFromRequest(request.getServletPath());
             XpPage xpPage = getXpPage(xpURI);
             if (xpPage == null){
 //                  TODO replace with smarter error page
@@ -172,8 +172,8 @@ public class XpServlet extends HttpServlet{
                 if (xsltPath == null || "".equals(xsltPath)) {
                     transformer = templatesCache.getTransformer();
                 } else {
-                    org.anodyneos.commons.net.URI xslURI;
-                    xslURI = new org.anodyneos.commons.net.URI(xpURI, xsltPath);
+                    URI xslURI;
+                    xslURI = xpURI.resolve(xsltPath);
                     if(logger.isDebugEnabled()) {
                         logger.debug("Using xslURI: " + xslURI);
                     }
@@ -211,8 +211,8 @@ public class XpServlet extends HttpServlet{
                         ,xpOutputProperties.getProperty(XpOutputKeys.OMIT_XML_DECLARATION));
             } else {
                 try {
-                    org.anodyneos.commons.net.URI xslURI;
-                    xslURI = new org.anodyneos.commons.net.URI(xpURI, xsltPath);
+                    URI xslURI;
+                    xslURI = xpURI.resolve(xsltPath);
                     if(logger.isDebugEnabled()) {
                         logger.debug("Using xslURI: " + xslURI);
                     }
@@ -231,9 +231,9 @@ public class XpServlet extends HttpServlet{
                     throw new XpException("Unable to transform " + xpPage.getClass().getCanonicalName() + ".xp " +
                             "Check the xsltURI attribute of your xp file.  File not found: " + fnf.getMessage());
 
-                } catch (URI.MalformedURIException mfe) {
-                    throw new XpException("Unable to transform " + xpPage.getClass().getCanonicalName() + ".xp " +
-                            "The xsltURI attribute of your xp file is invalid.  " + mfe.getMessage());
+                //} catch (URISyntaxException mfe) {
+                //    throw new XpException("Unable to transform " + xpPage.getClass().getCanonicalName() + ".xp " +
+                //            "The xsltURI attribute of your xp file is invalid.  " + mfe.getMessage());
                 }
 
             }
@@ -312,7 +312,8 @@ public class XpServlet extends HttpServlet{
         }
     }
 
-    private XpPage getXpPage(URI xp) throws XpFileNotFoundException,XpTranslationException,XpCompilationException{
+    private XpPage getXpPage(URI xp)
+    throws XpFileNotFoundException, XpTranslationException, XpCompilationException {
         return cache.getXpPage(xp);
     }
 

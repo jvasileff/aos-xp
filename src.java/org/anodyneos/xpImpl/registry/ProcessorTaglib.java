@@ -1,8 +1,9 @@
 package org.anodyneos.xpImpl.registry;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import org.anodyneos.commons.net.URI;
 import org.anodyneos.commons.xml.sax.CDATAProcessor;
 import org.anodyneos.commons.xml.sax.ElementProcessor;
 import org.anodyneos.xpImpl.XpTranslationException;
@@ -39,7 +40,7 @@ class ProcessorTaglib extends RegistryProcessor {
         URI locationURI;
         try {
             locationURI = getContext().uriFromRelative(locationProcessor.getCDATA().trim());
-        } catch (URI.MalformedURIException e) {
+        } catch (URISyntaxException e) {
             throw new SAXException("Malformed URI for taglib: " + locationProcessor.getCDATA(), e);
         }
 

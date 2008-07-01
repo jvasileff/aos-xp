@@ -1,6 +1,7 @@
 package org.anodyneos.xpImpl.translater;
 
-import org.anodyneos.commons.net.URI;
+import java.net.URI;
+
 import org.anodyneos.commons.xml.sax.ElementProcessor;
 import org.anodyneos.xpImpl.util.CodeWriter;
 import org.xml.sax.Attributes;

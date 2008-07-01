@@ -1,12 +1,12 @@
 package org.anodyneos.xpImpl.runtime;
 
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.anodyneos.commons.net.URI;
 import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.xp.XpCompilationException;
 import org.anodyneos.xp.XpFileNotFoundException;

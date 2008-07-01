@@ -4,11 +4,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.util.List;
 
 import org.anodyneos.commons.net.ClassLoaderURIHandler;
-import org.anodyneos.commons.net.URI;
 import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.commons.xml.sax.BaseParser;
 import org.anodyneos.xp.XpException;
@@ -158,14 +159,16 @@ public class Translater extends BaseParser {
             }
 
             return result;
-        }catch (IOException ioe){
+        } catch (URISyntaxException ex) {
+            throw new XpTranslationException(ex);
+        } catch (IOException ioe) {
             throw new XpTranslationException(ioe);
-        }catch (SAXException se){
-            if (se.getException() != null){
+        } catch (SAXException se) {
+            if (se.getException() != null) {
                 throw new XpTranslationException(se.getException());
-            }else if (se.getCause() != null){
+            } else if (se.getCause() != null) {
                 throw new XpTranslationException(se.getCause());
-            }else{
+            } else {
                 throw new XpTranslationException(se);
             }
         }
