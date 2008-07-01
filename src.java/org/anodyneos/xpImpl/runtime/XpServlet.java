@@ -32,6 +32,7 @@ import org.anodyneos.commons.net.ClassLoaderURIHandler;
 import org.anodyneos.commons.xml.StripNamespaceFilter;
 import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.commons.xml.xsl.TemplatesCache;
+import org.anodyneos.commons.xml.xsl.TemplatesCacheImpl;
 import org.anodyneos.servlet.net.ServletContextURIHandler;
 import org.anodyneos.servlet.util.BrowserDetector;
 import org.anodyneos.xp.XpCompilationException;
@@ -121,7 +122,8 @@ public class XpServlet extends HttpServlet{
         if (IP_FALSE.equalsIgnoreCase(servletConfig.getInitParameter(IP_XP_XSLT_CACHE))) {
             xsltCache = false;
         }
-        templatesCache = new TemplatesCache(resolver);
+        templatesCache = new TemplatesCacheImpl();
+        templatesCache.setUnifiedResolver(resolver);
         templatesCache.setCacheEnabled(xsltCache);
 
 
