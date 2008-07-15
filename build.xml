@@ -37,8 +37,8 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
     <!-- aos deps -->
-    <property name="anodyneos-commons.jar" location="${dir.jars}/anodyneos-commons-0.4/anodyneos-commons.jar"/>
-    <property name="anodyneos-servlet.jar" location="${dir.jars}/anodyneos-servlet-0.6/anodyneos-servlet.jar"/>
+    <property name="anodyneos-commons.jar" location="${dir.jars}/anodyneos-commons-0.4.1/anodyneos-commons.jar"/>
+    <property name="anodyneos-servlet.jar" location="${dir.jars}/anodyneos-servlet-0.6.2/anodyneos-servlet.jar"/>
 
     <!-- for fop -->
     <property name="fop.jar" location="${dir.jars}/apache-fop-0.20.5/fop.jar"/>
