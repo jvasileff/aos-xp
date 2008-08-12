@@ -13,7 +13,7 @@
 >
     <xp:output  indent="yes"
                 indentAmount="2"
-                mediaType="text/xml"
+                mediaType="application/xhtml+xml"
                 encoding="us-ascii"
                 method="xml"
                 excludeResultPrefixes="xp xpext fmt c" />
@@ -69,51 +69,31 @@
                     the other hand was set using the <code>value</code>
                     attribute thereby skipping the normalize step.
                 </p>
+                <p>1. Test whitespace <b>bold</b> <i>italics</i> words</p>
+                <p xml:space="preserve">2. Test whitespace <b>bold</b> <i>italics</i> words preserve</p>
+                <p>3. Test whitespace <b>bold</b> <i>italics</i> words</p>
+                <p>4. Test whitespace <b>bold</b><i>italics</i> word</p>
                 <p>
-                    Test whitespace <b>bold</b> <i>italics</i> words
+                    Note: The "bold" and "italics" tests do not work as desired
+                    with xml/xhtml output when indenting is enabled.  This is
+                    by design, there is no xhtml specific serializer.
+                    <ul>
+                        <li>XML, no-indent: Whitespace-only nodes are blown away unless xml:space="preserve".  So, 1, 3, and 4 have no space between the words.</li>
+                        <li>XML, indent: Whitespace is added to produce the indentations. So, 1, 2, 3, and 4 all have a space between the words.</li>
+                        <li>HTML, no-indent &amp; indent: Same as XML, no-indent; the Xalan HTML indent is smart enough to not add spaces when it would alter HTML rendering.</li>
+                    </ul>
                 </p>
-                <p xml:space="preserve">
-                    Test whitespace <b>bold</b> <i>italics</i> words preserve
-                </p>
-                <p>
-                    Test whitespace <b>bold</b> <i>italics</i> words
-                </p>
-                <p>
-                    Test whitespace <b>bold</b><i>italics</i> word
-                </p>
-                <p>
-                    Test whitespace <b>bold</b>&nbsp;<i>italics</i>
-                </p>
-                <p>
-                    Test whitespace <b>bold</b>&#x20;<i>italics</i>
-                </p>
-                <p>
-                    Test whitespace <b>bold</b><xp:text> </xp:text><i>italics</i>
-                </p>
-                <p>
-                    Test whitespace <b>bold</b><xp:text>  some text with 2spaces  </xp:text><i>italics</i>
-                </p>
-                <p>
-                    Test whitespace in attributes: <a href="." title="  whitespace  ">some link</a>
-                </p>
-                <p>
-                    Test whitespace in attributes: <a href="." title="nowhitespace">some link</a>
-                </p>
-                <p>
-                    Test whitespace in xp attributes: <a href="."><xp:attribute name="title" value="  whitespace  "/>some link</a>
-                </p>
-                <p>
-                    Test whitespace in xp attributes: <a href="."><xp:attribute name="title" value="nowhitespace"/>some link</a>
-                </p>
-                <p>
-                    Test whitespace in xp attributes2: <a href="."><xp:attribute name="title">  whitespace  </xp:attribute>some link</a>
-                </p>
-                <p>
-                    Test whitespace in xp attributes2: <a href="."><xp:attribute name="title">nowhitespace</xp:attribute>some link</a>
-                </p>
-                <p>
-                    Test whitespace in xp attributes3tag: <a href="."><xp:attribute name="title"><xp:text>  spaces  </xp:text></xp:attribute>some link</a>
-                </p>
+                <p>Test whitespace <b>bold</b>&nbsp;<i>italics</i></p>
+                <p>Test whitespace <b>bold</b>&#x20;<i>italics</i></p>
+                <p>Test whitespace <b>bold</b><xp:text> </xp:text><i>italics</i></p>
+                <p>Test whitespace <b>bold</b><xp:text>  some text with 2spaces  </xp:text><i>italics</i></p>
+                <p>Test whitespace in attributes: <a href="." title="  whitespace  ">some link</a></p>
+                <p>Test whitespace in attributes: <a href="." title="nowhitespace">some link</a></p>
+                <p>Test whitespace in xp attributes: <a href="."><xp:attribute name="title" value="  whitespace  "/>some link</a></p>
+                <p>Test whitespace in xp attributes: <a href="."><xp:attribute name="title" value="nowhitespace"/>some link</a></p>
+                <p>Test whitespace in xp attributes2: <a href="."><xp:attribute name="title">  whitespace  </xp:attribute>some link</a></p>
+                <p>Test whitespace in xp attributes2: <a href="."><xp:attribute name="title">nowhitespace</xp:attribute>some link</a></p>
+                <p>Test whitespace in xp attributes3tag: <a href="."><xp:attribute name="title"><xp:text>  spaces  </xp:text></xp:attribute>some link</a></p>
             </body>
         </html>
     </xp:content>
