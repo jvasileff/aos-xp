@@ -11,6 +11,12 @@
     <!-- setup -->
     <property name="build.sysclasspath"         value="ignore"/>
 
+    <path id="path.ant.script">
+        <pathelement location="${dir.jars}/bsf-2.4.0/bsf.jar"/>
+        <pathelement location="${dir.jars}/commons-logging-1.1.1/commons-logging-1.1.1.jar"/>
+        <pathelement location="${dir.jars}/rhino-1.7R1/js.jar"/>
+    </path>
+
     <!-- properties -->
     <property name="dir.src.java"               location="src.java"/>
     <property name="dir.build"                  location="build"/>
@@ -93,7 +99,7 @@
     </path>
 
     <!-- for tomcat -->
-    <script language="javascript">
+    <script language="javascript" classpathref="path.ant.script">
         <![CDATA[
             // tomcat needs the webapp dir in the form of a URL
             project.setProperty("url.build.webapp",
@@ -181,6 +187,11 @@
                 <patternset refid="pattern.resources"/>
             </fileset>
         </copy>
+        <copy toDir="${dir.build.classes}">
+            <fileset dir="${dir.build.java}">
+                <patternset refid="pattern.resources"/>
+            </fileset>
+        </copy>
     </target>
 
     <target name="compile.common" depends="compileJava, refreshWebapp"/>
@@ -192,7 +203,7 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  checkCatalogProps
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <target name="checkCatalogProps" depends="prepare">
+    <target name="checkCatalogProps" depends="prepare" if="do.genCatalogProps">
         <uptodate property="u2d.CatalogManager.properties" targetfile="${dir.build.classes}/CatalogManager.properties">
             <srcfiles dir=".">
                 <include name="build.properties"/>
@@ -207,6 +218,7 @@
     ~~  genCatalogProps
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <target name="genCatalogProps" depends="checkCatalogProps, prepare"
+            if="do.genCatalogProps"
             unless="u2d.CatalogManager.properties">
         <propertyfile file="${dir.build.classes}/CatalogManager.properties">
             <entry key="catalogs" value="${dir.src.lib.xml}/xhtml.cat"/>
@@ -224,25 +236,16 @@
                 <include name="build.xml"/>
                 <include name="build.webCommon.xml"/>
             </srcfiles>
+            <srcfiles file="${dir.src.misc}/dummy.xml"/>
+            <srcfiles file="${dir.src.misc}/context.xsl"/>
         </uptodate>
     </target>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ~~  cleanContext
+    ~~  genContext
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <target name="cleanContext" depends="checkContext, prepare" unless="u2d.context">
+    <target name="genContext" depends="checkContext, prepare" unless="u2d.context">
         <delete file="${file.build.context}"/>
-        <!--
-            note: style does not belong here; it should always run in order to
-            check the date on the xsl file.
-        -->
-    </target>
-
-    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ~~  Refresh Webapp
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <target name="refreshWebapp.common" depends="prepare, cleanContext">
-        <!-- build context.xml -->
         <xslt   in="${dir.src.misc}/dummy.xml"
                 out="${file.build.context}"
                 style="${dir.src.misc}/context.xsl">
@@ -250,7 +253,40 @@
             <param name="webapp.context" expression="${webapp.context}"/>
             <param name="webapp.reloadable" expression="${webapp.reloadable}"/>
         </xslt>
+    </target>
 
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  checkWebXML
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="checkWebXML" depends="prepare" if="do.genWebXML">
+        <uptodate property="u2d.web.xml" targetfile="${dir.build.webapp}/WEB-INF/web.xml">
+            <srcfiles dir=".">
+                <include name="build.properties"/>
+                <include name="default.properties"/>
+                <include name="build.xml"/>
+                <include name="build.webCommon.xml"/>
+            </srcfiles>
+            <srcfiles file="${dir.src.misc}/web.xsl"/>
+            <srcfiles file="${dir.src.misc}/dummy.xml"/>
+        </uptodate>
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  genWebXML
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="genWebXML" depends="checkWebXML, prepare" unless="u2d.web.xml" if="do.genWebXML">
+        <delete file="${dir.build.webapp}/WEB-INF/web.xml"/>
+        <xslt   in="${dir.src.misc}/dummy.xml"
+                out="${dir.build.webapp}/WEB-INF/web.xml"
+                style="${dir.src.misc}/web.xsl">
+            <param name="database.platform" expression="${database.platform}"/>
+        </xslt>
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  Refresh Webapp
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="refreshWebapp.common" depends="prepare, genContext, genWebXML">
         <!-- webapp -->
         <copy toDir="${dir.build.webapp}">
             <fileset dir="${dir.src.webapp}">
@@ -285,11 +321,12 @@
                 <patternset refid="pattern.resources"/>
                 <include name="**/*.class"/>
                 <exclude name="CatalogManager.properties"/>
+                <exclude name="application.properties"/>
             </fileset>
         </jar>
         <war
             warfile="${file.war}"
-            webxml="${dir.src.webapp}/WEB-INF/web.xml"
+            webxml="${dir.build.webapp}/WEB-INF/web.xml"
             compress="no">
             <fileset dir="${dir.src.webapp}">
                 <patternset refid="pattern.docRoot"/>
@@ -327,9 +364,12 @@
                     destdir="${dir.build.apidocs}"
                     author="true"
                     version="true"
-                    group="true" >
+                    stylesheetfile="${dir.src.misc}/stylesheet.css">
             <classpath refid="path.compile"/>
             <sourcepath refid="path.source"/>
+            <link href="http://java.sun.com/javase/6/docs/api"/>
+            <link href="http://java.sun.com/j2ee/1.4/docs/api"/>
+            <link href="http://static.springframework.org/spring/docs/2.5.x/api"/>
         </javadoc>
     </target>
 

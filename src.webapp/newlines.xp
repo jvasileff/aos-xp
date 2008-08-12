@@ -11,9 +11,9 @@
     xmlns:c="http://www.anodyneos.org/xmlns/xp/core"
     xmlns="http://www.w3.org/1999/xhtml"
 >
-    <xp:output  indent="no"
+    <xp:output  indent="yes"
                 indentAmount="2"
-                mediaType="application/xhtml+xml"
+                mediaType="text/xml"
                 encoding="us-ascii"
                 method="xml"
                 excludeResultPrefixes="xp xpext fmt c" />
@@ -70,7 +70,16 @@
                     attribute thereby skipping the normalize step.
                 </p>
                 <p>
-                    Test whitespace <b>bold</b> <i>italics</i>
+                    Test whitespace <b>bold</b> <i>italics</i> words
+                </p>
+                <p xml:space="preserve">
+                    Test whitespace <b>bold</b> <i>italics</i> words preserve
+                </p>
+                <p>
+                    Test whitespace <b>bold</b> <i>italics</i> words
+                </p>
+                <p>
+                    Test whitespace <b>bold</b><i>italics</i> word
                 </p>
                 <p>
                     Test whitespace <b>bold</b>&nbsp;<i>italics</i>

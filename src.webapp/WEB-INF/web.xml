@@ -16,6 +16,12 @@
     <servlet>
         <servlet-name>xp</servlet-name>
         <servlet-class>org.anodyneos.xpImpl.runtime.XpServlet</servlet-class>
+        <!--
+        <init-param>
+            <param-name>xhtmlToHtml</param-name>
+            <param-value>always</param-value>
+        </init-param>
+        -->
     </servlet>
 
     <servlet-mapping>

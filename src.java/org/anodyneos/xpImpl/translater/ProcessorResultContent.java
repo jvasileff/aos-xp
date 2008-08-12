@@ -124,11 +124,20 @@ public class ProcessorResultContent extends TranslaterProcessor {
         CodeWriter out = getTranslaterContext().getCodeWriter();
         if (sb != null) {
             String s = sb.toString();
+
             // Handle whitespace similar to XSLT stylesheets:
+            // http://www.w3.org/TR/xslt.html#section-Creating-Text
+            // http://www.w3.org/TR/xslt.html#strip
             //  - discard text nodes that have only whitespace
             //  - keep text nodes that have whitespace and non-whitespace
-            if (s.trim().length() > 0) { // don't output if only whitespace
+            //  - preserve space inside elements with xml:space="preserve" but not xml:space="default"
+
+            if (getContext().isXmlSpacePreserve()) {
                 Util.outputCharactersCode(s, out);
+            } else {
+                if (s.trim().length() > 0) { // don't output if only whitespace
+                    Util.outputCharactersCode(s, out);
+                }
             }
             sb = null;
         }

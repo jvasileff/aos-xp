@@ -19,7 +19,7 @@
             doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN"
             doctype-system="http://www.w3.org/2002/08/xhtml/xhtml1-strict.dtd"
 
-            indent="no"
+            indent="yes"
             xalan:indent-amount="2"
             omit-xml-declaration="no"
             encoding="UTF-8"/>
