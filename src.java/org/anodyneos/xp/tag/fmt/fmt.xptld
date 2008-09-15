@@ -20,7 +20,22 @@
         <request-time-ok>true</request-time-ok>
     </attribute>
   </tag>
-
+  
+  <tag>
+    <description>
+        Outputs bbCode formatted html (text and br and a elements)
+    </description>
+    <name>bbCode</name>
+    <tag-class>org.anodyneos.xp.tag.fmt.BBCodeTag</tag-class>
+    <attribute>
+        <description>
+            The raw bbCode to format.
+        </description>
+        <name>text</name>
+        <required>false</required>
+        <request-time-ok>true</request-time-ok>
+    </attribute>
+  </tag>
 
     <!-- JSTL TAGS -->
   <tag>

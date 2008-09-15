@@ -33,6 +33,7 @@
                     <br/>
                     browserVersionString: ${browser.browserVersionString}
                 </div>
+
                 <h1>Test AutoHtml</h1>
                 <fmt:autoHtml>
                     alksdjfal ksjaslkdfj alskfj alskfj aslfh alsdfh alskfh
@@ -42,6 +43,24 @@
                     alkj shfalsdkfh asldjfh alsdjfh alskdfh alsfh alskfh as
                     lkjfhasldfkj hasldfh l
                 </fmt:autoHtml>
+
+                <h1>Test BBCode</h1>
+                <fmt:bbCode>
+                    alksdjfal ksjaslkdfj alskfj alskfj aslfh alsdfh alskfh
+                    alsdfh als aslkfh as jvasileff@marketingcentral.com ldfh
+                    alskdfh alskdjfh alskdjfh alskdfh alskdjfh laskjdh flakjs
+
+                    [b]Bold Text[/b]
+
+                    [i]Italics[/i]
+
+                    [quote]
+                    Quoted Texted with [b]invalidly [i]nested[/b] tags[/i]
+                    [/quote]
+
+                    alkj shfalsdkfh asldjfh alsdjfh alskdfh alsfh alskfh as
+                    lkjfhasldfkj hasldfh l
+                </fmt:bbCode>
                 
                 <h1>Test Functions</h1>
                 <pre>
