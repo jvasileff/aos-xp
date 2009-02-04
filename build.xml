@@ -45,6 +45,12 @@
     <property name="batik.jar" location="${dir.jars}/apache-fop-0.20.5/batik.jar"/>
     <property name="avalon-framework-cvs-20020806.jar" location="${dir.jars}/apache-fop-0.20.5/avalon-framework-cvs-20020806.jar"/>
 
+    <!-- for spring -->
+    <property name="spring.jar" location="${dir.jars}/spring-framework-2.5.4/spring.jar"/>
+    <property name="spring-web.jar" location="${dir.jars}/spring-framework-2.5.4/modules/spring-web.jar"/>
+    <property name="spring-webmvc.jar" location="${dir.jars}/spring-framework-2.5.4/modules/spring-webmvc.jar"/>
+    <!--<property name="cglib-nodep-2.2.jar" location="${dir.jars}/cglib-2.2/cglib-nodep-2.2.jar"/>-->
+
     <!-- for jsp -->
     <property name="jstl.jar" location="${dir.jars}/jakarta-taglibs-standard-1.1.2/jstl.jar"/>
     <property name="standard.jar" location="${dir.jars}/jakarta-taglibs-standard-1.1.2/standard.jar"/>
@@ -89,6 +95,11 @@
         <copy toDir="${dir.build.ide.lib}" file="${fop.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${batik.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${avalon-framework-cvs-20020806.jar}"/>
+
+        <!-- for spring -->
+        <copy toDir="${dir.build.ide.lib}" file="${spring.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${spring-web.jar}"/>
+        <copy toDir="${dir.build.ide.lib}" file="${spring-webmvc.jar}"/>
 
         <copy toDir="${dir.build.ide.lib}" file="${jstl.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${standard.jar}"/>

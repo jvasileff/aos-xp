@@ -23,5 +23,8 @@
 	<classpathentry kind="lib" path="build/ide.lib/servlet-api.jar"/>
 	<classpathentry kind="lib" path="build/ide.lib/standard.jar"/>
 	<classpathentry kind="lib" path="build/ide.lib/xsltc.jar"/>
+	<classpathentry kind="lib" path="build/ide.lib/spring.jar"/>
+	<classpathentry kind="lib" path="build/ide.lib/spring-web.jar"/>
+	<classpathentry kind="lib" path="build/ide.lib/spring-webmvc.jar"/>
 	<classpathentry kind="output" path="build/ide.classes"/>
 </classpath>
