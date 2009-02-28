@@ -17,6 +17,10 @@
                 encoding="us-ascii"
                 method="xml"
                 excludeResultPrefixes="xp xpext fmt c" />
+    <!--
+                mediaType="text/html"
+                method="html"
+    -->
     <xp:content>
         <html>
             <head/>
