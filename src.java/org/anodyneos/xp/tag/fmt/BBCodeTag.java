@@ -14,6 +14,7 @@ import org.anodyneos.servlet.xsl.xalan.BBCodeParser;
 import org.anodyneos.servlet.xsl.xalan.ParseException;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.XpOutput;
+import org.anodyneos.xp.tagext.XpFragment;
 import org.anodyneos.xp.tagext.XpTagSupport;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,13 +33,20 @@ public class BBCodeTag extends XpTagSupport {
     public void doTag(XpOutput out) throws XpException, ELException,
             SAXException {
         if (null == text) {
-            text = getXpBody().invokeToString();
+            XpFragment body = getXpBody();
+            if (null == body) {
+                text = "";
+            } else {
+                text = body.invokeToString();
+            }
         }
-        BBCodeParserXp ahps = new BBCodeParserXp(new java.io.StringReader(text), out);
-        try {
-            ahps.process();
-        } catch (Exception e) {
-            // TODO:
+        if (! "".equals(text)) {
+            BBCodeParserXp ahps = new BBCodeParserXp(new java.io.StringReader(text), out);
+            try {
+                ahps.process();
+            } catch (Exception e) {
+                // TODO:
+            }
         }
     }
 
