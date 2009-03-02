@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE xp:page [
+    <!ENTITY copy "&#169;">
+    <!ENTITY nbsp "&#160;">
+    <!ENTITY reg "&#174;">
+    <!ENTITY trade "&#8482;">
+    <!ENTITY newl   "<xp:text>&#10;</xp:text>">
+    <!ENTITY startl "<xp:text/>">
+    <!ENTITY endl   "<xp:text/>">
+    <!ENTITY sp "<xp:text> </xp:text>">
+]>
+
+<xp:page 
+    xmlns:xp="http://www.anodyneos.org/xmlns/xp"
+    xmlns:fmt="http://www.anodyneos.org/xmlns/xp/fmt"
+    xmlns:c="http://www.anodyneos.org/xmlns/xp/core"
+>
+    <xp:output  encoding="UTF-8"
+                mediaType="text/plain"
+                method="text"/>
+    
+<xp:content>
+<html>Sample Text Output
+--------------------
+汉语/漢語, pinyin: Hànyǔ; 华语/華語, Huáyǔ; or 中文, Zhōngwén) can be considered a
+<c:forEach varStatus="status" var="current" items="${header}">
+
+    &startl;${status.count}:  ${current}&newl;
+
+</c:forEach>
+&newl;el1 content
+el2 content
+foot content
+</html>
+</xp:content>
+</xp:page>

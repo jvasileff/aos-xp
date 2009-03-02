@@ -13,13 +13,13 @@
 >
     <xp:output  indent="yes"
                 indentAmount="2"
-                mediaType="application/xhtml+xml"
-                encoding="us-ascii"
-                method="xml"
-                excludeResultPrefixes="xp xpext fmt c" />
-    <!--
+                encoding="utf-8"
                 mediaType="text/html"
                 method="html"
+                excludeResultPrefixes="xp xpext fmt c" />
+    <!--
+                mediaType="application/xhtml+xml"
+                method="xml"
     -->
     <xp:content>
         <html>

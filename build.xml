@@ -76,10 +76,14 @@
 
     <property name="commons-collections-2.1.1.jar" location="${dir.jars}/commons-collections-2.1.1/commons-collections-2.1.1.jar"/>
 
+    <property name="ecj-3.4.2.jar" location="${dir.jars}/eclipse-ecj-3.4.2/ecj-3.4.2.jar"/>
+
+<!--
     <available property="tools.jar" value="${env.JAVA_HOME}/lib/tools.jar" file="${env.JAVA_HOME}/lib/tools.jar"/>
     <path id="path.tools.jar">
         <fileset id="fs.tools.jar" file="${tools.jar}"/>
     </path>
+-->
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  prepare.post
@@ -123,7 +127,9 @@
         <copy toDir="${dir.build.ide.lib}" file="${log4j-1.2.15.jar}"/>
         <copy toDir="${dir.build.ide.lib}" file="${commons-collections-2.1.1.jar}"/>
 
-        <copy toDir="${dir.build.ide.lib}"><fileset refid="fs.tools.jar"/></copy>
+        <copy toDir="${dir.build.ide.lib}" file="${ecj-3.4.2.jar}"/>
+
+        <!--<copy toDir="${dir.build.ide.lib}"><fileset refid="fs.tools.jar"/></copy>-->
 
         <!-- paths -->
         <path id="path.compile">
@@ -134,7 +140,7 @@
 
         <fileset id="fs.jars" dir="${dir.build.ide.lib}">
             <include name="*.jar"/>
-            <exclude name="tools.jar"/>
+            <!--<exclude name="tools.jar"/>-->
             <exclude name="servlet-api.jar"/>
             <exclude name="jsp-api.jar"/>
         </fileset>
@@ -209,6 +215,23 @@
             <classpath location="${dir.build.classes.sample}"/>
         </java>
     </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  testStandalone
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="testStandalone" depends="compile">
+        <java taskname="testStandalone" fork="yes" classname="test.org.anodyneos.xpImpl.XpStandaloneTest">
+            <classpath location="${dir.build.classes}"/>
+            <classpath refid="path.compile"/>
+            <arg value="${dir.build.java.sample}" />
+            <arg value="${dir.build.classes.sample}" />
+            <arg value="${dir.src.sample}" />
+            <arg value="file:/registry.xpreg" />
+            <arg value="file:/Login.xp" />
+        </java>
+        <!--<mkdir dir="${dir.build.java.sample}/common"/>-->
+    </target>
+
 
 </project>
 

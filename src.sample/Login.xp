@@ -38,6 +38,7 @@
                     </tr>
                 </table>
             </body>
+            <xp:include file="common/footer.xp"/>
         </html>
 
         

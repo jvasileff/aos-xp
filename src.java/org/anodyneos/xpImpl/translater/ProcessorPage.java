@@ -37,15 +37,18 @@ class ProcessorPage extends TranslaterProcessor {
     public static final String E_OUTPUT = "output";
     public static final String E_CONTENT = "content";
 
-    public ProcessorPage(TranslaterContext ctx) {
+    public ProcessorPage(TranslaterContext ctx) throws SAXException {
         super(ctx);
         outputProcessor = new ProcessorOutput(ctx);
-        contentProcessor = new ProcessorContent(ctx);
     }
 
     public ElementProcessor getProcessorFor(String uri, String localName, String qName) throws SAXException {
         if (URI_XP.equals(uri)) {
             if (E_CONTENT.equals(localName)) {
+                // lazy load contentProcessor so the constructor can use results from the outputProcessor
+                if (null == contentProcessor) {
+                    contentProcessor = new ProcessorContent(getTranslaterContext());
+                }
                 return contentProcessor;
             } else if (E_OUTPUT.equals(localName)) {
                 return outputProcessor;

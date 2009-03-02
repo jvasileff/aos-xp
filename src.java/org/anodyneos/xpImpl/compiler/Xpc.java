@@ -19,7 +19,10 @@ public class Xpc {
         InputSource is = new InputSource(new java.io.File(args[3]).toURL().toString());
         TagLibraryRegistry registry = new RegistryParser().process(is, resolver);
 
+        throw new UnsupportedOperationException();
+
         // xpcCtx
+        /*
         XpCompilerContext xpcCtx = new SimpleXpCompilerContext(
                 new SunJavaCompiler(generateClassPath(), args[2]),
                 registry,
@@ -34,6 +37,7 @@ public class Xpc {
 
         // DOIT
         xpCompiler.compile(xpcCtx, xpFiles, resolver);
+        */
     }
 
     public static XpFile[] getXpFiles(File xpRootDir) throws Exception {

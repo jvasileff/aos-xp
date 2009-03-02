@@ -3,10 +3,12 @@ package org.anodyneos.xpImpl.translater;
 import java.util.Enumeration;
 
 import org.anodyneos.commons.xml.sax.ElementProcessor;
+import org.anodyneos.xp.XpOutputKeys;
 import org.anodyneos.xpImpl.util.CodeWriter;
 import org.anodyneos.xpImpl.util.Util;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 import org.xml.sax.helpers.NamespaceSupport;
 
 /**
@@ -28,12 +30,16 @@ public class ProcessorContent extends TranslaterProcessor {
 
     private StringBuffer sb;
     private int phantomPrefixCount = 0;
+    private boolean isTextOutput = false;
 
     private ProcessorResultContent resultContentProcessor;
 
-    public ProcessorContent(TranslaterContext ctx) {
+    public ProcessorContent(TranslaterContext ctx) throws SAXException {
         super(ctx);
         resultContentProcessor = new ProcessorResultContent(ctx);
+        if (null != ctx.getOutputProperties() && "text".equals(ctx.getOutputProperties().get(XpOutputKeys.METHOD))) {
+            isTextOutput = true;
+        }
     }
 
     public ElementProcessor getProcessorFor(String uri, String localName, String qName)
@@ -98,14 +104,26 @@ public class ProcessorContent extends TranslaterProcessor {
                 + ");");
             phantomPrefixCount++;
         }
+
+        // Support method="text" where an outer element may not exist in the xp page.
+        if (isTextOutput) {
+            resultContentProcessor.startElement("", "dummy", "dummy", new AttributesImpl());
+        }
     }
 
     public void characters(char[] ch, int start, int length) {
-        // @TODO: We don't take raw characters, do we?  For XML, this would be an error (no root element).
-        // But if we want to support text output we need to.
+        // Support method="text" where an outer element may not exist in the xp page.
+        if (isTextOutput) {
+            resultContentProcessor.characters(ch, start, length);
+        }
     }
 
-    public void endElement(String uri, String localName, String qName) {
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+        // Support method="text" where an outer element may not exist in the xp page.
+        if (isTextOutput) {
+            resultContentProcessor.endElement("", "dummy", "dummy");
+        }
+
         CodeWriter out = getTranslaterContext().getCodeWriter();
 
         // close out phantom prefixes
