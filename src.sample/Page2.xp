@@ -3,30 +3,29 @@
 <xp:page 
     xmlns:xp="http://www.anodyneos.org/xmlns/xp"
     xmlns:fmt="http://www.anodyneos.org/xmlns/xp/fmt"
-    xmlns:c="http://www.anodyneos.org/xmlns/xp/standard"
+    xmlns:c="http://www.anodyneos.org/xmlns/xp/core"
+    xmlns:fn="http://www.anodyneos.org/xmlns/xp/function"
 >
 
-    <!--
-    <xp:output
-        type="xml|html"
-        doctype-system="xxx"
-        doctype-public="xxx"
-        xhtml-compat="true|false">
 
-    <xp:xsl url="xx">
-    <xp:xsl url="xx">
-    -->
+    <xp:output
+        method="html"
+        indent="yes"
+        indentAmount="4"/>
 
     <xp:content>
+        <xp:newBean scope="page" var="startDate" class="java.util.Date"/>
         <html>
-            <fmt:timeZone timeZone="America/New_York" e="\${er} ${expr}"/>
-            <fmt:timeZone timeZone="America/New_York" e="\${er}\${\${"/>
-            <fmt:timeZone timeZone="America/New_York"/>
-            <fmt:timeZone timeZone="America/New_York"/>
-            <fmt:timeZone timeZone="America/New_York"/>
-            <fmt:timeZone timeZone="America/New_York"/>
             <head/>
             <body class="${expr}">
+                <fmt:timeZone value="GMT">
+                    <p><fmt:formatDate type="both" dateStyle="medium" timeStyle="short" value="${startDate}"/></p>
+                </fmt:timeZone>
+                <fmt:timeZone value="America/New_York">
+                    <p><fmt:formatDate type="both" dateStyle="medium" timeStyle="short" value="${startDate}"/></p>
+                </fmt:timeZone>
+                <fmt:setLocale value="en_GB"/>
+                <p><fmt:formatDate type="both" dateStyle="medium" timeStyle="short" value="${startDate}"/></p>
                 <h1>
                     Heading...
                     ${myexpression}
@@ -37,11 +36,5 @@
                 ${expr1}${expr2}${expr3}
             </body>
         </html>
-        <c:set>
-            <h1/>
-        </c:set>
-        <c:set>
-            <h1/>
-        </c:set>
     </xp:content>
 </xp:page>

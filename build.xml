@@ -227,7 +227,7 @@
             <arg value="${dir.build.classes.sample}" />
             <arg value="${dir.src.sample}" />
             <arg value="file:/registry.xpreg" />
-            <arg value="file:/Login.xp" />
+            <arg value="file:/Page2.xp" />
         </java>
         <!--<mkdir dir="${dir.build.java.sample}/common"/>-->
     </target>

@@ -37,7 +37,12 @@ public class XpStandaloneTest {
         obj.init();
 
         StandaloneXpContext ctx = new StandaloneXpContextImpl();
-        obj.service(ctx, new URI(args[4]));
+        ctx.initialize();
+        try {
+            obj.service(ctx, new URI(args[4]));
+        } finally {
+            ctx.release();
+        }
     }
 
     public void init() throws Exception {
