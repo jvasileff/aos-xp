@@ -10,4 +10,8 @@ public class XpContentHandlerFactoryImpl extends XpContentHandlerFactory {
         return new XpContentHandlerImpl(ch);
     }
 
+    public XpContentHandler getXpContentHandler(ContentHandler ch, boolean namespacePrefixes) {
+        return new XpContentHandlerImpl(ch, namespacePrefixes);
+    }
+
 }

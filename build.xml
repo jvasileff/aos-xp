@@ -219,7 +219,7 @@
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  testStandalone
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <target name="testStandalone" depends="compile">
+    <target name="testStandalone" depends="compile" description="testStandalone">
         <java taskname="testStandalone" fork="yes" classname="test.org.anodyneos.xpImpl.XpStandaloneTest">
             <classpath location="${dir.build.classes}"/>
             <classpath refid="path.compile"/>

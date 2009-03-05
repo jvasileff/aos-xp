@@ -103,6 +103,11 @@ public final class XpContentHandlerImpl implements XpContentHandler {
         this.wrappedContentHandler = contentHandler;
     }
 
+    XpContentHandlerImpl(ContentHandler contentHandler, boolean namespacePrefixes) {
+        this.wrappedContentHandler = contentHandler;
+        setNamespacePrefixes(namespacePrefixes);
+    }
+
     ////////////////////////////////////////////////////////////////////////////////
     //
     // phantom prefix push/pop

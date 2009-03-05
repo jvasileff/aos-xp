@@ -40,6 +40,7 @@ public abstract class XpContentHandlerFactory {
     }
 
     public abstract XpContentHandler getXpContentHandler(ContentHandler ch);
+    public abstract XpContentHandler getXpContentHandler(ContentHandler ch, boolean namespacePrefixes);
     //public abstract void releaseHttpXpContext(HttpXpContext xpContext);
 
 }
