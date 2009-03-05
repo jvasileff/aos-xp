@@ -118,7 +118,7 @@ public class XpCachingLoader{
             // TODO - throw file not found exception instead?
             return null;
         } else {
-            XpRunner xpRunner = new XpRunner(xpPage, xpURI, templatesCache);
+            XpRunner xpRunner = new XpRunner(xpPage, templatesCache);
             return xpRunner;
         }
     }

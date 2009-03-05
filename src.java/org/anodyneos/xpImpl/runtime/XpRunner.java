@@ -48,7 +48,6 @@ public class XpRunner {
     public static final String KEY_XALAN_INDENT_AMOUNT = "{http://xml.apache.org/xalan}indent-amount";
 
     private XpPage xpPage;
-    private URI xpPageURI;
     private TemplatesCache templatesCache;
     private Transformer transformer;
 
@@ -64,9 +63,8 @@ public class XpRunner {
     private String doctypeSystem = "";
     private String xsltURI = "";
 
-    public XpRunner(XpPage xpPage, URI xpPageURI, TemplatesCache templatesCache) throws XpException {
+    public XpRunner(XpPage xpPage, TemplatesCache templatesCache) throws XpException {
         this.xpPage = xpPage;
-        this.xpPageURI = xpPageURI;
         this.templatesCache = templatesCache;
 
         this.xsltURI = xpPage.getOutputProperties().getProperty(XpOutputKeys.XSLT_URI);
@@ -74,7 +72,7 @@ public class XpRunner {
         // get the transformer if specified and retrieve output properties
         if (null != xsltURI && xsltURI.length() > 0) {
             try {
-                URI resolvedURI = xpPageURI.resolve(xsltURI);
+                URI resolvedURI = xpPage.getSourceURI().resolve(xsltURI);
                 if(logger.isDebugEnabled()) {
                     logger.debug("Using xslURI: " + resolvedURI);
                 }
