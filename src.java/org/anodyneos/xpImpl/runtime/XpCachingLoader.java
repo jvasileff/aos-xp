@@ -61,12 +61,14 @@ public class XpCachingLoader{
         return me;
     }
 
-    public XpPage getXpPage(URI xpURI) throws XpFileNotFoundException, XpTranslationException, XpCompilationException{
+    public XpPage getXpPage(URI xpURI)
+    throws XpFileNotFoundException, XpTranslationException, XpCompilationException, XpException {
 
-        XpPage xpPage = (XpPage)xpCache.get(xpURI.toString());
+        //XpPage xpPage = (XpPage)xpCache.get(xpURI.toString());
+        XpPageHolder xpPageHolder = (XpPageHolder) xpCache.get(xpURI.toString());
         long loadTime = NEVER_LOADED;
-        if (xpPage != null ){
-            loadTime = xpPage.getLoadTime();
+        if (xpPageHolder != null ){
+            loadTime = xpPageHolder.loadTime;
         }
 
         // if the page hasn't been loaded before or it's out of date,
@@ -75,15 +77,16 @@ public class XpCachingLoader{
 
         // TODO: jv note: technically, this may not work, see http://www.javaworld.com/jw-02-2001/jw-0209-double.html
         // not sure how much the weakness may just be theoretical, but we may want to take a closer look.
-        if ((xpPage == null )
-                || (xpPage != null && xpNeedsReloading(xpURI, loadTime, xpPage.getClass().getClassLoader()))){
+        if ((xpPageHolder == null )
+                || (xpPageHolder != null
+                        && xpNeedsReloading(xpURI, loadTime, xpPageHolder.xpPageClass.getClassLoader()))){
 
             synchronized(this){
 
-                xpPage = (XpPage)xpCache.get(xpURI.toString());
+                xpPageHolder = (XpPageHolder)xpCache.get(xpURI.toString());
                 loadTime = NEVER_LOADED;
-                if (xpPage != null ){
-                    loadTime = xpPage.getLoadTime();
+                if (xpPageHolder != null ){
+                    loadTime = xpPageHolder.loadTime;
                 }
                 // is the xp file even there any longer ?
                 // TODO this should be checked above, not just when reloading is required (also dependents)
@@ -93,8 +96,9 @@ public class XpCachingLoader{
                 }
 
                 // does it still need reloading (we could have spent a lot of time waiting for the lock) ?
-                if ((xpPage == null )
-                        || (xpPage != null && xpNeedsReloading(xpURI, loadTime, xpPage.getClass().getClassLoader()))){
+                if ((xpPageHolder == null )
+                        || (xpPageHolder != null
+                                && xpNeedsReloading(xpURI, loadTime, xpPageHolder.getClass().getClassLoader()))) {
 
                     if (logger.isInfoEnabled()) {
                         logger.info("reloading: " + xpURI.toString());
@@ -102,33 +106,32 @@ public class XpCachingLoader{
                     translateXp(xpURI);
                     compileXp(xpURI);
                     xpCache.remove(xpURI.toString());
-                    xpPage = loadPage(xpURI);
-                    xpCache.put(xpURI.toString(),xpPage);
+                    xpPageHolder = loadPage(xpURI);
+                    xpCache.put(xpURI.toString(),xpPageHolder);
                 }
             }
         }
 
-        return xpPage;
-
-    }
-
-    public XpRunner getXpRunner(URI xpURI) throws XpException {
-        XpPage xpPage = getXpPage(xpURI);
-        if (null == xpPage) {
-            // TODO - throw file not found exception instead?
-            return null;
-        } else {
-            XpRunner xpRunner = new XpRunner(xpPage, templatesCache);
-            return xpRunner;
+        try {
+            AbstractXpPage xpPage = (AbstractXpPage) xpPageHolder.xpPageClass.newInstance();
+            xpPage.setTemplatesCache(getTemplatesCache());
+            xpPage.init();
+            return xpPage;
+        } catch (IllegalAccessException e) {
+            throw new XpCompilationException(e);
+        } catch (InstantiationException e) {
+            throw new XpCompilationException(e);
         }
     }
 
-    private XpPage loadPage(URI xpURI) throws XpCompilationException{
+    private XpPageHolder loadPage(URI xpURI) throws XpCompilationException{
         try{
+            XpPageHolder xpPageHolder = new XpPageHolder();
+            xpPageHolder.loadTime = System.currentTimeMillis();
             XpClassLoader loader = new XpClassLoader(parentLoader);
             loader.setRoot(getClassRoot());
-            Class cls = loader.loadClass(Translater.getClassName(xpURI));
-            return (XpPage)cls.newInstance();
+            xpPageHolder.xpPageClass = loader.loadClass(Translater.getClassName(xpURI));
+            return xpPageHolder;
         }catch(Exception e){
             throw new XpCompilationException(e);
         }
@@ -286,6 +289,11 @@ public class XpCachingLoader{
         }
 
         this.classPath = cpath.toString();
+    }
+
+    private class XpPageHolder {
+        private Class xpPageClass;
+        private long loadTime;
     }
 
 }

@@ -17,6 +17,7 @@ import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.servlet.net.ServletContextURIHandler;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.XpFileNotFoundException;
+import org.anodyneos.xp.XpPage;
 import org.anodyneos.xp.http.HttpXpContext;
 import org.anodyneos.xpImpl.http.HttpXpContextImpl;
 import org.apache.commons.logging.Log;
@@ -104,20 +105,20 @@ public class XpServlet extends HttpServlet{
 
         try {
 
-            // get XpRunner
+            // get XpPage
             URI xpURI = getXpURIFromRequest(req.getServletPath());
-            XpRunner xpRunner = cache.getXpRunner(xpURI);
-            if (xpRunner == null) {
+            XpPage xpPage = cache.getXpPage(xpURI);
+            if (xpPage == null) {
                 // TODO replace with smarter error page
                 res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
 
             // configure userAgent for xhtml auto method
-            xpRunner.setUserAgent(req.getHeader("User-Agent"));
+            xpPage.setUserAgent(req.getHeader("User-Agent"));
 
             // set mimetype and encoding on the servlet response
-            res.setContentType(genContentType(xpRunner.getMediaType(), xpRunner.getEncoding()));
+            res.setContentType(genContentType(xpPage.getMediaType(), xpPage.getEncoding()));
 
             // setup xpContext
             // TODO: use factory instead
@@ -126,7 +127,7 @@ public class XpServlet extends HttpServlet{
 
             // do it
             OutputStream out = res.getOutputStream();
-            xpRunner.run(xpContext, out);
+            xpPage.run(xpContext, out);
             out.close();
 
         } catch (TransformerConfigurationException tce) {

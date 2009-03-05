@@ -71,7 +71,7 @@ public interface XpContentHandler extends ContentHandler, XpNamespaceMapper {
     //
     // //////////////////////////////////////////////////////////////////////////////
 
-    //ContentHandler getWrappedContentHandler();
+    ContentHandler getWrappedContentHandler();
 
     boolean isNamespacePrefixes();
 

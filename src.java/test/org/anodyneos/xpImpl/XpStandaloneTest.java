@@ -8,9 +8,9 @@ import org.anodyneos.commons.net.ClassLoaderURIHandler;
 import org.anodyneos.commons.net.URLChangeRootURIHandler;
 import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.xp.XpContext;
+import org.anodyneos.xp.XpPage;
 import org.anodyneos.xp.standalone.StandaloneXpContext;
 import org.anodyneos.xpImpl.runtime.XpCachingLoader;
-import org.anodyneos.xpImpl.runtime.XpRunner;
 import org.anodyneos.xpImpl.standalone.StandaloneXpContextImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,10 +60,8 @@ public class XpStandaloneTest {
         File xpSourceDirectoryFile = new File(getXpSourceDirectory());
         UnifiedResolver resolver = new UnifiedResolver();
         resolver.setDefaultLookupEnabled(false);
-        resolver.addProtocolHandler("classpath",
-                new ClassLoaderURIHandler());
-        resolver.addProtocolHandler("file",
-                new URLChangeRootURIHandler(xpSourceDirectoryFile.toURL()));
+        resolver.addProtocolHandler("classpath", new ClassLoaderURIHandler());
+        resolver.addProtocolHandler("file", new URLChangeRootURIHandler(xpSourceDirectoryFile.toURL()));
 
         // determine xpRegistry configuration file
         String xpRegistry = getXpRegistryFile();
@@ -79,14 +77,14 @@ public class XpStandaloneTest {
 
     public void service(XpContext xpContext, URI xpURI) throws Exception {
 
-        XpRunner xpRunner = cache.getXpRunner(xpURI);
-        if (xpRunner == null) {
-            throw new Exception("could not get xpRunner for: " + xpURI);
+        XpPage xpPage = cache.getXpPage(xpURI);
+        if (xpPage == null) {
+            throw new Exception("could not get XpPage for: " + xpURI);
         }
 
-        xpRunner.setEncoding("UTF-8");
+        xpPage.setEncoding("UTF-8");
         OutputStream out = System.out;
-        xpRunner.run(xpContext, out);
+        xpPage.run(xpContext, out);
 
     }
 

@@ -74,10 +74,10 @@ class ProcessorPage extends TranslaterProcessor {
         JavaClass c = new JavaClass();
         c.setFullClassName(getTranslaterContext().getFullClassName());
         c.addInterface("org.anodyneos.xp.XpPage");
+        c.setExtends("org.anodyneos.xpImpl.runtime.AbstractXpPage");
 
         CodeWriter out = getTranslaterContext().getCodeWriter();
         String systemId = getTranslaterContext().getInputSource().getSystemId();
-        System.out.println("******* " + systemId);
 
         c.printHeader(out);
 
@@ -121,7 +121,6 @@ class ProcessorPage extends TranslaterProcessor {
 
         out.println();
         out.printIndent().println("private java.util.Properties outputProperties = new java.util.Properties(defaultProperties);");
-        out.println();
 
         // functionMapper
         out.println();
@@ -153,9 +152,10 @@ class ProcessorPage extends TranslaterProcessor {
         out.println();
 
         // constructor()
-        out.printIndent().println("public " + c.getClassName() + "() {");
+        out.printIndent().println("public " + c.getClassName() + "() throws org.anodyneos.xp.XpException {");
         out.indentPlus();
         out.printIndent().println("initOutputProperties();");
+        //out.printIndent().println("super.init();");
         out.endBlock();
         out.println();
 
@@ -217,13 +217,7 @@ class ProcessorPage extends TranslaterProcessor {
         }
         out.printIndent().println("return dependents;");
         out.endBlock();
-
         out.println();
-        out.printIndent().println("private final long loadTime = System.currentTimeMillis();");
-        out.printIndent().println("public long getLoadTime(){");
-        out.indentPlus();
-        out.printIndent().println("return loadTime;");
-        out.endBlock();
 
         if(getTranslaterContext().getFragmentCount() > 0) {
             // Output Fragments

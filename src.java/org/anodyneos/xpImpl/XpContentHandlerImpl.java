@@ -544,15 +544,15 @@ public final class XpContentHandlerImpl implements XpContentHandler {
     //
     ////////////////////////////////////////////////////////////////////////////////
 
-    /*  REMOVED
+    /**
      * This method should be used carefully; output should not be made directly
      * to the wrapped <code>ContentHandler</code>.
      *
      * @return the wrapped <code>ContentHandler</code>
+     */
     public ContentHandler getWrappedContentHandler() {
         return wrappedContentHandler;
     }
-     */
 
     public boolean isNamespacePrefixes() {
         return namespacePrefixes;
