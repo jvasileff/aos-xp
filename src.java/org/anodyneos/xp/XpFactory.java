@@ -3,8 +3,14 @@ package org.anodyneos.xp;
 import java.io.File;
 import java.net.URI;
 
+import javax.servlet.Servlet;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
 import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.commons.xml.xsl.TemplatesCache;
+import org.anodyneos.xp.http.HttpXpContext;
+import org.anodyneos.xp.standalone.StandaloneXpContext;
 
 public abstract class XpFactory {
 
@@ -51,6 +57,13 @@ public abstract class XpFactory {
 
     public abstract XpPage newXpPage(URI xpURI)
     throws XpFileNotFoundException, XpTranslationException, XpCompilationException, XpException;
+
+    public abstract StandaloneXpContext getStandaloneXpContext();
+    public abstract void releaseStandaloneXpContext(StandaloneXpContext ctx);
+
+    public abstract HttpXpContext  getHttpXpContext(
+            Servlet servlet, ServletRequest servletRequest,  ServletResponse servletResponse);
+    public abstract void releaseHttpXpContext(HttpXpContext ctx);
 
     // getters and setters
 

@@ -16,10 +16,10 @@ import org.anodyneos.commons.net.ClassLoaderURIHandler;
 import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.servlet.net.ServletContextURIHandler;
 import org.anodyneos.xp.XpException;
+import org.anodyneos.xp.XpFactory;
 import org.anodyneos.xp.XpFileNotFoundException;
 import org.anodyneos.xp.XpPage;
 import org.anodyneos.xp.http.HttpXpContext;
-import org.anodyneos.xpImpl.http.HttpXpContextImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -35,7 +35,7 @@ public class XpServlet extends HttpServlet{
 
     private static final String TMP_DIR_ATTRIBUTE = "javax.servlet.context.tempdir";
 
-    private XpFactoryImpl cache;
+    private XpFactory xpFactory;
 
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
@@ -81,12 +81,16 @@ public class XpServlet extends HttpServlet{
         if (logger.isInfoEnabled()) { logger.info("xpCacheAutoload: " + xpCacheAutoload); }
 
         // configure the XpCachingLoader
-        cache = XpFactoryImpl.getLoader();
-        cache.setXpRegistryURI(xpRegistryURI);
-        cache.setAutoLoad(xpCacheAutoload);
-        cache.setResolver(resolver);
-        cache.setJavaGenDirectory(scratchDir);
-        cache.setClassGenDirectory(scratchDir);
+        try {
+            xpFactory = XpFactory.newInstance();
+        } catch (XpException e) {
+            throw new ServletException("Could not create xpFactory.", e);
+        }
+        xpFactory.setXpRegistryURI(xpRegistryURI);
+        xpFactory.setAutoLoad(xpCacheAutoload);
+        xpFactory.setResolver(resolver);
+        xpFactory.setJavaGenDirectory(scratchDir);
+        xpFactory.setClassGenDirectory(scratchDir);
 
         //////////////////////////////////////////
         // XSLT Setup
@@ -101,7 +105,7 @@ public class XpServlet extends HttpServlet{
         if (logger.isInfoEnabled()) { logger.info("xsltCacheEnabled: " + xsltCache); }
 
         // configure the xslt templates cache
-        cache.getTemplatesCache().setCacheEnabled(xsltCache);
+        xpFactory.getTemplatesCache().setCacheEnabled(xsltCache);
     }
 
     public void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -112,7 +116,7 @@ public class XpServlet extends HttpServlet{
 
             // get XpPage
             URI xpURI = getXpURIFromRequest(req.getServletPath());
-            XpPage xpPage = cache.newXpPage(xpURI);
+            XpPage xpPage = xpFactory.newXpPage(xpURI);
             if (xpPage == null) {
                 // TODO replace with smarter error page
                 res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -126,9 +130,7 @@ public class XpServlet extends HttpServlet{
             res.setContentType(genContentType(xpPage.getMediaType(), xpPage.getEncoding()));
 
             // setup xpContext
-            // TODO: use factory instead
-            xpContext = new HttpXpContextImpl(this,req,res);
-            xpContext.initialize(this,req,res);
+            xpContext = xpFactory.getHttpXpContext(this,req,res);
 
             // do it
             OutputStream out = res.getOutputStream();

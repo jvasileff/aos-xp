@@ -11,6 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.Servlet;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
 import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.commons.xml.xsl.TemplatesCache;
 import org.anodyneos.commons.xml.xsl.TemplatesCacheImpl;
@@ -21,6 +25,10 @@ import org.anodyneos.xp.XpFactory;
 import org.anodyneos.xp.XpFileNotFoundException;
 import org.anodyneos.xp.XpPage;
 import org.anodyneos.xp.XpTranslationException;
+import org.anodyneos.xp.http.HttpXpContext;
+import org.anodyneos.xp.standalone.StandaloneXpContext;
+import org.anodyneos.xpImpl.http.HttpXpContextImpl;
+import org.anodyneos.xpImpl.standalone.StandaloneXpContextImpl;
 import org.anodyneos.xpImpl.translater.Translater;
 import org.anodyneos.xpImpl.translater.TranslaterResult;
 import org.apache.commons.logging.Log;
@@ -42,9 +50,9 @@ public class XpFactoryImpl extends XpFactory {
 
     private final Map xpCache =
         Collections.synchronizedMap(new HashMap());
-    private static XpFactoryImpl me = new XpFactoryImpl();
 
-    private XpFactoryImpl() {
+    public XpFactoryImpl() {
+        // TODO: lazy load if possible
         templatesCache = new TemplatesCacheImpl();
         GenericErrorHandler errorHandler = new GenericErrorHandler();
         templatesCache.setErrorHandler(errorHandler);
@@ -56,10 +64,6 @@ public class XpFactoryImpl extends XpFactory {
             loader = this.getClass().getClassLoader();
         }
         setParentLoader(loader);
-    }
-
-    public static XpFactoryImpl getLoader(){
-        return me;
     }
 
     public XpPage newXpPage(URI xpURI)
@@ -124,6 +128,26 @@ public class XpFactoryImpl extends XpFactory {
             throw new XpCompilationException(e);
         }
     }
+
+    public HttpXpContext getHttpXpContext(
+            Servlet servlet, ServletRequest servletRequest, ServletResponse servletResponse) {
+        HttpXpContextImpl ctx = new HttpXpContextImpl();
+        ctx.initialize(servlet, servletRequest, servletResponse);
+        return ctx;
+    }
+
+    public void releaseHttpXpContext(HttpXpContext ctx) {
+        // noop
+    }
+
+    public StandaloneXpContext getStandaloneXpContext() {
+        return new StandaloneXpContextImpl();
+    }
+
+    public void releaseStandaloneXpContext(StandaloneXpContext ctx) {
+        // noop
+    }
+
 
     private XpPageHolder loadPage(URI xpURI) throws XpCompilationException{
         try{

@@ -27,11 +27,7 @@ public class HttpXpContextImpl implements HttpXpContext {
 
     private Hashtable pageScopeMap = new Hashtable();
 
-    public HttpXpContextImpl(Servlet servlet, ServletRequest servletRequest,
-            ServletResponse servletResponse) {
-        this.servlet = servlet;
-        this.servletRequest = servletRequest;
-        this.servletResponse = servletResponse;
+    public HttpXpContextImpl() {
     }
 
     public ServletRequest getRequest() {
@@ -54,8 +50,7 @@ public class HttpXpContextImpl implements HttpXpContext {
         return ((HttpServletRequest)servletRequest).getSession();
     }
 
-    public void initialize(Servlet iServlet, ServletRequest iServletRequest,
-            ServletResponse iServletResponse) {
+    public void initialize(Servlet iServlet, ServletRequest iServletRequest, ServletResponse iServletResponse) {
         this.servlet = iServlet;
         this.servletRequest = iServletRequest;
         this.servletResponse = iServletResponse;

@@ -8,10 +8,8 @@ import org.anodyneos.commons.net.ClassLoaderURIHandler;
 import org.anodyneos.commons.net.URLChangeRootURIHandler;
 import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.xp.XpContext;
+import org.anodyneos.xp.XpFactory;
 import org.anodyneos.xp.XpPage;
-import org.anodyneos.xp.standalone.StandaloneXpContext;
-import org.anodyneos.xpImpl.runtime.XpFactoryImpl;
-import org.anodyneos.xpImpl.standalone.StandaloneXpContextImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -21,7 +19,7 @@ public class XpStandaloneTest {
 
     private static final long serialVersionUID = 1L;
 
-    private XpFactoryImpl cache;
+    private XpFactory xpFactory;
     private URI xpRegistryURI;
     private File xpSourceDirectory;
     private File scratchJavaDirectory;
@@ -35,13 +33,7 @@ public class XpStandaloneTest {
         obj.setXpRegistryURI(new URI(args[3]));
         obj.init();
 
-        StandaloneXpContext ctx = new StandaloneXpContextImpl();
-        ctx.initialize();
-        try {
-            obj.service(ctx, new URI(args[4]));
-        } finally {
-            ctx.release();
-        }
+        obj.service(new URI(args[4]));
     }
 
     public void init() throws Exception {
@@ -65,24 +57,25 @@ public class XpStandaloneTest {
         resolver.addProtocolHandler("file", new URLChangeRootURIHandler(xpSourceDirectoryFile.toURL()));
 
         // configure the XpCachingLoader
-        cache = XpFactoryImpl.getLoader();
-        cache.setXpRegistryURI(getXpRegistryURI());
-        cache.setResolver(resolver);
-        cache.setJavaGenDirectory(getScratchJavaDirectory());
-        cache.setClassGenDirectory(getScratchClassDirectory());
+        xpFactory = XpFactory.newInstance();
+        xpFactory.setXpRegistryURI(getXpRegistryURI());
+        xpFactory.setResolver(resolver);
+        xpFactory.setJavaGenDirectory(getScratchJavaDirectory());
+        xpFactory.setClassGenDirectory(getScratchClassDirectory());
 
     }
 
-    public void service(XpContext xpContext, URI xpURI) throws Exception {
+    public void service(URI xpURI) throws Exception {
 
-        XpPage xpPage = cache.newXpPage(xpURI);
+        XpContext ctx = xpFactory.getStandaloneXpContext();
+        XpPage xpPage = xpFactory.newXpPage(xpURI);
         if (xpPage == null) {
             throw new Exception("could not get XpPage for: " + xpURI);
         }
 
         xpPage.setEncoding("UTF-8");
         OutputStream out = System.out;
-        xpPage.service(xpContext, out);
+        xpPage.service(ctx, out);
 
     }
 
