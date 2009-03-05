@@ -17,9 +17,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.XMLReader;
 
-public class XpXMLReader implements XMLReader {
+public class XpPageReader implements XMLReader {
 
-    private static final Log logger = LogFactory.getLog(XpXMLReader.class);
+    private static final Log logger = LogFactory.getLog(XpPageReader.class);
 
     private XpPage xp;
     private XpContext xpContext;
@@ -34,7 +34,7 @@ public class XpXMLReader implements XMLReader {
      */
     private boolean namespacePrefixes = false;
 
-    public XpXMLReader(XpPage xp, XpContext xpContext) {
+    public XpPageReader(XpPage xp, XpContext xpContext) {
         this.xp = xp;
         this.xpContext = xpContext;
     }

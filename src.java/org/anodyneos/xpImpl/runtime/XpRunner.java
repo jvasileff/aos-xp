@@ -149,7 +149,7 @@ public class XpRunner {
 
     public void run(XpContext xpContext, OutputStream out) throws TransformerConfigurationException,
             TransformerException, IOException {
-        XMLReader xpXmlReader = new XpXMLReader(xpPage, xpContext);
+        XMLReader xpXmlReader = new XpPageReader(xpPage, xpContext);
 
         if ("fop".equals(method)) {
             Transformer trans = transformer;
