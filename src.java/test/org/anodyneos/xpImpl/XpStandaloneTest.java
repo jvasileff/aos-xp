@@ -82,7 +82,7 @@ public class XpStandaloneTest {
 
         xpPage.setEncoding("UTF-8");
         OutputStream out = System.out;
-        xpPage.run(xpContext, out);
+        xpPage.service(xpContext, out);
 
     }
 

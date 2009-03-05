@@ -11,7 +11,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.TransformerConfigurationException;
 
 import org.anodyneos.commons.net.ClassLoaderURIHandler;
 import org.anodyneos.commons.xml.UnifiedResolver;
@@ -133,13 +132,9 @@ public class XpServlet extends HttpServlet{
 
             // do it
             OutputStream out = res.getOutputStream();
-            xpPage.run(xpContext, out);
+            xpPage.service(xpContext, out);
             out.close();
 
-        } catch (TransformerConfigurationException tce) {
-            if (logger.isInfoEnabled()) {
-                logger.info("XpServlet.service - " + tce.getMessage(),tce);
-            }
         } catch (XpFileNotFoundException fnf) {
             res.sendError(HttpServletResponse.SC_NOT_FOUND,req.getServletPath());
 

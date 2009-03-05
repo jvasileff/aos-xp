@@ -9,6 +9,7 @@ import java.io.Writer;
 import java.net.URI;
 import java.util.Properties;
 
+import javax.servlet.jsp.el.ELException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -24,12 +25,14 @@ import org.anodyneos.commons.xml.xsl.TemplatesCache;
 import org.anodyneos.servlet.util.BrowserDetector;
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
+import org.anodyneos.xp.XpOutput;
 import org.anodyneos.xp.XpOutputKeys;
 import org.anodyneos.xp.XpPage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.fop.apps.Driver;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLFilterImpl;
 
@@ -48,9 +51,6 @@ public abstract class AbstractXpPage implements XpPage {
     public static final String KEY_XALAN_INDENT_AMOUNT = "{http://xml.apache.org/xalan}indent-amount";
 
     private TemplatesCache templatesCache;
-    //private Transformer transformer;
-
-    // default values
     private String encoding = "UTF-8";
     private String indent = "no";
     private String indentAmount = "1";
@@ -62,37 +62,90 @@ public abstract class AbstractXpPage implements XpPage {
     private String doctypeSystem = "";
 
     protected abstract Properties getOutputProperties();
+    protected abstract void service(XpContext xpContext, XpOutput out) throws XpException, ELException, SAXException;
+
+    public void service(XpContext xpContext, OutputStream out) throws IOException, XpException {
+
+        String xsltURI = getOutputProperties().getProperty(XpOutputKeys.XSLT_URI);
+
+        boolean isIdentityTransformer = false;
+        Transformer trans = newTransformer(xsltURI);
+        if (null == trans) {
+            isIdentityTransformer = true;
+            trans = newTransformer();
+        }
+
+        XMLReader xpXmlReader = new XpPageReader(this, xpContext);
+
+        try {
+            if ("fop".equals(method)) {
+                resetProperties(trans);
+                setTransformerProp(trans, OutputKeys.METHOD, "xml");
+                Driver driver = new Driver();
+                driver.setRenderer(Driver.RENDER_PDF);
+                driver.setOutputStream(out);
+                Source source = new SAXSource(xpXmlReader, new InputSource(""));
+                trans.transform(source, new SAXResult(driver.getContentHandler()));
+                out.flush();
+            } else if (METHOD_HTML.equals(method)) {
+                XMLFilterImpl nsFilter = new StripNamespaceFilter();
+                if (isIdentityTransformer) {
+                    // xp -> nsfilter -> identityXSL Template
+                    resetProperties(trans);
+                    nsFilter.setParent(xpXmlReader);
+                    setTransformerProp(trans, OutputKeys.METHOD, "html");
+                    setTransformerProp(trans, OutputKeys.MEDIA_TYPE, mediaType);
+                    Source source = new SAXSource(nsFilter, new InputSource(""));
+                    trans.transform(source, new StreamResult(out));
+                    out.flush();
+                } else {
+                    // xp -> XSL Template -> nsfilter -> identityXSL TH
+                    TransformerHandler th = templatesCache.getTransformerHandler();
+                    resetProperties(th.getTransformer());
+                    setTransformerProp(th.getTransformer(), OutputKeys.METHOD, "html");
+                    setTransformerProp(th.getTransformer(), OutputKeys.MEDIA_TYPE, mediaType);
+                    setTransformerProp(trans, OutputKeys.METHOD, "xml");
+
+                    // xp source outputs to transformer
+                    Source source = new SAXSource(xpXmlReader, new InputSource(""));
+                    // transformer outputs to nsFilter (acting as a contentHandler)
+                    SAXResult transformerSaxResult = new SAXResult(nsFilter);
+                    // nsFilter (acting as an XMLReader) outputs to th
+                    nsFilter.setContentHandler(th);
+                    // th outputs to browser
+                    th.setResult(new StreamResult(out));
+
+                    // do it
+                    trans.transform(source, transformerSaxResult);
+                    out.flush();
+                }
+            } else if ("text".equals(method)) {
+                // same as default, except let xalan think utf-8, and handle our own text encoding
+                // OutputStreamWriter uses "?" for unavailable characters, while xalan likes to complain
+                // to stderr for each one, and then follow up with &#nnnn; which doesn't make sense for text.
+                resetProperties(trans);
+                setTransformerProp(trans, OutputKeys.ENCODING, "UTF-8");
+                setTransformerProp(trans, OutputKeys.METHOD, method);
+                setTransformerProp(trans, OutputKeys.MEDIA_TYPE, mediaType);
+                Writer writer = new BufferedWriter(new OutputStreamWriter(out, getEncoding()));
+                Source source = new SAXSource(xpXmlReader, new InputSource(""));
+                trans.transform(source, new StreamResult(writer));
+                writer.flush();
+            } else {
+                resetProperties(trans);
+                setTransformerProp(trans, OutputKeys.METHOD, method);
+                setTransformerProp(trans, OutputKeys.MEDIA_TYPE, mediaType);
+                Source source = new SAXSource(xpXmlReader, new InputSource(""));
+                trans.transform(source, new StreamResult(out));
+                out.flush();
+            }
+        } catch (TransformerException e) {
+            throw new XpException(e);
+        }
+    }
 
     void init() throws XpException {
         updatePropertiesFromXpPage();
-    }
-
-    private Transformer newTransformer(String xsltURI) throws XpException {
-        Transformer transformer;
-
-        // get the transformer if specified
-        if (null == xsltURI || xsltURI.length() == 0) {
-            transformer = null;
-        } else {
-            try {
-                URI resolvedURI = getSourceURI().resolve(xsltURI);
-                if(log.isDebugEnabled()) {
-                    log.debug("Using xslURI: " + resolvedURI);
-                }
-                transformer = templatesCache.getTransformer(resolvedURI);
-            } catch(FileNotFoundException fnf) {
-                throw new XpException("Unable to load " + getClass().getCanonicalName() + ".xp " +
-                    "Check the xsltURI attribute of your xp file.  FileNotFound: " + fnf.getMessage());
-            } catch(TransformerConfigurationException ex) {
-                throw new XpException("Unable to load " + getClass().getCanonicalName() + ".xp " +
-                    "Check the xsltURI attribute of your xp file.  TransformerConfigurationException: " + ex.getMessage());
-            } catch(IOException ex) {
-                throw new XpException("Unable to load " + getClass().getCanonicalName() + ".xp " +
-                    "Check the xsltURI attribute of your xp file.  IOException: " + ex.getMessage());
-            }
-        }
-
-        return transformer;
     }
 
     /*
@@ -148,80 +201,39 @@ public abstract class AbstractXpPage implements XpPage {
         setTransformerProp(trans, OutputKeys.OMIT_XML_DECLARATION, omitXmlDeclaration);
     }
 
-    public void run(XpContext xpContext, OutputStream out) throws TransformerConfigurationException,
-            TransformerException, IOException, XpException {
+    private Transformer newTransformer(String xsltURI) throws XpException {
+        Transformer transformer;
 
-        String xsltURI = getOutputProperties().getProperty(XpOutputKeys.XSLT_URI);
-
-        boolean isIdentityTransformer = false;
-        Transformer trans = newTransformer(xsltURI);
-        if (null == trans) {
-            isIdentityTransformer = true;
-            trans = templatesCache.getTransformer();
+        // get the transformer if specified
+        if (null == xsltURI || xsltURI.length() == 0) {
+            transformer = null;
+        } else {
+            try {
+                URI resolvedURI = getSourceURI().resolve(xsltURI);
+                if(log.isDebugEnabled()) {
+                    log.debug("Using xslURI: " + resolvedURI);
+                }
+                transformer = templatesCache.getTransformer(resolvedURI);
+            } catch(FileNotFoundException fnf) {
+                throw new XpException("Unable to load " + getClass().getCanonicalName() + ".xp " +
+                    "Check the xsltURI attribute of your xp file.  FileNotFound: " + fnf.getMessage());
+            } catch(TransformerConfigurationException ex) {
+                throw new XpException("Unable to load " + getClass().getCanonicalName() + ".xp " +
+                    "Check the xsltURI attribute of your xp file.  TransformerConfigurationException: " + ex.getMessage());
+            } catch(IOException ex) {
+                throw new XpException("Unable to load " + getClass().getCanonicalName() + ".xp " +
+                    "Check the xsltURI attribute of your xp file.  IOException: " + ex.getMessage());
+            }
         }
 
-        XMLReader xpXmlReader = new XpPageReader(this, xpContext);
+        return transformer;
+    }
 
-        if ("fop".equals(method)) {
-            resetProperties(trans);
-            setTransformerProp(trans, OutputKeys.METHOD, "xml");
-            Driver driver = new Driver();
-            driver.setRenderer(Driver.RENDER_PDF);
-            driver.setOutputStream(out);
-            Source source = new SAXSource(xpXmlReader, new InputSource(""));
-            trans.transform(source, new SAXResult(driver.getContentHandler()));
-            out.flush();
-        } else if (METHOD_HTML.equals(method)) {
-            XMLFilterImpl nsFilter = new StripNamespaceFilter();
-            if (isIdentityTransformer) {
-                // xp -> nsfilter -> identityXSL Template
-                resetProperties(trans);
-                nsFilter.setParent(xpXmlReader);
-                setTransformerProp(trans, OutputKeys.METHOD, "html");
-                setTransformerProp(trans, OutputKeys.MEDIA_TYPE, mediaType);
-                Source source = new SAXSource(nsFilter, new InputSource(""));
-                trans.transform(source, new StreamResult(out));
-                out.flush();
-            } else {
-                // xp -> XSL Template -> nsfilter -> identityXSL TH
-                TransformerHandler th = templatesCache.getTransformerHandler();
-                resetProperties(th.getTransformer());
-                setTransformerProp(th.getTransformer(), OutputKeys.METHOD, "html");
-                setTransformerProp(th.getTransformer(), OutputKeys.MEDIA_TYPE, mediaType);
-                setTransformerProp(trans, OutputKeys.METHOD, "xml");
-
-                // xp source outputs to transformer
-                Source source = new SAXSource(xpXmlReader, new InputSource(""));
-                // transformer outputs to nsFilter (acting as a contentHandler)
-                SAXResult transformerSaxResult = new SAXResult(nsFilter);
-                // nsFilter (acting as an XMLReader) outputs to th
-                nsFilter.setContentHandler(th);
-                // th outputs to browser
-                th.setResult(new StreamResult(out));
-
-                // do it
-                trans.transform(source, transformerSaxResult);
-                out.flush();
-            }
-        } else if ("text".equals(method)) {
-            // same as default, except let xalan think utf-8, and handle our own text encoding
-            // OutputStreamWriter uses "?" for unavailable characters, while xalan likes to complain
-            // to stderr for each one, and then follow up with &#nnnn; which doesn't make sense for text.
-            resetProperties(trans);
-            setTransformerProp(trans, OutputKeys.ENCODING, "UTF-8");
-            setTransformerProp(trans, OutputKeys.METHOD, method);
-            setTransformerProp(trans, OutputKeys.MEDIA_TYPE, mediaType);
-            Writer writer = new BufferedWriter(new OutputStreamWriter(out, getEncoding()));
-            Source source = new SAXSource(xpXmlReader, new InputSource(""));
-            trans.transform(source, new StreamResult(writer));
-            writer.flush();
-        } else {
-            resetProperties(trans);
-            setTransformerProp(trans, OutputKeys.METHOD, method);
-            setTransformerProp(trans, OutputKeys.MEDIA_TYPE, mediaType);
-            Source source = new SAXSource(xpXmlReader, new InputSource(""));
-            trans.transform(source, new StreamResult(out));
-            out.flush();
+    private Transformer newTransformer() throws XpException {
+        try {
+            return getTemplatesCache().getTransformer();
+        } catch (TransformerConfigurationException e) {
+            throw new XpException(e);
         }
     }
 

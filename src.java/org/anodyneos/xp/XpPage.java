@@ -4,12 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 
-import javax.servlet.jsp.el.ELException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.anodyneos.commons.xml.xsl.TemplatesCache;
-import org.xml.sax.SAXException;
 
 public interface XpPage {
 
@@ -19,7 +14,7 @@ public interface XpPage {
     static final String MEDIA_TYPE_XHTML = "application/xhtml+xml";
     static final String MEDIA_TYPE_HTML = "text/html";
 
-    void service(XpContext xpContext, XpOutput out) throws XpException, ELException, SAXException;
+    void service(XpContext xpContext, OutputStream out) throws IOException, XpException;
 
     /**
      * XP output properties are defined by the optional <code>&lt;xp:output&gt;</code> tag.  See XpOutputKeys for
@@ -29,9 +24,6 @@ public interface XpPage {
      */
 
     URI getSourceURI();
-
-    void run(XpContext xpContext, OutputStream out) throws TransformerConfigurationException,
-                TransformerException, IOException, XpException;
 
     String getEncoding();
     void setEncoding(String encoding);

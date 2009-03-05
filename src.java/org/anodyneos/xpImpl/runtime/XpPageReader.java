@@ -5,7 +5,6 @@ import javax.servlet.jsp.el.ELException;
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.XpOutput;
-import org.anodyneos.xp.XpPage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.ContentHandler;
@@ -21,7 +20,7 @@ public class XpPageReader implements XMLReader {
 
     private static final Log logger = LogFactory.getLog(XpPageReader.class);
 
-    private XpPage xp;
+    private AbstractXpPage xp;
     private XpContext xpContext;
 
     private static final String FEATURE_NAMESPACES = "http://xml.org/sax/features/namespaces";
@@ -34,7 +33,7 @@ public class XpPageReader implements XMLReader {
      */
     private boolean namespacePrefixes = false;
 
-    public XpPageReader(XpPage xp, XpContext xpContext) {
+    public XpPageReader(AbstractXpPage xp, XpContext xpContext) {
         this.xp = xp;
         this.xpContext = xpContext;
     }
