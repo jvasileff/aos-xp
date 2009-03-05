@@ -26,7 +26,6 @@ import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.XpOutputKeys;
 import org.anodyneos.xp.XpPage;
-import org.anodyneos.xp.XpXMLReader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.fop.apps.Driver;

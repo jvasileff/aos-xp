@@ -147,7 +147,7 @@ class ProcessorPage extends TranslaterProcessor {
         out.printIndent().println("start = System.currentTimeMillis();");
         out.printIndent().println(c.getFullClassName() + " obj = new " + c.getFullClassName() + "();");
         out.printIndent().println("org.anodyneos.xp.standalone.StandaloneXpContext xpContext = org.anodyneos.xp.standalone.StandaloneXpFactory.getDefaultFactory().getStandaloneXpContext();");
-        out.printIndent().println("org.anodyneos.xp.util.XMLStreamer.process(new org.anodyneos.xp.XpXMLReader(obj, xpContext), System.out);");
+        out.printIndent().println("org.anodyneos.xp.util.XMLStreamer.process(new org.anodyneos.xpImpl.runtime.XpXMLReader(obj, xpContext), System.out);");
         out.printIndent().println("System.out.println(\"Completed in \" + (System.currentTimeMillis() - start) + \" milliseconds\");");
         out.endBlock();
         out.println();

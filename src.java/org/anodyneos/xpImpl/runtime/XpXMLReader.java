@@ -1,9 +1,10 @@
-package org.anodyneos.xp;
+package org.anodyneos.xpImpl.runtime;
 
 import javax.servlet.jsp.el.ELException;
 
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
+import org.anodyneos.xp.XpOutput;
 import org.anodyneos.xp.XpPage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
