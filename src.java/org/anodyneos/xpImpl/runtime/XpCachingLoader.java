@@ -49,6 +49,12 @@ public class XpCachingLoader{
         templatesCache.setErrorHandler(errorHandler);
         templatesCache.setErrorListener(errorHandler);
         templatesCache.setCacheEnabled(true);
+
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        if (loader == null) {
+            loader = this.getClass().getClassLoader();
+        }
+        setParentLoader(loader);
     }
 
     public static XpCachingLoader getLoader(){
@@ -80,7 +86,9 @@ public class XpCachingLoader{
                     loadTime = xpPage.getLoadTime();
                 }
                 // is the xp file even there any longer ?
+                // TODO this should be checked above, not just when reloading is required (also dependents)
                 if (!Translater.xpExists(xpURI,getResolver())){
+                    // TODO xpCache.remove(xpURI.toString());
                     throw new XpFileNotFoundException(xpURI.toString());
                 }
 
@@ -107,6 +115,7 @@ public class XpCachingLoader{
     public XpRunner getXpRunner(URI xpURI) throws XpException {
         XpPage xpPage = getXpPage(xpURI);
         if (null == xpPage) {
+            // TODO - throw file not found exception instead?
             return null;
         } else {
             XpRunner xpRunner = new XpRunner(xpPage, xpURI, templatesCache);
@@ -197,6 +206,7 @@ public class XpCachingLoader{
         if (getResolver() == null){
             throw new IllegalStateException("XpCachingLoader requires resolver to be set.");
         }
+        // TODO parse the registry separately, check it on each page load.
         TranslaterResult result = Translater.translate(getJavaRoot(), xpURI, getXpRegistry(),resolver);
     }
 
@@ -271,8 +281,8 @@ public class XpCachingLoader{
             cpath.append(classRoot);
         }
 
-        if (logger.isInfoEnabled()) {
-            logger.info("now using classpath: " + cpath.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug("now using classpath: " + cpath.toString());
         }
 
         this.classPath = cpath.toString();

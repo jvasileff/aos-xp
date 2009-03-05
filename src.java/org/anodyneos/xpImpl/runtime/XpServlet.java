@@ -55,15 +55,9 @@ public class XpServlet extends HttpServlet{
         UnifiedResolver resolver = new UnifiedResolver();
         resolver.setDefaultLookupEnabled(false);
         resolver.addProtocolHandler("classpath",
-                new ClassLoaderURIHandler(Thread.currentThread().getContextClassLoader()));
+                new ClassLoaderURIHandler());
         resolver.addProtocolHandler("webapp",
                 new ServletContextURIHandler(servletConfig.getServletContext()));
-
-        // determine current class loader
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        if (loader == null) {
-            loader = this.getClass().getClassLoader();
-        }
 
         // determine xpRegistry configuration file
         String xpRegistry = servletConfig.getInitParameter(IP_XP_REGISTRY);
@@ -87,7 +81,6 @@ public class XpServlet extends HttpServlet{
         cache.setResolver(resolver);
         cache.setJavaRoot(scratchDirPath);
         cache.setClassRoot(scratchDirPath);
-        cache.setParentLoader(loader);
 
         //////////////////////////////////////////
         // XSLT Setup

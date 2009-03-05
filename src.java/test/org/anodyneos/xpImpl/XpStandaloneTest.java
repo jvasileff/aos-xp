@@ -56,18 +56,12 @@ public class XpStandaloneTest {
         File scratchClassDir = new File(getScratchClassDirectory());
         String scratchClassDirPath = scratchClassDir.getAbsolutePath();
 
-        // determine current class loader
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        if (loader == null) {
-            loader = this.getClass().getClassLoader();
-        }
-
         // configure URI resolvers
         File xpSourceDirectoryFile = new File(getXpSourceDirectory());
         UnifiedResolver resolver = new UnifiedResolver();
         resolver.setDefaultLookupEnabled(false);
         resolver.addProtocolHandler("classpath",
-                new ClassLoaderURIHandler(loader));
+                new ClassLoaderURIHandler());
         resolver.addProtocolHandler("file",
                 new URLChangeRootURIHandler(xpSourceDirectoryFile.toURL()));
 
@@ -80,7 +74,6 @@ public class XpStandaloneTest {
         cache.setResolver(resolver);
         cache.setJavaRoot(scratchJavaDirPath);
         cache.setClassRoot(scratchClassDirPath);
-        cache.setParentLoader(loader);
 
     }
 

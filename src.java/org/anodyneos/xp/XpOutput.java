@@ -11,6 +11,7 @@ public final class XpOutput {
     private final XpContentHandler ch;
     private int mode = XML_MODE;
 
+    /*
     public XpOutput(XpContentHandler ch) {
         this.ch = ch;
     }
@@ -19,6 +20,7 @@ public final class XpOutput {
         this.ch = ch;
         setMode(mode);
     }
+    */
 
     public XpOutput(ContentHandler ch) {
         this.ch = XpContentHandlerFactory.getDefaultFactory().getXpContentHandler(ch);

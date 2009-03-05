@@ -12,7 +12,6 @@ import java.util.List;
 import org.anodyneos.commons.net.ClassLoaderURIHandler;
 import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.commons.xml.sax.BaseParser;
-import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.XpFileNotFoundException;
 import org.anodyneos.xp.XpTranslationException;
 import org.anodyneos.xp.tagext.TagLibraryRegistry;
@@ -187,13 +186,13 @@ public class Translater extends BaseParser {
         return (TranslaterResult) ctx;
     }
 
-    /**
+    /*//REMOVED
      * Check to see if xp is newer than java
      * @param xpURI
      * @param tempRoot
      * @param resolver
      * @return
-     */
+     *
     public static boolean xpNeedsTranslating(URI xpURI, String tempRoot, UnifiedResolver resolver)
     throws XpException{
 
@@ -205,15 +204,16 @@ public class Translater extends BaseParser {
             return true;
         }
     }
+    */
 
-    /**
+    /*//REMOVED
      * Check to see if xp is newer than class
      *
      * @param xpURI
      * @param tempRoot
      * @param resolver
      * @return
-     */
+     *
     public static boolean xpNeedsCompiling(URI xpURI, String tempRoot, UnifiedResolver resolver)
         throws XpException{
 
@@ -225,6 +225,7 @@ public class Translater extends BaseParser {
             return true;
         }
     }
+    */
 
     public static boolean xpIsOutOfDate(URI xpURI, String tempRoot, UnifiedResolver resolver, long loadTime)
         throws XpFileNotFoundException{
@@ -234,6 +235,8 @@ public class Translater extends BaseParser {
             if (conn == null){
                 throw new IOException(xpURI.toString() + " does not exist.");
             }
+            // conn.getLastModified() returns 0 if not known, so
+            // classpath: and webapp: type resources are ok
             long xpLastModified = conn.getLastModified();
 
             if (loadTime >= xpLastModified){
@@ -282,6 +285,8 @@ public class Translater extends BaseParser {
         return fullPath;
 
     }
+
+    /* REMOVED
     public static String getClassFile(String tempRoot, URI xpURI){
         String fullPath = concatPaths(TranslaterContext.DEFAULT_PACKAGE + "/",xpURI.getPath());
         fullPath = stripXpExtensionFromPath(fullPath);
@@ -293,6 +298,7 @@ public class Translater extends BaseParser {
         return fullPath;
 
     }
+    */
 
 
 
