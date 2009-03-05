@@ -25,9 +25,9 @@ import org.anodyneos.xpImpl.translater.TranslaterResult;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class XpCachingLoader{
+public class XpFactoryImpl{
 
-    private static final Log logger = LogFactory.getLog(XpCachingLoader.class);
+    private static final Log log = LogFactory.getLog(XpFactoryImpl.class);
 
     public static final long NEVER_LOADED = -1;
     private ClassLoader parentLoader;
@@ -41,9 +41,9 @@ public class XpCachingLoader{
 
     private final Map xpCache =
         Collections.synchronizedMap(new HashMap());
-    private static XpCachingLoader me = new XpCachingLoader();
+    private static XpFactoryImpl me = new XpFactoryImpl();
 
-    private XpCachingLoader() {
+    private XpFactoryImpl() {
         templatesCache = new TemplatesCacheImpl();
         GenericErrorHandler errorHandler = new GenericErrorHandler();
         templatesCache.setErrorHandler(errorHandler);
@@ -57,7 +57,7 @@ public class XpCachingLoader{
         setParentLoader(loader);
     }
 
-    public static XpCachingLoader getLoader(){
+    public static XpFactoryImpl getLoader(){
         return me;
     }
 
@@ -100,8 +100,8 @@ public class XpCachingLoader{
                         || (xpPageHolder != null
                                 && xpNeedsReloading(xpURI, loadTime, xpPageHolder.getClass().getClassLoader()))) {
 
-                    if (logger.isInfoEnabled()) {
-                        logger.info("reloading: " + xpURI.toString());
+                    if (log.isInfoEnabled()) {
+                        log.info("reloading: " + xpURI.toString());
                     }
                     translateXp(xpURI);
                     compileXp(xpURI);
@@ -160,8 +160,8 @@ public class XpCachingLoader{
 
                 }catch (Exception e){
                     // something happened
-                    if(logger.isErrorEnabled()) {
-                        logger.error("Unable to inspect children of "
+                    if(log.isErrorEnabled()) {
+                        log.error("Unable to inspect children of "
                                 + xpURI.toString() + " to see if they would cause a reload.", e);
                     }
                     return true;
@@ -177,8 +177,8 @@ public class XpCachingLoader{
 
 
     private void compileXp(URI xpURI) {
-        if(logger.isDebugEnabled()) {
-            logger.debug("compiling: " + xpURI.toString());
+        if(log.isDebugEnabled()) {
+            log.debug("compiling: " + xpURI.toString());
         }
 
         String[] args = new String[9];
@@ -202,8 +202,8 @@ public class XpCachingLoader{
     }
 
     private void translateXp(URI xpURI) throws IllegalStateException, XpTranslationException,XpFileNotFoundException{
-        if(logger.isDebugEnabled()) {
-            logger.debug("translating: " + xpURI.toString());
+        if(log.isDebugEnabled()) {
+            log.debug("translating: " + xpURI.toString());
         }
 
         if (getResolver() == null){
@@ -260,8 +260,8 @@ public class XpCachingLoader{
                 loopLoader != null;
                 loopLoader = (URLClassLoader) loopLoader.getParent()) {
             URL[] urls = loopLoader.getURLs();
-            if (logger.isDebugEnabled()) {
-                logger.debug("adding URLClassloader URLs:" + Arrays.asList(urls));
+            if (log.isDebugEnabled()) {
+                log.debug("adding URLClassloader URLs:" + Arrays.asList(urls));
             }
             for(int i=0; i<urls.length;i++) {
                 URL url = urls[i];
@@ -284,8 +284,8 @@ public class XpCachingLoader{
             cpath.append(classRoot);
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("now using classpath: " + cpath.toString());
+        if (log.isDebugEnabled()) {
+            log.debug("now using classpath: " + cpath.toString());
         }
 
         this.classPath = cpath.toString();

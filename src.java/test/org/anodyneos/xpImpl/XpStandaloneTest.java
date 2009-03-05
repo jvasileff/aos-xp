@@ -10,7 +10,7 @@ import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpPage;
 import org.anodyneos.xp.standalone.StandaloneXpContext;
-import org.anodyneos.xpImpl.runtime.XpCachingLoader;
+import org.anodyneos.xpImpl.runtime.XpFactoryImpl;
 import org.anodyneos.xpImpl.standalone.StandaloneXpContextImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,7 +21,7 @@ public class XpStandaloneTest {
 
     private static final long serialVersionUID = 1L;
 
-    private XpCachingLoader cache;
+    private XpFactoryImpl cache;
     private String xpSourceDirectory;
     private String xpRegistryFile;
     private String scratchJavaDirectory;
@@ -67,7 +67,7 @@ public class XpStandaloneTest {
         String xpRegistry = getXpRegistryFile();
 
         // configure the XpCachingLoader
-        cache = XpCachingLoader.getLoader();
+        cache = XpFactoryImpl.getLoader();
         cache.setXpRegistry(xpRegistry);
         cache.setResolver(resolver);
         cache.setJavaRoot(scratchJavaDirPath);

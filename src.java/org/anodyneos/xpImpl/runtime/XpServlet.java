@@ -35,7 +35,7 @@ public class XpServlet extends HttpServlet{
 
     private static final String TMP_DIR_ATTRIBUTE = "javax.servlet.context.tempdir";
 
-    private XpCachingLoader cache;
+    private XpFactoryImpl cache;
 
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
@@ -76,7 +76,7 @@ public class XpServlet extends HttpServlet{
         if (logger.isInfoEnabled()) { logger.info("xpCacheAutoload: " + xpCacheAutoload); }
 
         // configure the XpCachingLoader
-        cache = XpCachingLoader.getLoader();
+        cache = XpFactoryImpl.getLoader();
         cache.setXpRegistry(xpRegistry);
         cache.setAutoLoad(xpCacheAutoload);
         cache.setResolver(resolver);
