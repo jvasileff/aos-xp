@@ -22,18 +22,17 @@ public class XpStandaloneTest {
     private static final long serialVersionUID = 1L;
 
     private XpFactoryImpl cache;
-    private String xpSourceDirectory;
-    private String xpRegistryFile;
-    private String scratchJavaDirectory;
-    private String scratchClassDirectory;
+    private URI xpRegistryURI;
+    private File xpSourceDirectory;
+    private File scratchJavaDirectory;
+    private File scratchClassDirectory;
 
     public static void main(String[] args) throws Exception {
-        log.info("adsfasdf");
         XpStandaloneTest obj = new XpStandaloneTest();
-        obj.setScratchJavaDirectory(args[0]);
-        obj.setScratchClassDirectory(args[1]);
-        obj.setXpSourceDirectory(args[2]);
-        obj.setXpRegistryFile(args[3]);
+        obj.setScratchJavaDirectory(new File(args[0]));
+        obj.setScratchClassDirectory(new File(args[1]));
+        obj.setXpSourceDirectory(new File(args[2]));
+        obj.setXpRegistryURI(new URI(args[3]));
         obj.init();
 
         StandaloneXpContext ctx = new StandaloneXpContextImpl();
@@ -47,37 +46,36 @@ public class XpStandaloneTest {
 
     public void init() throws Exception {
 
-        // TODO: perform this check in XpCachingLoader
-        File scratchJavaDir = new File(getScratchJavaDirectory());
+        // validate scratch directories
+        File scratchJavaDir = getScratchJavaDirectory();
         if (!(scratchJavaDir.exists() && scratchJavaDir.canRead() && scratchJavaDir.canWrite())) {
-            throw new Exception("Work directory is invalid.  Check for existance and Read/Write settings.");
+            throw new Exception("Java work directory is invalid.  Check for existance and Read/Write settings: " + scratchJavaDir);
         }
-        String scratchJavaDirPath = scratchJavaDir.getAbsolutePath();
-        File scratchClassDir = new File(getScratchClassDirectory());
-        String scratchClassDirPath = scratchClassDir.getAbsolutePath();
+
+        File scratchClassDir = getScratchClassDirectory();
+        if (!(scratchClassDir.exists() && scratchClassDir.canRead() && scratchClassDir.canWrite())) {
+            throw new Exception("Class work directory is invalid.  Check for existance and Read/Write settings: " + scratchClassDir);
+        }
 
         // configure URI resolvers
-        File xpSourceDirectoryFile = new File(getXpSourceDirectory());
+        File xpSourceDirectoryFile = getXpSourceDirectory();
         UnifiedResolver resolver = new UnifiedResolver();
         resolver.setDefaultLookupEnabled(false);
         resolver.addProtocolHandler("classpath", new ClassLoaderURIHandler());
         resolver.addProtocolHandler("file", new URLChangeRootURIHandler(xpSourceDirectoryFile.toURL()));
 
-        // determine xpRegistry configuration file
-        String xpRegistry = getXpRegistryFile();
-
         // configure the XpCachingLoader
         cache = XpFactoryImpl.getLoader();
-        cache.setXpRegistry(xpRegistry);
+        cache.setXpRegistryURI(getXpRegistryURI());
         cache.setResolver(resolver);
-        cache.setJavaRoot(scratchJavaDirPath);
-        cache.setClassRoot(scratchClassDirPath);
+        cache.setJavaGenDirectory(getScratchJavaDirectory());
+        cache.setClassGenDirectory(getScratchClassDirectory());
 
     }
 
     public void service(XpContext xpContext, URI xpURI) throws Exception {
 
-        XpPage xpPage = cache.getXpPage(xpURI);
+        XpPage xpPage = cache.newXpPage(xpURI);
         if (xpPage == null) {
             throw new Exception("could not get XpPage for: " + xpURI);
         }
@@ -88,16 +86,16 @@ public class XpStandaloneTest {
 
     }
 
-    public String getXpSourceDirectory() { return xpSourceDirectory; }
-    public void setXpSourceDirectory(String xpSourceDirectory) { this.xpSourceDirectory = xpSourceDirectory; }
+    public File getXpSourceDirectory() { return xpSourceDirectory; }
+    public void setXpSourceDirectory(File xpSourceDirectory) { this.xpSourceDirectory = xpSourceDirectory; }
 
-    public String getScratchJavaDirectory() { return scratchJavaDirectory; }
-    public void setScratchJavaDirectory(String scratchDirectory) { this.scratchJavaDirectory = scratchDirectory; }
+    public File getScratchJavaDirectory() { return scratchJavaDirectory; }
+    public void setScratchJavaDirectory(File scratchDirectory) { this.scratchJavaDirectory = scratchDirectory; }
 
-    public String getXpRegistryFile() { return xpRegistryFile; }
-    public void setXpRegistryFile(String xpRegistryFile) { this.xpRegistryFile = xpRegistryFile; }
+    public URI getXpRegistryURI() { return xpRegistryURI; }
+    public void setXpRegistryURI(URI xpRegistryURI) { this.xpRegistryURI = xpRegistryURI; }
 
-    public String getScratchClassDirectory() { return scratchClassDirectory; }
-    public void setScratchClassDirectory(String scratchClassDirectory) { this.scratchClassDirectory = scratchClassDirectory; }
+    public File getScratchClassDirectory() { return scratchClassDirectory; }
+    public void setScratchClassDirectory(File scratchClassDirectory) { this.scratchClassDirectory = scratchClassDirectory; }
 
 }

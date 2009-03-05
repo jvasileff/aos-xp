@@ -17,6 +17,7 @@ import org.anodyneos.commons.xml.xsl.TemplatesCacheImpl;
 import org.anodyneos.servlet.xsl.GenericErrorHandler;
 import org.anodyneos.xp.XpCompilationException;
 import org.anodyneos.xp.XpException;
+import org.anodyneos.xp.XpFactory;
 import org.anodyneos.xp.XpFileNotFoundException;
 import org.anodyneos.xp.XpPage;
 import org.anodyneos.xp.XpTranslationException;
@@ -25,16 +26,16 @@ import org.anodyneos.xpImpl.translater.TranslaterResult;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class XpFactoryImpl{
+public class XpFactoryImpl extends XpFactory {
 
     private static final Log log = LogFactory.getLog(XpFactoryImpl.class);
 
     public static final long NEVER_LOADED = -1;
     private ClassLoader parentLoader;
     private String classPath;
-    private String classRoot;
-    private String javaRoot;
-    private String xpRegistry;
+    private File classRoot;
+    private File javaRoot;
+    private URI xpRegistry;
     private UnifiedResolver resolver;
     private boolean autoLoad = true;
     private TemplatesCache templatesCache;
@@ -61,7 +62,7 @@ public class XpFactoryImpl{
         return me;
     }
 
-    public XpPage getXpPage(URI xpURI)
+    public XpPage newXpPage(URI xpURI)
     throws XpFileNotFoundException, XpTranslationException, XpCompilationException, XpException {
 
         //XpPage xpPage = (XpPage)xpCache.get(xpURI.toString());
@@ -129,7 +130,7 @@ public class XpFactoryImpl{
             XpPageHolder xpPageHolder = new XpPageHolder();
             xpPageHolder.loadTime = System.currentTimeMillis();
             XpClassLoader loader = new XpClassLoader(parentLoader);
-            loader.setRoot(getClassRoot());
+            loader.setRoot(getClassGenDirectory().getPath());
             xpPageHolder.xpPageClass = loader.loadClass(Translater.getClassName(xpURI));
             return xpPageHolder;
         }catch(Exception e){
@@ -139,7 +140,7 @@ public class XpFactoryImpl{
 
     private boolean xpNeedsReloading(URI xpURI, long loadTime, ClassLoader loader) throws XpFileNotFoundException{
         if (this.isAutoLoad()){
-            if (Translater.xpIsOutOfDate(xpURI,getClassRoot(),getResolver(),loadTime)) {
+            if (Translater.xpIsOutOfDate(xpURI, getClassGenDirectory().getPath(), getResolver(), loadTime)) {
                 return true;
             } else {
 
@@ -183,12 +184,12 @@ public class XpFactoryImpl{
 
         String[] args = new String[9];
         args[0] = "-classpath";
-        args[1] = getClassPath();
+        args[1] = getCompileClassPath();
         args[2] = "-sourcepath";
-        args[3] = getJavaRoot();
+        args[3] = getJavaGenDirectory().getPath();
         args[4] = "-d";
-        args[5] = getClassRoot();
-        args[6] = Translater.getJavaFile(getJavaRoot(),xpURI);
+        args[5] = getClassGenDirectory().getPath();
+        args[6] = Translater.getJavaFile(getJavaGenDirectory().getPath(), xpURI);
         args[7] = "-noExit";
         args[8] = "-nowarn";
 
@@ -210,13 +211,14 @@ public class XpFactoryImpl{
             throw new IllegalStateException("XpCachingLoader requires resolver to be set.");
         }
         // TODO parse the registry separately, check it on each page load.
-        TranslaterResult result = Translater.translate(getJavaRoot(), xpURI, getXpRegistry(),resolver);
+        TranslaterResult result = Translater.translate(
+                getJavaGenDirectory().getPath(), xpURI, getXpRegistryURI().toString(),resolver);
     }
 
-    public String getClassRoot() {
+    public File getClassGenDirectory() {
         return classRoot;
     }
-    public void setClassRoot(String classRoot) {
+    public void setClassGenDirectory(File classRoot) {
         this.classRoot = classRoot;
         refreshClassPath();
     }
@@ -229,14 +231,13 @@ public class XpFactoryImpl{
         refreshClassPath();
     }
 
-    public String getJavaRoot() { return javaRoot; }
-    public void setJavaRoot(String javaRoot) { this.javaRoot = javaRoot; }
+    public File getJavaGenDirectory() { return javaRoot; }
+    public void setJavaGenDirectory(File javaRoot) { this.javaRoot = javaRoot; }
 
-    public String getXpRegistry() { return xpRegistry; }
-    public void setXpRegistry(String xpRegistry) { this.xpRegistry = xpRegistry; }
+    public URI getXpRegistryURI() { return xpRegistry; }
+    public void setXpRegistryURI(URI xpRegistry) { this.xpRegistry = xpRegistry; }
 
-    public String getClassPath() { return classPath; }
-    //public void setClassPath(String classPath) { this.classPath = classPath; }
+    public String getCompileClassPath() { return classPath; }
 
     public boolean isAutoLoad() { return autoLoad; }
     public void setAutoLoad(boolean autoLoad) { this.autoLoad = autoLoad; }
@@ -252,7 +253,7 @@ public class XpFactoryImpl{
         templatesCache.setUnifiedResolver(resolver);
     }
 
-    protected void refreshClassPath() {
+    private void refreshClassPath() {
 
         StringBuffer cpath = new StringBuffer();
 

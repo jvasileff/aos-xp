@@ -48,7 +48,7 @@ public abstract class AbstractXpPage implements XpPage {
     public static final String KEY_XALAN_INDENT_AMOUNT = "{http://xml.apache.org/xalan}indent-amount";
 
     private TemplatesCache templatesCache;
-    private Transformer transformer;
+    //private Transformer transformer;
 
     // default values
     private String encoding = "UTF-8";
@@ -60,20 +60,26 @@ public abstract class AbstractXpPage implements XpPage {
     private String cdataSectionElements = "";
     private String doctypePublic = "";
     private String doctypeSystem = "";
-    private String xsltURI = "";
+
+    protected abstract Properties getOutputProperties();
 
     void init() throws XpException {
-        this.xsltURI = getOutputProperties().getProperty(XpOutputKeys.XSLT_URI);
+        updatePropertiesFromXpPage();
+    }
 
-        // get the transformer if specified and retrieve output properties
-        if (null != xsltURI && xsltURI.length() > 0) {
+    private Transformer newTransformer(String xsltURI) throws XpException {
+        Transformer transformer;
+
+        // get the transformer if specified
+        if (null == xsltURI || xsltURI.length() == 0) {
+            transformer = null;
+        } else {
             try {
                 URI resolvedURI = getSourceURI().resolve(xsltURI);
                 if(log.isDebugEnabled()) {
                     log.debug("Using xslURI: " + resolvedURI);
                 }
-                this.transformer = templatesCache.getTransformer(resolvedURI);
-                updatePropertiesFromTransformer();
+                transformer = templatesCache.getTransformer(resolvedURI);
             } catch(FileNotFoundException fnf) {
                 throw new XpException("Unable to load " + getClass().getCanonicalName() + ".xp " +
                     "Check the xsltURI attribute of your xp file.  FileNotFound: " + fnf.getMessage());
@@ -86,10 +92,10 @@ public abstract class AbstractXpPage implements XpPage {
             }
         }
 
-        // update properties from the XpPage
-        updatePropertiesFromXpPage();
+        return transformer;
     }
 
+    /*
     private void updatePropertiesFromTransformer() {
         cdataSectionElements = propWithDefault(transformer, OutputKeys.CDATA_SECTION_ELEMENTS, cdataSectionElements);
         doctypePublic = propWithDefault(transformer, OutputKeys.DOCTYPE_PUBLIC, doctypePublic);
@@ -102,6 +108,16 @@ public abstract class AbstractXpPage implements XpPage {
         omitXmlDeclaration = propWithDefault(transformer, OutputKeys.OMIT_XML_DECLARATION, omitXmlDeclaration);
         //standalone = propWithDefault(trans, OutputKeys.STANDALONE, doctypePublic);
     }
+
+    private String propWithDefault(Transformer transformer, String key, String defaultValue) {
+        String val = transformer.getOutputProperty(key);
+        if (null != val && val.length() > 0) {
+            return val;
+        } else {
+            return defaultValue;
+        }
+    }
+    */
 
     private void updatePropertiesFromXpPage() {
         Properties props = getOutputProperties();
@@ -121,35 +137,32 @@ public abstract class AbstractXpPage implements XpPage {
         }
     }
 
-    private void resetProperties(Transformer transformer) {
-        transformer.clearParameters();
-        setTransformerProp(transformer, OutputKeys.CDATA_SECTION_ELEMENTS, cdataSectionElements);
-        setTransformerProp(transformer, OutputKeys.DOCTYPE_PUBLIC, doctypePublic);
-        setTransformerProp(transformer, OutputKeys.DOCTYPE_SYSTEM, doctypeSystem);
-        setTransformerProp(transformer, OutputKeys.ENCODING, encoding);
-        setTransformerProp(transformer, OutputKeys.INDENT, indent);
-        setTransformerProp(transformer, KEY_XALAN_INDENT_AMOUNT, indentAmount);
-        setTransformerProp(transformer, OutputKeys.OMIT_XML_DECLARATION, omitXmlDeclaration);
-    }
-
-    private String propWithDefault(Transformer transformer, String key, String defaultValue) {
-        String val = transformer.getOutputProperty(key);
-        if (null != val && val.length() > 0) {
-            return val;
-        } else {
-            return defaultValue;
-        }
+    private void resetProperties(Transformer trans) {
+        trans.clearParameters();
+        setTransformerProp(trans, OutputKeys.CDATA_SECTION_ELEMENTS, cdataSectionElements);
+        setTransformerProp(trans, OutputKeys.DOCTYPE_PUBLIC, doctypePublic);
+        setTransformerProp(trans, OutputKeys.DOCTYPE_SYSTEM, doctypeSystem);
+        setTransformerProp(trans, OutputKeys.ENCODING, encoding);
+        setTransformerProp(trans, OutputKeys.INDENT, indent);
+        setTransformerProp(trans, KEY_XALAN_INDENT_AMOUNT, indentAmount);
+        setTransformerProp(trans, OutputKeys.OMIT_XML_DECLARATION, omitXmlDeclaration);
     }
 
     public void run(XpContext xpContext, OutputStream out) throws TransformerConfigurationException,
-            TransformerException, IOException {
+            TransformerException, IOException, XpException {
+
+        String xsltURI = getOutputProperties().getProperty(XpOutputKeys.XSLT_URI);
+
+        boolean isIdentityTransformer = false;
+        Transformer trans = newTransformer(xsltURI);
+        if (null == trans) {
+            isIdentityTransformer = true;
+            trans = templatesCache.getTransformer();
+        }
+
         XMLReader xpXmlReader = new XpPageReader(this, xpContext);
 
         if ("fop".equals(method)) {
-            Transformer trans = transformer;
-            if (null == transformer) {
-                trans = templatesCache.getTransformer();
-            }
             resetProperties(trans);
             setTransformerProp(trans, OutputKeys.METHOD, "xml");
             Driver driver = new Driver();
@@ -160,9 +173,8 @@ public abstract class AbstractXpPage implements XpPage {
             out.flush();
         } else if (METHOD_HTML.equals(method)) {
             XMLFilterImpl nsFilter = new StripNamespaceFilter();
-            if (null == transformer) {
+            if (isIdentityTransformer) {
                 // xp -> nsfilter -> identityXSL Template
-                Transformer trans = templatesCache.getTransformer();
                 resetProperties(trans);
                 nsFilter.setParent(xpXmlReader);
                 setTransformerProp(trans, OutputKeys.METHOD, "html");
@@ -176,7 +188,7 @@ public abstract class AbstractXpPage implements XpPage {
                 resetProperties(th.getTransformer());
                 setTransformerProp(th.getTransformer(), OutputKeys.METHOD, "html");
                 setTransformerProp(th.getTransformer(), OutputKeys.MEDIA_TYPE, mediaType);
-                setTransformerProp(transformer, OutputKeys.METHOD, "xml");
+                setTransformerProp(trans, OutputKeys.METHOD, "xml");
 
                 // xp source outputs to transformer
                 Source source = new SAXSource(xpXmlReader, new InputSource(""));
@@ -188,30 +200,22 @@ public abstract class AbstractXpPage implements XpPage {
                 th.setResult(new StreamResult(out));
 
                 // do it
-                transformer.transform(source, transformerSaxResult);
+                trans.transform(source, transformerSaxResult);
                 out.flush();
             }
         } else if ("text".equals(method)) {
             // same as default, except let xalan think utf-8, and handle our own text encoding
             // OutputStreamWriter uses "?" for unavailable characters, while xalan likes to complain
             // to stderr for each one, and then follow up with &#nnnn; which doesn't make sense for text.
-            Transformer trans = transformer;
-            if (null == transformer) {
-                trans = templatesCache.getTransformer();
-            }
             resetProperties(trans);
             setTransformerProp(trans, OutputKeys.ENCODING, "UTF-8");
             setTransformerProp(trans, OutputKeys.METHOD, method);
             setTransformerProp(trans, OutputKeys.MEDIA_TYPE, mediaType);
-            Writer writer = new BufferedWriter(new OutputStreamWriter(out, encoding));
+            Writer writer = new BufferedWriter(new OutputStreamWriter(out, getEncoding()));
             Source source = new SAXSource(xpXmlReader, new InputSource(""));
             trans.transform(source, new StreamResult(writer));
             writer.flush();
         } else {
-            Transformer trans = transformer;
-            if (null == transformer) {
-                trans = templatesCache.getTransformer();
-            }
             resetProperties(trans);
             setTransformerProp(trans, OutputKeys.METHOD, method);
             setTransformerProp(trans, OutputKeys.MEDIA_TYPE, mediaType);
@@ -261,7 +265,10 @@ public abstract class AbstractXpPage implements XpPage {
     public String getDoctypeSystem() { return doctypeSystem; }
     public void setDoctypeSystem(String doctypeSystem) { this.doctypeSystem = doctypeSystem; }
 
-    public void setUserAgent(String userAgent) {
+    public TemplatesCache getTemplatesCache() { return templatesCache; }
+    public void setTemplatesCache(TemplatesCache templatesCache) { this.templatesCache = templatesCache; }
+
+    public void configureForUserAgent(String userAgent) {
         if (METHOD_XHTML_AUTO.equals(getOutputProperties().getProperty(XpOutputKeys.METHOD))) {
             BrowserDetector bd = getBrowserDetector(userAgent);
             if ((BrowserDetector.MOZILLA.equals(bd.getBrowserName()) && bd.getBrowserVersion() >= 5)
@@ -290,7 +297,5 @@ public abstract class AbstractXpPage implements XpPage {
         return browserDetector;
     }
 
-    public TemplatesCache getTemplatesCache() { return templatesCache; }
-    public void setTemplatesCache(TemplatesCache templatesCache) { this.templatesCache = templatesCache; }
 
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -49,8 +50,7 @@ public class XpServlet extends HttpServlet{
         if (!(scratchDir.exists() && scratchDir.canRead() && scratchDir.canWrite())){
             throw new ServletException("Work directory is invalid.  Check for existance and Read/Write settings.");
         }
-        String scratchDirPath = scratchDir.getAbsolutePath();
-        if (logger.isInfoEnabled()) { logger.info("xpClassRoot and xpJavaRoot: " + scratchDirPath); }
+        if (logger.isInfoEnabled()) { logger.info("xpClassRoot and xpJavaRoot: " + scratchDir.getPath()); }
 
         // configure URI resolvers
         UnifiedResolver resolver = new UnifiedResolver();
@@ -62,10 +62,16 @@ public class XpServlet extends HttpServlet{
 
         // determine xpRegistry configuration file
         String xpRegistry = servletConfig.getInitParameter(IP_XP_REGISTRY);
-        if (xpRegistry == null){
-            xpRegistry = "webapp:///WEB-INF/registry.xpreg";
+        URI xpRegistryURI;
+        try {
+            if (xpRegistry == null){
+                xpRegistry = "webapp:///WEB-INF/registry.xpreg";
+            }
+            if (logger.isInfoEnabled()) { logger.info("xpRegistry URI: " + xpRegistry); }
+            xpRegistryURI = new URI(xpRegistry);
+        } catch (URISyntaxException e) {
+            throw new ServletException("Cannot create URI for xpRegistry '" + xpRegistry + "';", e);
         }
-        if (logger.isInfoEnabled()) { logger.info("xpRegistry URI: " + xpRegistry); }
 
         // determine autoLoad setting
         boolean xpCacheAutoload = true; // default true
@@ -77,11 +83,11 @@ public class XpServlet extends HttpServlet{
 
         // configure the XpCachingLoader
         cache = XpFactoryImpl.getLoader();
-        cache.setXpRegistry(xpRegistry);
+        cache.setXpRegistryURI(xpRegistryURI);
         cache.setAutoLoad(xpCacheAutoload);
         cache.setResolver(resolver);
-        cache.setJavaRoot(scratchDirPath);
-        cache.setClassRoot(scratchDirPath);
+        cache.setJavaGenDirectory(scratchDir);
+        cache.setClassGenDirectory(scratchDir);
 
         //////////////////////////////////////////
         // XSLT Setup
@@ -107,7 +113,7 @@ public class XpServlet extends HttpServlet{
 
             // get XpPage
             URI xpURI = getXpURIFromRequest(req.getServletPath());
-            XpPage xpPage = cache.getXpPage(xpURI);
+            XpPage xpPage = cache.newXpPage(xpURI);
             if (xpPage == null) {
                 // TODO replace with smarter error page
                 res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -115,7 +121,7 @@ public class XpServlet extends HttpServlet{
             }
 
             // configure userAgent for xhtml auto method
-            xpPage.setUserAgent(req.getHeader("User-Agent"));
+            xpPage.configureForUserAgent(req.getHeader("User-Agent"));
 
             // set mimetype and encoding on the servlet response
             res.setContentType(genContentType(xpPage.getMediaType(), xpPage.getEncoding()));

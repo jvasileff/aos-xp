@@ -3,7 +3,6 @@ package org.anodyneos.xp;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.Properties;
 
 import javax.servlet.jsp.el.ELException;
 import javax.xml.transform.TransformerConfigurationException;
@@ -28,12 +27,11 @@ public interface XpPage {
      *
      * @return the output <code>Properties</code> object.
      */
-    Properties getOutputProperties();
 
     URI getSourceURI();
 
     void run(XpContext xpContext, OutputStream out) throws TransformerConfigurationException,
-                TransformerException, IOException;
+                TransformerException, IOException, XpException;
 
     String getEncoding();
     void setEncoding(String encoding);
@@ -65,6 +63,6 @@ public interface XpPage {
     TemplatesCache getTemplatesCache();
     void setTemplatesCache(TemplatesCache templatesCache);
 
-    void setUserAgent(String userAgent);
+    void configureForUserAgent(String userAgent);
 
 }
