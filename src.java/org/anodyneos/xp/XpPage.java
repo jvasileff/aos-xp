@@ -1,5 +1,6 @@
 package org.anodyneos.xp;
 
+import java.net.URI;
 import java.util.Properties;
 
 import javax.servlet.jsp.el.ELException;
@@ -20,4 +21,7 @@ public interface XpPage {
      * @return the output <code>Properties</code> object.
      */
     public Properties getOutputProperties();
+
+    public URI getSourceURI();
+
 }

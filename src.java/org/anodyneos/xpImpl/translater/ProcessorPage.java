@@ -76,13 +76,32 @@ class ProcessorPage extends TranslaterProcessor {
         c.addInterface("org.anodyneos.xp.XpPage");
 
         CodeWriter out = getTranslaterContext().getCodeWriter();
+        String systemId = getTranslaterContext().getInputSource().getSystemId();
+        System.out.println("******* " + systemId);
+
         c.printHeader(out);
 
         // output properties
         out.printIndent().println("private static final java.util.Properties defaultProperties = new java.util.Properties();");
+        if (null != systemId) {
+            out.printIndent().println("private static final java.net.URI sourceURI;");
+        } else {
+            out.printIndent().println("private static java.net.URI sourceURI = null;");
+        }
         out.println();
         out.printIndent().println("static {");
         out.indentPlus();
+        if (null != systemId) {
+            out.printIndent().println("java.net.URI tmp = null;");
+            out.printIndent().println("try {");
+            out.indentPlus();
+            out.printIndent().println("tmp = new java.net.URI(\"" + Util.escapeString(systemId) + "\");");
+            out.indentMinus();
+            out.printIndent().println("} catch ( java.net.URISyntaxException e) {");
+            out.indentPlus();
+            out.endBlock();
+            out.printIndent().println("sourceURI = tmp;");
+        }
 
         /*
             TODO: should these properties have defaults?  It is probably better for them not to since the serializer (XSL) has its own defaults.
@@ -137,6 +156,13 @@ class ProcessorPage extends TranslaterProcessor {
         out.printIndent().println("public " + c.getClassName() + "() {");
         out.indentPlus();
         out.printIndent().println("initOutputProperties();");
+        out.endBlock();
+        out.println();
+
+        // getSourceURI()
+        out.printIndent().println("public java.net.URI getSourceURI() {");
+        out.indentPlus();
+        out.printIndent().println("return sourceURI;");
         out.endBlock();
         out.println();
 
