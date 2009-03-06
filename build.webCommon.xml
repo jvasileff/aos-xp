@@ -316,7 +316,7 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
     <target name="jar" depends="compile" description="Create the jar/war">
-        <jar jarfile="${file.jar}" compress="no">
+        <jar jarfile="${file.jar}" compress="yes">
             <fileset dir="${dir.build.classes}">
                 <patternset refid="pattern.resources"/>
                 <include name="**/*.class"/>
@@ -327,7 +327,7 @@
         <war
             warfile="${file.war}"
             webxml="${dir.build.webapp}/WEB-INF/web.xml"
-            compress="no">
+            compress="yes">
             <fileset dir="${dir.src.webapp}">
                 <patternset refid="pattern.docRoot"/>
                 <!-- get rid of web.xml warning on war task -->
@@ -342,7 +342,7 @@
                 <include name="META-INF/**"/>
             </classes>
         </war>
-        <zip zipfile="${file.src.zip}" compress="no">
+        <zip zipfile="${file.src.zip}" compress="yes">
             <fileset dir="${dir.src.java}">
                 <patternset refid="pattern.resources"/>
                 <include name="**/*.java"/>
