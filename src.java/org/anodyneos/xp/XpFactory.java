@@ -10,6 +10,7 @@ import javax.servlet.ServletResponse;
 import org.anodyneos.commons.xml.UnifiedResolver;
 import org.anodyneos.commons.xml.xsl.TemplatesCache;
 import org.anodyneos.xp.http.HttpXpContext;
+import org.anodyneos.xp.standalone.StandaloneXpAppContext;
 import org.anodyneos.xp.standalone.StandaloneXpContext;
 
 public abstract class XpFactory {
@@ -61,7 +62,7 @@ public abstract class XpFactory {
     public abstract StandaloneXpContext getStandaloneXpContext();
     public abstract void releaseStandaloneXpContext(StandaloneXpContext ctx);
 
-    public abstract HttpXpContext  getHttpXpContext(
+    public abstract HttpXpContext getHttpXpContext(
             Servlet servlet, ServletRequest servletRequest,  ServletResponse servletResponse);
     public abstract void releaseHttpXpContext(HttpXpContext ctx);
 
@@ -78,6 +79,9 @@ public abstract class XpFactory {
 
     public abstract URI getXpRegistryURI();
     public abstract void setXpRegistryURI(URI xpRegistry);
+
+    public abstract StandaloneXpAppContext getStandaloneXpAppContext();
+    public abstract void setStandaloneXpAppContext(StandaloneXpAppContext appCtx);
 
     public abstract UnifiedResolver getResolver();
     public abstract void setResolver(UnifiedResolver resolver);

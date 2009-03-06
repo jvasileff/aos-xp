@@ -26,6 +26,8 @@ import org.anodyneos.xp.XpFileNotFoundException;
 import org.anodyneos.xp.XpPage;
 import org.anodyneos.xp.XpTranslationException;
 import org.anodyneos.xp.http.HttpXpContext;
+import org.anodyneos.xp.standalone.StandaloneXpAppContext;
+import org.anodyneos.xp.standalone.StandaloneXpAppContextMapAdapter;
 import org.anodyneos.xp.standalone.StandaloneXpContext;
 import org.anodyneos.xpImpl.http.HttpXpContextImpl;
 import org.anodyneos.xpImpl.standalone.StandaloneXpContextImpl;
@@ -44,6 +46,7 @@ public class XpFactoryImpl extends XpFactory {
     private File classRoot;
     private File javaRoot;
     private URI xpRegistry;
+    private StandaloneXpAppContext appCtx;
     private UnifiedResolver resolver;
     private boolean autoLoad = true;
     private TemplatesCache templatesCache;
@@ -261,6 +264,14 @@ public class XpFactoryImpl extends XpFactory {
     public URI getXpRegistryURI() { return xpRegistry; }
     public void setXpRegistryURI(URI xpRegistry) { this.xpRegistry = xpRegistry; }
 
+    public StandaloneXpAppContext getStandaloneXpAppContext() {
+        if (null == appCtx) {
+            appCtx = new StandaloneXpAppContextMapAdapter();
+        }
+        return appCtx;
+    }
+    public void setStandaloneXpAppContext(StandaloneXpAppContext appCtx) { this.appCtx = appCtx; }
+
     public String getCompileClassPath() { return classPath; }
 
     public boolean isAutoLoad() { return autoLoad; }
@@ -320,5 +331,6 @@ public class XpFactoryImpl extends XpFactory {
         private Class xpPageClass;
         private long loadTime;
     }
+
 
 }

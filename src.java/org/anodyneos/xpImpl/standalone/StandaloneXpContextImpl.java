@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.el.VariableResolver;
 
+import org.anodyneos.xp.standalone.StandaloneXpAppContext;
 import org.anodyneos.xp.standalone.StandaloneXpContext;
 import org.apache.commons.el.ExpressionEvaluatorImpl;
 
@@ -19,19 +20,21 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
      */
     private Map[] scopeMaps = new Map[] { new HashMap(), new HashMap() };
 
+    private StandaloneXpAppContext appCtx;
     private Map pageScopeMap = new HashMap();
-    private Map applicationScopeMap = new HashMap();
     private VariableResolver variableResolver;
     private ExpressionEvaluator expEval = new ExpressionEvaluatorImpl(false);
 
     public StandaloneXpContextImpl() {
     }
 
-    public void initialize() {
+    public void initialize(StandaloneXpAppContext appCtx) {
+        this.appCtx = appCtx;
         this.variableResolver = new StandaloneVariableResolverImpl(this);
     }
 
     public void release() {
+        this.appCtx = null;
         this.variableResolver = null;
     }
 
@@ -46,7 +49,7 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
             case PAGE_SCOPE:
                 return pageScopeMap.get(name);
             case APPLICATION_SCOPE:
-                return applicationScopeMap.get(name);
+                return appCtx.getAttribute(name);
             default:
                 throw new IllegalArgumentException("invalid scope: " + scope);
         }
@@ -62,7 +65,7 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
                 pageScopeMap.remove(name);
                 break;
             case APPLICATION_SCOPE:
-                applicationScopeMap.remove(name);
+                appCtx.removeAttribute(name);
                 break;
             default:
                 throw new IllegalArgumentException("invalid scope: " + scope);
@@ -82,7 +85,7 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
                     pageScopeMap.put(name,obj);
                     break;
                 case APPLICATION_SCOPE:
-                    applicationScopeMap.put(name,obj);
+                    appCtx.setAttribute(name, obj);
                     break;
                 default:
                     throw new IllegalArgumentException("invalid scope: " + scope);
@@ -97,8 +100,7 @@ public class StandaloneXpContextImpl extends StandaloneXpContext {
                 keys = pageScopeMap.keySet();
                 break;
             case APPLICATION_SCOPE:
-                keys = applicationScopeMap.keySet();
-                break;
+                return appCtx.getAttributeNames();
             default:
                 throw new IllegalArgumentException("invalid scope: " + scope);
         }
