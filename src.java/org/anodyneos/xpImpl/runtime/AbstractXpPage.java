@@ -30,7 +30,6 @@ import org.anodyneos.xp.XpOutputKeys;
 import org.anodyneos.xp.XpPage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.fop.apps.Driver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -81,11 +80,7 @@ public abstract class AbstractXpPage implements XpPage {
             if ("fop".equals(method)) {
                 resetProperties(trans);
                 setTransformerProp(trans, OutputKeys.METHOD, "xml");
-                Driver driver = new Driver();
-                driver.setRenderer(Driver.RENDER_PDF);
-                driver.setOutputStream(out);
-                Source source = new SAXSource(xpXmlReader, new InputSource(""));
-                trans.transform(source, new SAXResult(driver.getContentHandler()));
+                FopOutputer.outputFop(xpXmlReader, trans, out);
                 out.flush();
             } else if (METHOD_HTML.equals(method)) {
                 XMLFilterImpl nsFilter = new StripNamespaceFilter();
