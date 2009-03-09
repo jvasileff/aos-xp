@@ -144,7 +144,9 @@ public class XpFactoryImpl extends XpFactory {
     }
 
     public StandaloneXpContext getStandaloneXpContext() {
-        return new StandaloneXpContextImpl();
+        StandaloneXpContext ctx = new StandaloneXpContextImpl();
+        ctx.initialize(getStandaloneXpAppContext());
+        return ctx;
     }
 
     public void releaseStandaloneXpContext(StandaloneXpContext ctx) {

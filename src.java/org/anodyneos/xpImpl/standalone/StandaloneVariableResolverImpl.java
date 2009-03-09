@@ -29,7 +29,7 @@ public class StandaloneVariableResolverImpl implements VariableResolver {
         } else if (StandaloneXpContext.APPLICATION_SCOPE_STRING.equals(pName)) {
             return new ApplicationScopeMap(ctx);
         } else {
-            return ctx.getAttribute(pName);
+            return ctx.findAttribute(pName);
         }
     }
 
