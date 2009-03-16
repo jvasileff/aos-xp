@@ -29,6 +29,13 @@ import org.anodyneos.xp.http.HttpXpContext;
 public class Config {
 
     /*
+     * Core actions related configuration data
+     */
+    public static final String CORE_CONTEXT_URI = "org.anodyneos.xp.tag.core.contextUri";
+    public static final String CORE_URI_ENCODING = "org.anodyneos.xp.tag.core.uriEncoding";
+    public static final String CORE_FALLBACK_URI_ENCODING = "org.anodyneos.xp.tag.core.fallbackUriEncoding";
+
+    /*
      * I18N/Formatting actions related configuration data
      */
 

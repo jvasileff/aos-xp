@@ -25,7 +25,6 @@ import javax.servlet.jsp.el.ELException;
 
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.XpOutput;
-import org.anodyneos.xp.http.HttpXpContext;
 import org.anodyneos.xp.tagext.XpTag;
 import org.anodyneos.xp.tagext.XpTagSupport;
 import org.xml.sax.SAXException;
@@ -48,13 +47,6 @@ public class ParamTag extends XpTagSupport {
     protected String name; // 'name' attribute
 
     protected String value; // 'value' attribute
-
-    /**
-     * There used to be an 'encode' attribute; I've left this as a vestige in
-     * case custom subclasses want to use our functionality but NOT encode
-     * parameters.
-     */
-    protected boolean encode = true;
 
     // *********************************************************************
     // Constructor and initialization
@@ -89,18 +81,9 @@ public class ParamTag extends XpTagSupport {
                 value = getXpBody().invokeToString().trim();
             }
         }
-        if (encode) {
-            String enc = ((HttpXpContext) getXpContext()).getResponse()
-                    .getCharacterEncoding();
-            try {
-                parent.addParameter(URLEncoder.encode(name, enc), URLEncoder
-                        .encode(value, enc));
-            } catch (UnsupportedEncodingException e) {
-                throw new XpException(e);
-            }
-        } else {
-            parent.addParameter(name, value);
-        }
+
+        parent.addParameter(name, value);
+
     }
 
     // for tag attribute
@@ -153,25 +136,22 @@ public class ParamTag extends XpTagSupport {
          * Produces a new URL with the stored parameters, in the appropriate
          * order.
          */
-        public String aggregateParams(String url) {
-            /*
-             * Since for efficiency we're destructive to the param lists, we
-             * don't want to run multiple times.
-             */
-            if (done)
+        public String aggregateParams(String url, String encoding) throws UnsupportedEncodingException {
+            if (done) {
                 throw new IllegalStateException();
-            done = true;
+            }
 
-            // // reverse the order of our two lists
-            // Collections.reverse(this.names);
-            // Collections.reverse(this.values);
+            done = true;
 
             // build a string from the parameter list
             StringBuffer newParams = new StringBuffer();
             for (int i = 0; i < names.size(); i++) {
-                newParams.append(names.get(i) + "=" + values.get(i));
-                if (i < (names.size() - 1))
+                newParams.append(URLEncoder.encode((String) names.get(i), encoding));
+                newParams.append('=');
+                newParams.append(URLEncoder.encode((String) values.get(i), encoding));
+                if (i < (names.size() - 1)) {
                     newParams.append("&");
+                }
             }
 
             // insert these parameters into the URL as appropriate

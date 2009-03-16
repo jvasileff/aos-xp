@@ -40,6 +40,8 @@
     <property name="anodyneos-commons.jar" location="${dir.jars}/anodyneos-commons-0.4.4/anodyneos-commons.jar"/>
     <property name="anodyneos-servlet.jar" location="${dir.jars}/anodyneos-servlet-0.6.4/anodyneos-servlet.jar"/>
 
+    <property name="activation.jar" location="${dir.jars.notfree}/jaf-1.0.2/activation.jar"/>
+
     <!-- for fop -->
     <property name="fop.jar" location="${dir.jars}/apache-fop-0.20.5/fop.jar"/>
     <property name="batik.jar" location="${dir.jars}/apache-fop-0.20.5/batik.jar"/>
@@ -128,6 +130,8 @@
         <copy toDir="${dir.build.ide.lib}" file="${commons-collections-2.1.1.jar}"/>
 
         <copy toDir="${dir.build.ide.lib}" file="${ecj-3.4.2.jar}"/>
+
+        <copy toDir="${dir.build.ide.lib}" file="${activation.jar}"/>
 
         <!--<copy toDir="${dir.build.ide.lib}"><fileset refid="fs.tools.jar"/></copy>-->
 

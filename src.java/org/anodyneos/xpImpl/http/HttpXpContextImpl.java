@@ -47,7 +47,9 @@ public class HttpXpContextImpl implements HttpXpContext {
     }
 
     public HttpSession getSession() {
-        return ((HttpServletRequest)servletRequest).getSession();
+        // FIXME We need to create sessions when necessary; JSP uses <%@ page session="true|false" %>
+        // With JSP, if session="false", the session is not available even if there is an active session.
+        return ((HttpServletRequest)servletRequest).getSession(false);
     }
 
     public void initialize(Servlet iServlet, ServletRequest iServletRequest, ServletResponse iServletResponse) {
@@ -79,7 +81,12 @@ public class HttpXpContextImpl implements HttpXpContext {
             case REQUEST_SCOPE:
                 return servletRequest.getAttribute(name);
             case SESSION_SCOPE:
-                return getSession().getAttribute(name);
+                HttpSession ses = getSession();
+                if (null == ses) {
+                    return null;
+                } else {
+                    return ses.getAttribute(name);
+                }
             case APPLICATION_SCOPE:
                 return getServletContext().getAttribute(name);
             default:

@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!DOCTYPE xp:page [
+    <!ENTITY copy "&#169;">
+    <!ENTITY nbsp "&#160;">
+    <!ENTITY baseURL "..">
+]>
+
+<xp:page 
+    xmlns:xp="http://www.anodyneos.org/xmlns/xp"
+    xmlns:fmt="http://www.anodyneos.org/xmlns/xp/fmt"
+    xmlns:c="http://www.anodyneos.org/xmlns/xp/core"
+    xmlns:fn="http://www.anodyneos.org/xmlns/xp/function"
+    xmlns="http://www.w3.org/1999/xhtml"
+>
+    <xp:output  indent="yes"
+                indentAmount="2"
+                mediaType="application/xhtml+xml"
+                encoding="windows-1252"
+                method="xml"
+                excludeResultPrefixes="xp fmt c"
+                />
+    <xp:content>
+        <html>
+            <head/>
+            <body>
+                <!--
+                <xp:set var="sesVar" value="myVal" scope="session"/>
+                TestSess: ${sessionScope.id}
+                <br/>
+                -->
+
+                <c:url value="relative"/><br/>
+                <c:url value="/absolute"/><br/>
+                <c:url value="http://www.example.com/fullyQualified"/><br/>
+                <hr/>
+                <c:url value="relative" context="/mycontext"/><br/>
+                <c:url value="relative" context="/mycontext/"/><br/>
+                <c:url value="/absolute" context="/mycontext"/><br/>
+                <c:url value="/absolute" context="/mycontext/"/><br/>
+                <c:url value="http://www.example.com/fullyQualified" context="/mycontext"/><br/>
+                <c:url value="http://www.example.com/fullyQualified" context="/mycontext/"/><br/>
+                <hr/>
+                <c:url value="relative" context="http://ctx.example.com"/><br/>
+                <c:url value="/absolute" context="http://ctx.example.com"/><br/>
+                <c:url value="http://www.example.com/fullyQualified" context="http://ctx.example.com"/><br/>
+                <hr/>
+                <c:url value="relative" context="http://ctx.example.com/mypath"/><br/>
+                <c:url value="relative" context="http://ctx.example.com/mypath/"/><br/>
+                <c:url value="/absolute" context="http://ctx.example.com/mypath"/><br/>
+                <c:url value="/absolute" context="http://ctx.example.com/mypath/"/><br/>
+                <c:url value="http://www.example.com/fullyQualified" context="http://ctx.example.com/mypath"/><br/>
+                <c:url value="http://www.example.com/fullyQualified" context="http://ctx.example.com/mypath/"/><br/>
+                <hr/>
+                <c:url value="relative/" context="http://ctx.example.com/mypath"/><br/>
+                <c:url value="/absolute/" context="http://ctx.example.com/mypath"/><br/>
+                <c:url value="http://www.example.com/fullyQualified/" context="http://ctx.example.com/mypath"/><br/>
+                <hr/>
+                <hr/>
+                key=x&#8220;value&#8221;x<br/>
+                non-specified: <c:url value="relative"> <c:param name="key" value="x&#8220;value&#8221;x"/> </c:url><br/>
+                utf-8: <c:url value="relative" uriEncoding="utf-8"> <c:param name="key" value="x&#8220;value&#8221;x"/> </c:url><br/>
+                ascii: <c:url value="relative" uriEncoding="ascii"> <c:param name="key" value="x&#8220;value&#8221;x"/> </c:url><br/>
+                windows-1252: <c:url value="relative" uriEncoding="windows-1252"> <c:param name="key" value="x&#8220;value&#8221;x"/> </c:url><br/>
+                <hr/>
+                non-specified: <c:url value="http://www.example.com"> <c:param name="key" value="x&#8220;value&#8221;x"/> </c:url><br/>
+                utf-8: <c:url value="http://www.example.com" uriEncoding="utf-8"> <c:param name="key" value="x&#8220;value&#8221;x"/> </c:url><br/>
+                ascii: <c:url value="http://www.example.com" uriEncoding="ascii"> <c:param name="key" value="x&#8220;value&#8221;x"/> </c:url><br/>
+                windows-1252: <c:url value="http://www.example.com" uriEncoding="windows-1252"> <c:param name="key" value="x&#8220;value&#8221;x"/> </c:url><br/>
+
+            </body>
+        </html>
+    </xp:content>
+</xp:page>

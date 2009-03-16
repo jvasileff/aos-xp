@@ -350,6 +350,11 @@
         <required>false</required>
         <request-time-ok>true</request-time-ok>
     </attribute>
+    <attribute>
+        <name>uriEncoding</name>
+        <required>false</required>
+        <request-time-ok>true</request-time-ok>
+    </attribute>
   </tag>
 
 

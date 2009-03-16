@@ -26,9 +26,13 @@ public class BBCodeTag extends XpTagSupport {
     public static final String XHTML_NS = "http://www.w3.org/1999/xhtml";
     public static final String XHTML_PREFIX = "xhtml";
 
+    public static final String MODE_HTML = "html";
+    public static final String MODE_TEXT = "text";
+
     private static final Log logger = LogFactory.getLog(BBCodeTag.class);
 
     private String text;
+    private String mode = MODE_HTML;
 
     public void doTag(XpOutput out) throws XpException, ELException,
             SAXException {
@@ -41,9 +45,14 @@ public class BBCodeTag extends XpTagSupport {
             }
         }
         if (! "".equals(text)) {
-            BBCodeParserXp ahps = new BBCodeParserXp(new java.io.StringReader(text), out);
             try {
-                ahps.process();
+                if (MODE_TEXT.equals(getMode())) {
+                    BBCodeParserXpText ahps = new BBCodeParserXpText(new java.io.StringReader(text), out);
+                    ahps.process();
+                } else {
+                    BBCodeParserXp ahps = new BBCodeParserXp(new java.io.StringReader(text), out);
+                    ahps.process();
+                }
             } catch (Exception e) {
                 // TODO:
             }
@@ -59,6 +68,93 @@ public class BBCodeTag extends XpTagSupport {
 
     protected static AutoHtmlParserUrlGen urlGenDefault = new AutoHtmlParserUrlGenDefault();
     protected static Attributes emptyAttributes = new AttributesImpl();
+
+    protected class BBCodeParserXpText extends BBCodeParser {
+
+        private XpOutput out;
+        private StringBuffer sb;
+        private String delayedUrl;
+
+        protected BBCodeParserXpText(InputStream stream, XpOutput out) {
+            super(stream);
+            this.out = out;
+        }
+
+        protected BBCodeParserXpText(java.io.Reader stream, XpOutput out) {
+            super(stream);
+            this.out = out;
+        }
+
+        protected void process() throws ParseException {
+            Input();
+            flushText();
+        }
+
+        protected void processWord(String s)   { addText(s); }
+        protected void processSpace(String s)  { addText(s); }
+        protected void processEol(String s)    { addText(s); }
+        protected void processEmail(String s)  { addText(s); }
+        protected void processUrl(String s)    { addText(s); }
+        protected void processFtp(String s)    { addText(s); }
+        protected void processWww(String s)    { addText(s); }
+
+        private void addText(char c) {
+            if (null == sb) {
+                sb = new StringBuffer();
+            }
+            sb.append(c);
+        }
+
+        private void addText(String s) {
+            if (null == sb) {
+                sb = new StringBuffer();
+            }
+            sb.append(s);
+        }
+
+        private void flushText() {
+            // Write contents of sb to node.
+            try {
+                if (null != sb) {
+                    out.write(sb.toString().toCharArray(), 0, sb.length());
+                    sb.setLength(0);
+                }
+            } catch (SAXException e) {
+                logger.error("FIXME: Thrown away SAXException.", e);
+                // FIXME: should not throw away exception
+            }
+        }
+
+        protected void processInvalidOpen(String arg0) { processWord(arg0); }
+
+        protected void processCloseTag(String arg0) {
+            if (BBCodeParser.TAG_URL.equals(arg0) && null != delayedUrl) {
+                processWord(" <" + delayedUrl + ">");
+                delayedUrl = null;
+            } else if (BBCodeParser.TAG_QUOTE.equals(arg0) || BBCodeParser.TAG_CODE.equals(arg0)) {
+                // parser removes whitespace around block tags (quote & code).  So, add some whitespace.
+                addText('\n');
+                addText('\n');
+            }
+        }
+
+        protected void processOpenColorTag(String arg0) { /* noop */ }
+        protected void processOpenSizeTag(String arg0) { /* noop */ }
+
+        protected void processOpenSimpleTag(String arg0) {
+            // parser removes whitespace around block tags (quote & code).  So, add some whitespace.
+            if (BBCodeParser.TAG_QUOTE.equals(arg0) || BBCodeParser.TAG_CODE.equals(arg0)) {
+                addText('\n');
+                addText('\n');
+            }
+        }
+
+        protected void processOpenUrlEmailTag(String arg0) { delayedUrl = arg0; }
+        protected void processOpenUrlFtpTag(String arg0) { delayedUrl = arg0; }
+        protected void processOpenUrlTag(String arg0) { delayedUrl = arg0; }
+        protected void processOpenUrlWwwTag(String arg0) { delayedUrl = arg0; }
+    }
+
     protected class BBCodeParserXp extends BBCodeParser {
 
         private XpOutput out;
@@ -287,5 +383,8 @@ public class BBCodeTag extends XpTagSupport {
         String namespace;
         String qName;
     }
+
+    public String getMode() { return mode; }
+    public void setMode(String mode) { this.mode = mode; }
 
 }

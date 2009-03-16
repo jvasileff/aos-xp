@@ -35,6 +35,14 @@
         <required>false</required>
         <request-time-ok>true</request-time-ok>
     </attribute>
+    <attribute>
+        <description>
+            Output mode, text or html.
+        </description>
+        <name>mode</name>
+        <required>false</required>
+        <request-time-ok>true</request-time-ok>
+    </attribute>
   </tag>
 
     <!-- JSTL TAGS -->
