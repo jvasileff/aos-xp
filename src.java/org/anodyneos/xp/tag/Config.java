@@ -22,6 +22,7 @@ import javax.servlet.http.HttpSession;
 
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.http.HttpXpContext;
+import org.anodyneos.xp.standalone.StandaloneXpAppContext;
 
 /**
  * Class supporting access to configuration settings.
@@ -162,6 +163,10 @@ public class Config {
         return context.getAttribute(name + "." + XpContext.APPLICATION_SCOPE_STRING);
     }
 
+    public static Object get(StandaloneXpAppContext context, String name) {
+        return context.getAttribute(name + "." + XpContext.APPLICATION_SCOPE_STRING);
+    }
+
     /**
      * Sets the value of a configuration variable in the given scope.
      *
@@ -230,6 +235,10 @@ public class Config {
         context.setAttribute(name + "." + XpContext.APPLICATION_SCOPE_STRING, value);
     }
 
+    public static void set(StandaloneXpAppContext context, String name, Object value) {
+        context.setAttribute(name + "." + XpContext.APPLICATION_SCOPE_STRING, value);
+    }
+
     /**
      * Removes a configuration variable from the given scope.
      *
@@ -289,6 +298,10 @@ public class Config {
      * @param name Configuration variable name
      */
     public static void remove(ServletContext context, String name) {
+        context.removeAttribute(name + "." + XpContext.APPLICATION_SCOPE_STRING);
+    }
+
+    public static void remove(StandaloneXpAppContext context, String name) {
         context.removeAttribute(name + "." + XpContext.APPLICATION_SCOPE_STRING);
     }
 
