@@ -19,6 +19,7 @@ package org.anodyneos.xp.tag.fmt;
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.XpOutput;
+import org.anodyneos.xp.tag.Config;
 import org.anodyneos.xp.tagext.XpTagSupport;
 
 /**

@@ -23,6 +23,7 @@ import javax.servlet.jsp.el.ELException;
 import org.anodyneos.xp.XpContext;
 import org.anodyneos.xp.XpException;
 import org.anodyneos.xp.XpOutput;
+import org.anodyneos.xp.tag.Config;
 import org.anodyneos.xp.tagext.XpTagSupport;
 import org.xml.sax.SAXException;
 

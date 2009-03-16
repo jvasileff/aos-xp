@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.anodyneos.xp.tag.fmt;
+package org.anodyneos.xp.tag;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;

@@ -22,7 +22,8 @@ import java.util.ResourceBundle;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.anodyneos.xp.tag.fmt.Config;
+
+import org.anodyneos.xp.tag.Config;
 import org.anodyneos.xp.tag.fmt.LocalizationContext;
 
 import org.springframework.context.MessageSource;
