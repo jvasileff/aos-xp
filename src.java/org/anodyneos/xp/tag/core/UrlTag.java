@@ -50,6 +50,7 @@ public class UrlTag extends XpTagSupport implements ParamParent {
     private String attributeName; // 'attributeName' attribute
     private String attributeNamespace; // 'attributeNamespace' attribute
     private String var; // 'var' attribute
+    private String fragment; // 'fragment' attribute
     private int scope; // processed 'scope' attr
 
     private ParamTag.ParamManager params; // added parameters
@@ -71,6 +72,7 @@ public class UrlTag extends XpTagSupport implements ParamParent {
     public void setScope(String scope) { this.scope = getXpContext().resolveScope(scope); }
     public void setContext(String context) { this.context = context; }
     public void setUriEncoding(String uriEncoding) { this.uriEncoding = uriEncoding; }
+    public void setFragment(String fragment) { this.fragment = fragment; }
 
     public String getContext() {
         String ctx = null;
@@ -118,7 +120,7 @@ public class UrlTag extends XpTagSupport implements ParamParent {
         String baseUrl = resolveUri(value, contextUri);
         String encoding = getUriEncodingFor(baseUrl);
         try {
-            result = params.aggregateParams(baseUrl, encoding);
+            result = params.aggregateParams(baseUrl, fragment, encoding);
         } catch (UnsupportedEncodingException ex) {
             throw new XpException(ex);
         }

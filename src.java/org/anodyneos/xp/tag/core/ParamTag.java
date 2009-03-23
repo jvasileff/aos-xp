@@ -136,37 +136,86 @@ public class ParamTag extends XpTagSupport {
          * Produces a new URL with the stored parameters, in the appropriate
          * order.
          */
-        public String aggregateParams(String url, String encoding) throws UnsupportedEncodingException {
+        public String aggregateParams(String url, String fragment, String encoding)
+        throws UnsupportedEncodingException {
             if (done) {
                 throw new IllegalStateException();
             }
-
             done = true;
 
-            // build a string from the parameter list
-            StringBuffer newParams = new StringBuffer();
-            for (int i = 0; i < names.size(); i++) {
-                newParams.append(URLEncoder.encode((String) names.get(i), encoding));
-                newParams.append('=');
-                newParams.append(URLEncoder.encode((String) values.get(i), encoding));
-                if (i < (names.size() - 1)) {
-                    newParams.append("&");
+            if (names.isEmpty() && (null == fragment)) {
+                return url;
+            }
+
+            int poundIndex = url.indexOf('#');
+            int questionMarkIndex = url.indexOf('?');
+
+            if (questionMarkIndex > poundIndex) {
+                questionMarkIndex = -1;
+            }
+
+            // fragment
+            String workingFragment = null;
+            if (null != fragment) {
+                workingFragment = URLEncoder.encode(fragment, encoding);
+            } else if (-1 != poundIndex) {
+                workingFragment = url.substring(poundIndex + 1);
+            }
+
+            // oldQuery
+            String oldQuery = null;
+            if (-1 != questionMarkIndex) {
+                if (-1 == poundIndex) {
+                    oldQuery = url.substring(questionMarkIndex + 1);
+                } else {
+                    oldQuery = url.substring(questionMarkIndex + 1, poundIndex);
                 }
             }
 
-            // insert these parameters into the URL as appropriate
-            if (newParams.length() > 0) {
-                int questionMark = url.indexOf('?');
-                if (questionMark == -1) {
-                    return (url + "?" + newParams);
-                } else {
-                    StringBuffer workingUrl = new StringBuffer(url);
-                    workingUrl.insert(questionMark + 1, (newParams + "&"));
-                    return workingUrl.toString();
-                }
-            } else {
-                return url;
+            // build the URL
+            StringBuilder workingUrl = new StringBuilder();
+
+            // base
+            if (-1 == poundIndex && -1 == questionMarkIndex) {
+                workingUrl.append(url);
+            } else if (-1 != questionMarkIndex) {
+                workingUrl.append(url.substring(0, questionMarkIndex));
+            } else if (-1 != poundIndex) {
+                workingUrl.append(url.substring(0, poundIndex));
             }
+
+            // newQuery
+            boolean queryStarted = false;
+            if (! names.isEmpty()) {
+                workingUrl.append('?');
+                queryStarted = true;
+                for (int i = 0; i < names.size(); i++) {
+                    workingUrl.append(URLEncoder.encode((String) names.get(i), encoding));
+                    workingUrl.append('=');
+                    workingUrl.append(URLEncoder.encode((String) values.get(i), encoding));
+                    if (i < (names.size() - 1)) {
+                        workingUrl.append("&");
+                    }
+                }
+            }
+
+            // old query params
+            if (null != oldQuery && oldQuery.length() > 0) {
+                if (! queryStarted) {
+                    workingUrl.append('?');
+                } else {
+                    workingUrl.append('&');
+                }
+                workingUrl.append(oldQuery);
+            }
+
+            // fragment
+            if (null != workingFragment && workingFragment.length() > 0) {
+                workingUrl.append("#");
+                workingUrl.append(workingFragment);
+            }
+
+            return workingUrl.toString();
         }
     }
 }
