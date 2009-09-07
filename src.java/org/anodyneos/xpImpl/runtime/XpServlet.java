@@ -33,6 +33,8 @@ public class XpServlet extends HttpServlet{
     public static final String IP_XP_CACHE_AUTOLOAD = "xpCacheAutoload";
     public static final String IP_XSLT_CACHE = "xsltCache";
 
+    public static final String XP_FACTORY_SERVLET_CONTEXT_ATTRIBUTE = "org.anodyneos.xp.xpFactory";
+
     private static final String TMP_DIR_ATTRIBUTE = "javax.servlet.context.tempdir";
 
     private XpFactory xpFactory;
@@ -106,6 +108,8 @@ public class XpServlet extends HttpServlet{
 
         // configure the xslt templates cache
         xpFactory.getTemplatesCache().setCacheEnabled(xsltCache);
+
+        servletConfig.getServletContext().setAttribute(XP_FACTORY_SERVLET_CONTEXT_ATTRIBUTE, xpFactory);
     }
 
     public void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
