@@ -6,18 +6,28 @@
 **
 *****************************************************************************-->
 
-<project name="anodyneos-xp" default="compile" basedir=".">
+<project name="anodyneos-xp" default="compile" basedir="."
+        xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
-    <!--++++++++++++++++++++++++++++++++++++
-    ++
-    ++  SETUP
-    ++
-    +++++++++++++++++++++++++++++++++++++-->
-
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  setup and defaults
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <property file="build.properties"/>
 
     <property name="compile.source" value="1.4"/>
     <property name="compile.target" value="1.4"/>
+
+    <!-- defaults, override in build.properties if desired -->
+    <property name="compile.deprecation" value="off"/>
+    <property name="compile.debug" value="true"/>
+    <property name="compile.debuglevel" value="lines,source,vars"/>
+
+    <property name="webapp.context" value="/aos-xp"/>
+    <property name="webapp.reloadable" value="false"/>
+    <property name="transformerFactory" value="xalan"/>
+    <!--
+    <property name="transformerFactory" value="xsltc"/>
+    -->
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  common
@@ -33,61 +43,6 @@
     <property name="dir.build.classes.sample"   location="build/classes.sample"/>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    ~~  required jars
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-
-    <!-- aos deps -->
-    <property name="anodyneos-commons.jar" location="${dir.jars}/anodyneos-commons-0.4.4/anodyneos-commons.jar"/>
-    <property name="anodyneos-servlet.jar" location="${dir.jars}/anodyneos-servlet-0.6.4/anodyneos-servlet.jar"/>
-
-    <property name="activation.jar" location="${dir.jars.notfree}/jaf-1.0.2/activation.jar"/>
-
-    <!-- for fop -->
-    <property name="fop.jar" location="${dir.jars}/apache-fop-0.20.5/fop.jar"/>
-    <property name="batik.jar" location="${dir.jars}/apache-fop-0.20.5/batik.jar"/>
-    <property name="avalon-framework-cvs-20020806.jar" location="${dir.jars}/apache-fop-0.20.5/avalon-framework-cvs-20020806.jar"/>
-
-    <!-- for spring -->
-    <property name="spring.jar" location="${dir.jars}/spring-framework-2.5.4/spring.jar"/>
-    <property name="spring-web.jar" location="${dir.jars}/spring-framework-2.5.4/modules/spring-web.jar"/>
-    <property name="spring-webmvc.jar" location="${dir.jars}/spring-framework-2.5.4/modules/spring-webmvc.jar"/>
-    <!--<property name="cglib-nodep-2.2.jar" location="${dir.jars}/cglib-2.2/cglib-nodep-2.2.jar"/>-->
-
-    <!-- for jsp -->
-    <property name="jstl.jar" location="${dir.jars}/jakarta-taglibs-standard-1.1.2/jstl.jar"/>
-    <property name="standard.jar" location="${dir.jars}/jakarta-taglibs-standard-1.1.2/standard.jar"/>
-
-    <property name="ant.jar" location="${dir.jars}/apache-ant-1.6.1/ant.jar"/>
-
-    <property name="bsf.jar" location="${dir.jars}/bsf-2.4.0/bsf.jar"/>
-
-    <property name="commons-el.jar" location="${dir.jars}/commons-el-1.0/commons-el.jar"/>
-    <property name="jsp-api.jar" location="${dir.jars}/jsp-api-2.0/jsp-api.jar"/>
-    <property name="junit-4.4.jar" location="${dir.jars}/junit-4.4/junit-4.4.jar"/>
-
-    <property name="servlet-api.jar" location="${dir.jars}/servlet-api-2.4/servlet-api.jar"/>
-
-    <property name="xml-apis.jar" location="${dir.jars}/xalan-2.7.1/xml-apis.jar"/>
-    <property name="xalan.jar" location="${dir.jars}/xalan-2.7.1/xalan.jar"/>
-    <property name="xercesImpl.jar" location="${dir.jars}/xalan-2.7.1/xercesImpl.jar"/>
-    <property name="serializer.jar" location="${dir.jars}/xalan-2.7.1/serializer.jar"/>
-    <property name="xsltc.jar" location="${dir.jars}/xalan-2.7.1/xsltc.jar"/>
-
-    <property name="commons-logging-1.1.1.jar" location="${dir.jars}/commons-logging-1.1.1/commons-logging-1.1.1.jar"/>
-    <property name="log4j-1.2.15.jar" location="${dir.jars}/apache-log4j-1.2.15/log4j-1.2.15.jar"/>
-
-    <property name="commons-collections-2.1.1.jar" location="${dir.jars}/commons-collections-2.1.1/commons-collections-2.1.1.jar"/>
-
-    <property name="ecj-3.4.2.jar" location="${dir.jars}/eclipse-ecj-3.4.2/ecj-3.4.2.jar"/>
-
-<!--
-    <available property="tools.jar" value="${env.JAVA_HOME}/lib/tools.jar" file="${env.JAVA_HOME}/lib/tools.jar"/>
-    <path id="path.tools.jar">
-        <fileset id="fs.tools.jar" file="${tools.jar}"/>
-    </path>
--->
-
-    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  prepare.post
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <target name="prepare.post">
@@ -95,59 +50,25 @@
         <mkdir dir="${dir.build.java.sample}"/>
         <mkdir dir="${dir.build.classes.sample}"/>
 
+        <artifact:pom id="pom.main" file="pom.xml"/>
+        <artifact:dependencies usescope="compile" filesetId="fs.dependencies.compile" pomrefid="pom.main"/>
+        <artifact:dependencies usescope="test" filesetId="fs.dependencies.test" pomrefid="pom.main"/>
+        <artifact:dependencies usescope="runtime" filesetId="fs.dependencies.runtime" pomrefid="pom.main"/>
+
         <!-- ide.lib -->
-
-        <!-- for fop -->
-        <copy toDir="${dir.build.ide.lib}" file="${fop.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${batik.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${avalon-framework-cvs-20020806.jar}"/>
-
-        <!-- for spring -->
-        <copy toDir="${dir.build.ide.lib}" file="${spring.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${spring-web.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${spring-webmvc.jar}"/>
-
-        <copy toDir="${dir.build.ide.lib}" file="${jstl.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${standard.jar}"/>
-
-        <copy toDir="${dir.build.ide.lib}" file="${anodyneos-commons.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${anodyneos-servlet.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${ant.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${bsf.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${commons-el.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${jsp-api.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${junit-4.4.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${servlet-api.jar}"/>
-
-        <copy toDir="${dir.build.ide.lib}" file="${xml-apis.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${xalan.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${xercesImpl.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${serializer.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${xsltc.jar}"/>
-
-        <copy toDir="${dir.build.ide.lib}" file="${commons-logging-1.1.1.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${log4j-1.2.15.jar}"/>
-        <copy toDir="${dir.build.ide.lib}" file="${commons-collections-2.1.1.jar}"/>
-
-        <copy toDir="${dir.build.ide.lib}" file="${ecj-3.4.2.jar}"/>
-
-        <copy toDir="${dir.build.ide.lib}" file="${activation.jar}"/>
-
-        <!--<copy toDir="${dir.build.ide.lib}"><fileset refid="fs.tools.jar"/></copy>-->
+        <copy toDir="${dir.build.ide.lib}" file="src.lib/ecj-3.4.2.jar"/>
 
         <!-- paths -->
-        <path id="path.compile">
+        <path id="path.dependencies.compile">
             <fileset id="fs.lib" dir="${dir.build.ide.lib}">
                 <include name="*.jar"/>
             </fileset>
+            <fileset refid="fs.dependencies.compile"/>
         </path>
-
-        <fileset id="fs.jars" dir="${dir.build.ide.lib}">
-            <include name="*.jar"/>
-            <!--<exclude name="tools.jar"/>-->
-            <exclude name="servlet-api.jar"/>
-            <exclude name="jsp-api.jar"/>
-        </fileset>
+        <path id="path.dependencies.runtime">
+            <fileset dir="${dir.build.ide.lib}" includes="*.jar"/>
+            <fileset refid="fs.dependencies.runtime"/>
+        </path>
     </target>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -177,7 +98,7 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <target name="translateSample" depends="compile">
         <java taskname="translateSample" fork="yes" classname="org.anodyneos.xpImpl.translater.Translater">
-            <classpath refid="path.compile"/>
+            <classpath refid="path.dependencies.compile"/>
             <classpath location="${dir.build.classes}"/>
             <arg value="${dir.src.sample}" /> <!-- root directory of all xp files, will be used to calculate package -->
             <arg value="${dir.src.sample}/Page.xp" />
@@ -197,7 +118,7 @@
                 includes="**/*.java"
                 debuglevel="${compile.debuglevel}"
                 debug="${compile.debug}">
-            <classpath refid="path.compile"/>
+            <classpath refid="path.dependencies.compile"/>
             <classpath location="${dir.build.classes}"/>
             <src path="${dir.build.java.sample}"/>
         </javac>
@@ -214,7 +135,7 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <target name="runSample" depends="compileSample" description="Run src.sample/xp/Page.xp">
         <java taskname="runSample" fork="yes" classname="Page">
-            <classpath refid="path.compile"/>
+            <classpath refid="path.dependencies.compile"/>
             <classpath location="${dir.build.classes}"/>
             <classpath location="${dir.build.classes.sample}"/>
         </java>
@@ -226,7 +147,7 @@
     <target name="testStandalone" depends="compile" description="testStandalone">
         <java taskname="testStandalone" fork="yes" classname="test.org.anodyneos.xpImpl.XpStandaloneTest">
             <classpath location="${dir.build.classes}"/>
-            <classpath refid="path.compile"/>
+            <classpath refid="path.dependencies.compile"/>
             <arg value="${dir.build.java.sample}" />
             <arg value="${dir.build.classes.sample}" />
             <arg value="${dir.src.sample}" />
@@ -236,6 +157,4 @@
         <!--<mkdir dir="${dir.build.java.sample}/common"/>-->
     </target>
 
-
 </project>
-

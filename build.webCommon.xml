@@ -6,16 +6,12 @@
 **
 *****************************************************************************-->
 
-<project name="aos-web-common" default="compile" basedir=".">
+<project name="aos-web-common" default="compile" basedir="."
+        xmlns:artifact="antlib:org.apache.maven.artifact.ant"
+        xmlns:tc="antlib:org.apache.catalina.ant">
 
     <!-- setup -->
     <property name="build.sysclasspath"         value="ignore"/>
-
-    <path id="path.ant.script">
-        <pathelement location="${dir.jars}/bsf-2.4.0/bsf.jar"/>
-        <pathelement location="${dir.jars}/commons-logging-1.1.1/commons-logging-1.1.1.jar"/>
-        <pathelement location="${dir.jars}/rhino-1.7R1/js.jar"/>
-    </path>
 
     <!-- properties -->
     <property name="dir.src.java"               location="src.java"/>
@@ -27,6 +23,7 @@
     <property name="dir.build.ide.classes"      location="${dir.build}/ide.classes"/>
     <property name="dir.build.ide.lib"          location="${dir.build}/ide.lib"/>
     <property name="dir.build.ide.src"          location="${dir.build}/ide.src"/>
+    <property name="dir.build.tmp"              location="${dir.build}/tmp"/>
     <property name="file.jar"                   location="${dir.build.jar}/${ant.project.name}.jar"/>
     <property name="file.src.zip"               location="${dir.build.jar}/${ant.project.name}-src.zip"/>
     <property name="file.depCache"              location="${dir.build}/ant_depcache"/>
@@ -76,6 +73,7 @@
         <include name="**/*.xml"/>
         <include name="**/*.xsl"/>
         <include name="**/*.xsd"/>
+        <include name="**/*.wsdl"/>
         <include name="**/*.css"/>
         <include name="**/*.dtd"/>
         <include name="**/*.js"/>
@@ -91,23 +89,8 @@
         <pathelement location="${dir.build.java}"/>
     </path>
 
-    <!-- Tomcat stuff -->
-    <path id="path.tomcat5.ant">
-        <fileset dir="${catalina.home}/server/lib">
-            <include name="catalina-ant.jar"/>
-        </fileset>
-    </path>
-
-    <!-- for tomcat -->
-    <script language="javascript" classpathref="path.ant.script">
-        <![CDATA[
-            // tomcat needs the webapp dir in the form of a URL
-            project.setProperty("url.build.webapp",
-                    "file:" + project.getProperty("dir.build.webapp").replace('\\','/'));
-            project.setProperty("url.build.context",
-                    "file:" + project.getProperty("file.build.context").replace('\\','/'));
-        ]]>
-    </script>
+    <!-- Maven tasks for ant -->
+    <typedef uri="antlib:org.apache.maven.artifact.ant" classpath="antlib/maven-ant-tasks-2.0.10.jar"  resource="org/apache/maven/artifact/ant/antlib.xml"/>
 
     <!--++++++++++++++++++++++++++++++++++++
     ++
@@ -126,6 +109,7 @@
         <mkdir dir="${dir.build.java}"/>
         <mkdir dir="${dir.build.ide.classes}"/>
         <mkdir dir="${dir.build.ide.lib}"/>
+        <mkdir dir="${dir.build.tmp}"/>
 
         <!-- webapp -->
         <mkdir dir="${dir.build.webapp}"/>
@@ -178,7 +162,7 @@
                 source="${compile.source}"
                 target="${compile.target}">
             <src refid="path.source"/>
-            <classpath refid="path.compile"/>
+            <classpath refid="path.dependencies.compile"/>
         </javac>
 
         <!-- resources -->
@@ -296,7 +280,7 @@
 
         <!-- lib -->
         <copy toDir="${dir.build.webapp}/WEB-INF/lib">
-            <fileset refid="fs.jars"/>
+            <path refid="path.dependencies.runtime"/>
             <mapper type="flatten"/>
         </copy>
 
@@ -315,8 +299,12 @@
     ~~  jar
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
-    <target name="jar" depends="compile" description="Create the jar/war">
-        <jar jarfile="${file.jar}" compress="yes">
+    <target name="jar.pre"/>
+    <target name="jar.post"/>
+    <target name="jar" depends="jar.pre, jar.common, jar.post" description="Create the jar/war"/>
+
+    <target name="jar.common" depends="compile" description="Create the jar/war">
+        <jar jarfile="${file.jar}" compress="no">
             <fileset dir="${dir.build.classes}">
                 <patternset refid="pattern.resources"/>
                 <include name="**/*.class"/>
@@ -327,7 +315,7 @@
         <war
             warfile="${file.war}"
             webxml="${dir.build.webapp}/WEB-INF/web.xml"
-            compress="yes">
+            compress="no">
             <fileset dir="${dir.src.webapp}">
                 <patternset refid="pattern.docRoot"/>
                 <!-- get rid of web.xml warning on war task -->
@@ -342,7 +330,7 @@
                 <include name="META-INF/**"/>
             </classes>
         </war>
-        <zip zipfile="${file.src.zip}" compress="yes">
+        <zip zipfile="${file.src.zip}" compress="no">
             <fileset dir="${dir.src.java}">
                 <patternset refid="pattern.resources"/>
                 <include name="**/*.java"/>
@@ -365,12 +353,22 @@
                     author="true"
                     version="true"
                     stylesheetfile="${dir.src.misc}/stylesheet.css">
-            <classpath refid="path.compile"/>
+            <classpath refid="path.dependencies.compile"/>
             <sourcepath refid="path.source"/>
             <link href="http://java.sun.com/javase/6/docs/api"/>
             <link href="http://java.sun.com/j2ee/1.4/docs/api"/>
             <link href="http://static.springframework.org/spring/docs/2.5.x/api"/>
         </javadoc>
+    </target>
+
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~  maven
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <target name="install" depends="jar" description="Installs the jar/war/sources to your local maven repo">
+        <artifact:install pomRefId="pom.main" file="${file.jar}">
+            <attach file="${file.war}" classifier="war"/>
+            <attach file="${file.src.zip}" classifier="sources"/>
+        </artifact:install>
     </target>
 
     <!--++++++++++++++++++++++++++++++++++++
@@ -379,26 +377,26 @@
     ++
     +++++++++++++++++++++++++++++++++++++-->
 
-   <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  Prep Tomcat
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <target name="prepTc">
+        <artifact:dependencies pathId="path.tomcat5.ant">
+            <dependency groupid="tomcat" artifactid="catalina-ant" version="5.5.23"/>
+        </artifact:dependencies>
+
         <!-- Define Tomcat tasks -->
-        <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask"
-                classpathref="path.tomcat5.ant"/>
-        <taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask"
-                classpathref="path.tomcat5.ant"/>
-        <taskdef name="reload" classname="org.apache.catalina.ant.ReloadTask"
-                classpathref="path.tomcat5.ant"/>
-        <taskdef name="list" classname="org.apache.catalina.ant.ListTask"
-                classpathref="path.tomcat5.ant"/>
+        <typedef uri="antlib:org.apache.catalina.ant" classpathref="path.tomcat5.ant"  resource="org/apache/catalina/ant/antlib.xml"/>
     </target>
 
     <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     ~~  deploy
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <target name="tcDeploy" depends="prepare, prepTc" description="Deploy to Tomcat">
-        <deploy
+        <makeurl property="url.build.webapp" file="${dir.build.webapp}"/>
+        <makeurl property="url.build.context" file="${file.build.context}"/>
+
+        <tc:deploy
                 url="${catalina.url.manager}"
                 username="${catalina.username}"
                 password="${catalina.password}"
@@ -411,7 +409,7 @@
     ~~  undeploy
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <target name="tcUndeploy" depends="prepare, prepTc" description="Undeploy to Tomcat">
-        <undeploy
+        <tc:undeploy
                 url="${catalina.url.manager}"
                 username="${catalina.username}"
                 password="${catalina.password}"
@@ -422,7 +420,7 @@
     ~~  reload
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <target name="tcReload" depends="prepare, prepTc" description="Reload on Tomcat">
-        <reload
+        <tc:reload
                 url="${catalina.url.manager}"
                 username="${catalina.username}"
                 password="${catalina.password}"
@@ -433,7 +431,7 @@
     ~~  list
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <target name="tcList" depends="prepare, prepTc" description="List Tomcat Webapps">
-        <list
+        <tc:list
                 url="${catalina.url.manager}"
                 username="${catalina.username}"
                 password="${catalina.password}"/>
