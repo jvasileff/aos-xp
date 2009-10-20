@@ -304,7 +304,7 @@
     <target name="jar" depends="jar.pre, jar.common, jar.post" description="Create the jar/war"/>
 
     <target name="jar.common" depends="compile" description="Create the jar/war">
-        <jar jarfile="${file.jar}" compress="no">
+        <jar jarfile="${file.jar}" compress="yes">
             <fileset dir="${dir.build.classes}">
                 <patternset refid="pattern.resources"/>
                 <include name="**/*.class"/>
@@ -315,7 +315,7 @@
         <war
             warfile="${file.war}"
             webxml="${dir.build.webapp}/WEB-INF/web.xml"
-            compress="no">
+            compress="yes">
             <fileset dir="${dir.src.webapp}">
                 <patternset refid="pattern.docRoot"/>
                 <!-- get rid of web.xml warning on war task -->
@@ -330,7 +330,7 @@
                 <include name="META-INF/**"/>
             </classes>
         </war>
-        <zip zipfile="${file.src.zip}" compress="no">
+        <zip zipfile="${file.src.zip}" compress="yes">
             <fileset dir="${dir.src.java}">
                 <patternset refid="pattern.resources"/>
                 <include name="**/*.java"/>
@@ -369,6 +369,15 @@
             <attach file="${file.war}" classifier="war"/>
             <attach file="${file.src.zip}" classifier="sources"/>
         </artifact:install>
+    </target>
+    <target name="deploy" depends="jar" description="Deploys the jar, war, and sources to the remote maven repo">
+        <artifact:deploy pomRefId="pom.main" file="${file.jar}">
+            <remoteRepository
+                id="${mvn.deploy.remoteRepository.id}"
+                url="${mvn.deploy.remoteRepository.url}"/>
+            <attach file="${file.war}" classifier="war"/>
+            <attach file="${file.src.zip}" classifier="sources"/>
+        </artifact:deploy>
     </target>
 
     <!--++++++++++++++++++++++++++++++++++++
