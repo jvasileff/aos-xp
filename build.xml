@@ -22,6 +22,10 @@
     <property name="compile.debug" value="true"/>
     <property name="compile.debuglevel" value="lines,source,vars"/>
 
+    <property name="catalina.username" value="admin"/>
+    <property name="catalina.password" value="admin"/>
+    <property name="catalina.url.manager" value="http://localhost:8080/manager"/>
+
     <property name="webapp.context" value="/aos-xp"/>
     <property name="webapp.reloadable" value="false"/>
     <property name="transformerFactory" value="xalan"/>
