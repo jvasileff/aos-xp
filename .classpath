@@ -2,31 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src.java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="build/ide.lib/anodyneos-commons.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/anodyneos-servlet.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/ant.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/bsf.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/commons-el.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/jsp-api.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/xalan.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/xercesImpl.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/xml-apis.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/avalon-framework-cvs-20020806.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/batik.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/fop.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/commons-collections-2.1.1.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/commons-logging-1.1.1.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/jstl.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/junit-4.4.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/serializer.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/servlet-api.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/standard.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/xsltc.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/spring.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/spring-web.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/spring-webmvc.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/ecj-3.4.2.jar"/>
-	<classpathentry kind="lib" path="build/ide.lib/activation.jar"/>
+	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
 	<classpathentry kind="output" path="build/ide.classes"/>
 </classpath>
