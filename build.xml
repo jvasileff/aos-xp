@@ -95,8 +95,8 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <target name="translateSample" depends="compile">
         <java taskname="translateSample" fork="yes" classname="org.anodyneos.xpImpl.translater.Translater">
-            <classpath refid="path.dependencies.compile"/>
             <classpath location="${dir.build.classes}"/>
+            <classpath refid="path.dependencies.compile"/>
             <arg value="${dir.src.sample}" /> <!-- root directory of all xp files, will be used to calculate package -->
             <arg value="${dir.src.sample}/Page.xp" />
             <arg value="${dir.build.java.sample}/Page.java" />
@@ -115,8 +115,8 @@
                 includes="**/*.java"
                 debuglevel="${compile.debuglevel}"
                 debug="${compile.debug}">
-            <classpath refid="path.dependencies.compile"/>
             <classpath location="${dir.build.classes}"/>
+            <classpath refid="path.dependencies.compile"/>
             <src path="${dir.build.java.sample}"/>
         </javac>
         <!-- resources -->
@@ -132,9 +132,9 @@
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
     <target name="runSample" depends="compileSample" description="Run src.sample/xp/Page.xp">
         <java taskname="runSample" fork="yes" classname="Page">
-            <classpath refid="path.dependencies.compile"/>
             <classpath location="${dir.build.classes}"/>
             <classpath location="${dir.build.classes.sample}"/>
+            <classpath refid="path.dependencies.compile"/>
         </java>
     </target>
 
