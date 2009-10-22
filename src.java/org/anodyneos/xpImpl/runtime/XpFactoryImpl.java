@@ -293,6 +293,7 @@ public class XpFactoryImpl extends XpFactory {
     private void refreshClassPath() {
 
         StringBuffer cpath = new StringBuffer();
+        StringBuffer rejectpath = new StringBuffer();
 
         for (URLClassLoader loopLoader = (URLClassLoader) this.parentLoader;
                 loopLoader != null;
@@ -304,7 +305,15 @@ public class XpFactoryImpl extends XpFactory {
             for(int i=0; i<urls.length;i++) {
                 URL url = urls[i];
                 if( url.getProtocol().equals("file") ) {
-                    cpath.append((String)url.getFile()+File.pathSeparator);
+                    String file = url.getFile();
+                    if (file.endsWith(".jnilib") || file.endsWith(".dylib")) {
+                        // skip these; Eclipse JDT 3.3.1 complains about them.
+                        // JDT 3.4.2 doesn't complain, but we are using jasper-jdt
+                        // for Maven dependency convenience, and it is currently 3.3.1.
+                        rejectpath.append(file + File.pathSeparator);
+                    } else {
+                        cpath.append(file + File.pathSeparator);
+                    }
                 }
             }
         }
@@ -322,6 +331,9 @@ public class XpFactoryImpl extends XpFactory {
             cpath.append(classRoot);
         }
 
+        if (rejectpath.length() > 0) {
+            log.info("skipping classpath elements to avoid future warnings from JDT: '" + rejectpath.toString() + "'");
+        }
         if (log.isDebugEnabled()) {
             log.debug("now using classpath: " + cpath.toString());
         }
