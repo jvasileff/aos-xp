@@ -216,6 +216,7 @@ public final class NamespaceMappings {
     }
 
     public String getPrefix(String uri, boolean includePhantom) {
+        // FIXME don't return the default ("") prefix
         if (!includePhantom || !phantomsExistForCurrentContext()) {
             return namespaceSupport.getPrefix(uri);
         } else {
