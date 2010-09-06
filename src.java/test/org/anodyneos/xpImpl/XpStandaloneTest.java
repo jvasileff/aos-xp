@@ -54,7 +54,7 @@ public class XpStandaloneTest {
         UnifiedResolver resolver = new UnifiedResolver();
         resolver.setDefaultLookupEnabled(false);
         resolver.addProtocolHandler("classpath", new ClassLoaderURIHandler());
-        resolver.addProtocolHandler("file", new URLChangeRootURIHandler(xpSourceDirectoryFile.toURL()));
+        resolver.addProtocolHandler("file", new URLChangeRootURIHandler(xpSourceDirectoryFile.toURI().toURL()));
 
         // configure the XpCachingLoader
         xpFactory = XpFactory.newInstance();

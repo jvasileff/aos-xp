@@ -20,7 +20,7 @@ public class RegistryParser extends BaseParser {
         RegistryParser obj = new RegistryParser();
         long start = System.currentTimeMillis();
         //InputSource is = new InputSource(args[0]);
-        InputSource is = new InputSource(new java.io.File(args[0]).toURL().toString());
+        InputSource is = new InputSource(new java.io.File(args[0]).toURI().toURL().toString());
 
         UnifiedResolver resolver = new UnifiedResolver();
         resolver.addProtocolHandler("classpath",

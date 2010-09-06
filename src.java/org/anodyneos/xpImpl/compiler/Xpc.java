@@ -16,7 +16,7 @@ public class Xpc {
         UnifiedResolver resolver = new UnifiedResolver();
         resolver.addProtocolHandler("classpath",
                 new ClassLoaderURIHandler(RegistryParser.class.getClassLoader()));
-        InputSource is = new InputSource(new java.io.File(args[3]).toURL().toString());
+        InputSource is = new InputSource(new java.io.File(args[3]).toURI().toURL().toString());
         TagLibraryRegistry registry = new RegistryParser().process(is, resolver);
 
         throw new UnsupportedOperationException();

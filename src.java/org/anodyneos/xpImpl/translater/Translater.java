@@ -67,7 +67,7 @@ public class Translater extends BaseParser {
         UnifiedResolver resolver = new UnifiedResolver();
         resolver.addProtocolHandler("classpath",
                 new ClassLoaderURIHandler(Thread.currentThread().getContextClassLoader()));
-        InputSource is = new InputSource(new java.io.File(registryFile).toURL().toString());
+        InputSource is = new InputSource(new java.io.File(registryFile).toURI().toURL().toString());
         TagLibraryRegistry registry = new RegistryParser().process(is, resolver);
 
         // add a / if it doesn't exist
